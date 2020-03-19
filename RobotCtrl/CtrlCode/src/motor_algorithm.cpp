@@ -1,5 +1,4 @@
 #include <mobile_robot/motor_algorithm.h>
-    
 
 DcMotorForRaspberryPi motor1 = DcMotorForRaspberryPi(motor_DIR1, motor_PWM1, motor_ENA1, motor_ENB1);
 DcMotorForRaspberryPi motor2 = DcMotorForRaspberryPi(motor_DIR2, motor_PWM2, motor_ENA2, motor_ENB2);
@@ -287,8 +286,7 @@ double DcMotorForRaspberryPi::position_controller(int desired_angle, int max_rpm
     check_position = true;
     return 0;
   }
-  else
-  {
+  else{
     position_error_ = ((desired_angle*encoder_pulse_per_rotation_*channel_)*360) - position_static_encoder_pulse_;
     position_control_ = p_gain_position_ * position_error_;
 
@@ -308,8 +306,7 @@ double DcMotorForRaspberryPi::position_controller(int desired_angle, int max_rpm
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-int main (int argc, char **argv)
-{
+int main (int argc, char **argv) {
   printf("Motor node Start \n");
   ros::init(argc, argv, "motor_node");
   ros::NodeHandle nh;
@@ -333,8 +330,7 @@ int main (int argc, char **argv)
   //   usleep(100);
   //   ros::spinOnce();
   // }
-  while(ros::ok())
-  {
+  while(ros::ok()) {
     ros::spinOnce();
     loop_rate.sleep();
   }
