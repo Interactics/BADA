@@ -104,10 +104,9 @@ void Interrupt3_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick
 void Interrupt4_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tick);
 void Interrupt4_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick);
 
-
 int Limit_Function(int pwm);
 
 void motor_first_command_callback(const mobile_robot::motor_cmd::ConstPtr& msg);
 void motor_second_command_callback(const mobile_robot::motor_cmd::ConstPtr& msg);
 void left_motor_cmd_callback(const mobile_robot::motor_cmd::ConstPtr& msg);
-void right_motor_cmd_callback(const mobile_robot::motor_cmd::ConstPtr& msg);  
+void right_motor_cmd_callback(const mobile_robot::motor_cmd::ConstPtr& msg);

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <name>BADA</name>
+  <version>0.0.1</version>
+  <description>
+    BADA is a social robot made for Hearing impaired.
+    The origin of this name is coming from "Buddy for Auditory Detection Assistance".
+    This project is started by Robotics Department's Capstone Design 
+    in Hanyang University, ERICA. Korea
+  </description>
+  <maintainer email="zz3123@hanyang.ac.kr">Interactics</maintainer>
+
+  <author>Hoyeon Yu</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslib</build_depend>
+  <build_depend>rostime</build_depend>
+  <build_depend>std_msgs</build_depend>
+  
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>roslib</run_depend>
+  <run_depend>rostime</run_depend>
+  <run_depend>std_msgs</run_depend>
+</package>
