@@ -1,14 +1,13 @@
-// bada.cpp
-#include <ros/ros.h>
-#include <pigpiod_if2.h>
-#include "bada.h"
+// bada_motion.h
 
-//class for ROS
+#ifndef BADA_H_
+#define BADA_H_
+
 #include <bada/Pose.h>
 #include <geometry_msgs/Twist.h>
 
 namespace bada{
-
+    
 const int ROBOT_WHEEL_BASE = 300; // [mm]
 
 const int MOTOR_DIR_R = 26;
@@ -312,22 +311,5 @@ int Limit_Function(int pwm){
     return output; 
 }
 
-int main(int argc, char** argv){
-  ros::init(argc, argv, "motor_node");
-  ros::NodeHandle nh;
-  Initialize();
-  ros::Rate loop_rate(10);
 
-  while(ros::ok()){
-    //Switch_Turn_Example(100, 100);
-    //Theta_Distance(400,100,-200,110);
-    //motor1.Accel_Controller(false, 100);
-    //motor2.Accel_Controller(true, 100);
-    ros::spinOnce();
-    loop_rate.sleep();
-  }
-
-  motor1.Motor_Controller(true, 0);
-  motor2.Motor_Controller(true, 0);
-  return 0;
-}
+#endif // BADA_H_
