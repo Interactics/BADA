@@ -1,15 +1,5 @@
-// bada.cpp
 #include <ros/ros.h>
 #include <pigpiod_if2.h>
-#include "bada.h"
-
-//class for ROS
-#include <bada/Pose.h>
-#include <geometry_msgs/Twist.h>
-
-namespace bada{
-
-const int ROBOT_WHEEL_BASE = 300; // [mm]
 
 const int MOTOR_DIR_R = 26;
 const int MOTOR_PWM_R = 12;
@@ -71,7 +61,6 @@ public:
 
 DCMotor::DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB)
         :motor_DIR(M_Dir), motor_PWM(M_PWM), motor_ENA(M_encA), motor_ENB(M_encB){
-
     pinum = pigpio_start(NULL, NULL); //pigpiod와 연결되면 0 이상의 값으로 리턴
 
     if(pinum < 0){
@@ -79,11 +68,10 @@ DCMotor::DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB)
       ROS_INFO("pinum is %d", pinum);
     }
 
-    //PWM Duty Cycle and PWM frequency setting
+    //Setup PWM Duty Cycle and PWM frequency, Pin Mode
     PWM_range = 512;          
     PWM_frequency = 40000;    
 
-    //Setting Pin Mode
     set_mode(pinum, motor_DIR, PI_OUTPUT);
     set_mode(pinum, motor_PWM, PI_OUTPUT);
     set_mode(pinum, motor_ENA, PI_INPUT);
@@ -96,7 +84,8 @@ DCMotor::DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB)
     
     current_PWM = 0;
     current_Direction = true;
-    acceleration = 5; // Acceleration 
+    acceleration = 5; // Acceleration
+
     ROS_INFO("Setup Fin");
 }
 
@@ -105,36 +94,33 @@ DCMotor::~DCMotor(){
 }
 
 void DCMotor::MotorCtrl(bool Dir, int PWM){
-    if(Dir == true) {
+    if(Dir == true) { // CW
         gpio_write(pinum, motor_DIR, PI_LOW);
         set_PWM_dutycycle(pinum, motor_PWM, PWM);
         current_PWM = PWM;
         current_Direction = true;
-    }   // CW
-
-    else{
+    } else { // CCW
         gpio_write(pinum, motor_DIR, PI_HIGH);
         set_PWM_dutycycle(pinum, motor_PWM, PWM);
         current_PWM = PWM;
         current_Direction = false;
-    }   // CCW
-
+    }   
 }
 
 void DCMotor::AccelCtrl(bool Dir, int PWM_desired){
+    // P ctrl
+
     int PWM_local;
 
-    if(PWM_desired > current_PWM){
-        local_PWM = current_PWM + acceleration;
-        Motor_Controller(Dir, PWM_local);
-    }
-    else if(PWM_desired < current_PWM){
-        local_PWM = current_PWM - acceleration;
-        Motor_Controller(Dir, PWM_local);
-    }
-    else{
-        local_PWM = current_PWM;
-        Motor_Controller(Dir, PWM_local);
+    if(PWM_desired > current_PWM) {
+        PWM_local = current_PWM + acceleration;
+        MotorCtrl(Dir, PWM_local);
+    } else if (PWM_desired < current_PWM) {
+        PWM_local = current_PWM - acceleration;
+        MotorCtrl(Dir, PWM_local);
+    } else {
+        PWM_local = current_PWM;
+        MotorCtrl(Dir, PWM_local);
     }
     //ROS_INFO("Current_PWM is %d", current_PWM);
 }
@@ -142,58 +128,6 @@ void DCMotor::AccelCtrl(bool Dir, int PWM_desired){
 //==================================DCMotor Class========================= 
 //========================================================================
 /////////////////////////////////////////////////////////////////////////////////////
-
-
-//----------------------------------------------------------------------------------
-/************************************************************************
-*                                Bada Class                              *
-************************************************************************/
-
-class Bada {
-private:
-    ros::NodeHandle nh_;
-
-    ros::Subscriber vel_sub_;
-    ros::Publisher pos_pub_;
-    ros::WallTime last_command_time_;
-
-    float lin_vel_;
-    float angular_vel_;
-
-    float motor_vel_right_;
-    float motor_vel_left_;
-
-public:
-    Bada(const ros::NodeHandl& nh);
-    void velocityCb(const geometry_msgs::Twist::ConstPtr& vel);
-    void twistToMotor();
-
-    friend void DCMotor::controllingMotor();
-};
-
-Bada::Bada(const ros::NodeHandle& nh)
-    :nh_(nh), lin_vel_(0), angular_vel_(0), motor_vel_right_(0), motor_vel_left_(0) {
-    vel_sub_ = nh -> subscribe("/bada/cmd_vel", 1, &Bada::velocityCb, this);
-    pos_pub_ = nh -> advertise<Pose>("/bada/pose", 1);
-}
-
-void Bada::velocityCb(const geometry_msgs::Twist::ConstPtr& vel){
-  last_command_time_ = ros::WallTime::now();
-  lin_vel_ = vel -> linear.x;
-  angular_vel_= vel -> angular.z;
-}
-
-void Bada::twistToMotor(){
-    motor_vel_right_ = lin_vel_ - ROBOT_WHEEL_BASE * angular_vel_ / 2;
-    motor_vel_left_ = lin_vel_ + ROBOT_WHEEL_BASE * angular_vel_ / 2;
-}
-
-
-//===========================Method of Bada Class ======================
-//======================================================================
-/////////////////////////////////////////////////////////////////////////////////////
-
-} //end namespace bada
 
 bool motor1_ena_uprising;
 bool motor1_ena_falling;
@@ -239,6 +173,7 @@ void Initialize(){
     callback(motor2.pinum, L_Motor.motor_ENB, FALLING_EDGE, Interrupt4_Falling);
     callback(motor2.pinum, L_Motor.motor_ENB, RISING_EDGE,  Interrupt4_Rising);
     ///////////////////////////////////////////////////////////////////////////////
+
     switch_direction = true;
     Theta_Distance_Flag = 0;
     ROS_INFO("Initialize Complete");
@@ -246,88 +181,113 @@ void Initialize(){
 
 void Interrupt1_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENB = gpio_read(motor1.pinum, R_Motor.motor_ENB);
-    if (ENB == PI_LOW)  //CCW
-        EncoderCounter1 ++;
-    else if (ENB == PI_HIGH) //CW
-        EncoderCounter1 --;
+    if (ENB == PI_LOW)          EncoderCounter1 ++;          //CCW
+    else if (ENB == PI_HIGH)    EncoderCounter1 --;          //CW
 }
 void Interrupt1_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENB = gpio_read(motor1.pinum, R_Motor.motor_ENB);
-    if (ENB == PI_LOW)  //CW
-        EncoderCounter1 --;
-    else if (ENB == PI_HIGH) //CCW
-        EncoderCounter1 ++;
+    if (ENB == PI_LOW)          EncoderCounter1 --;          //CW
+    else if (ENB == PI_HIGH)    EncoderCounter1 ++;          //CCW
 }
-
 void Interrupt2_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENB = gpio_read(motor2.pinum, L_Motor.motor_ENB);
-    if (ENB == PI_LOW)  //CCW
-        EncoderCounter2 ++;
-    else if (ENB == PI_HIGH) //CW
-        EncoderCounter2 --;
+    if (ENB == PI_LOW)          EncoderCounter2 ++;           //CCW
+    else if (ENB == PI_HIGH)    EncoderCounter2 --;           //CW
 }
 void Interrupt2_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENB = gpio_read(motor2.pinum, L_Motor.motor_ENB);
-    if (ENB == PI_LOW)  //CW
-        EncoderCounter2 --;
-    else if (ENB == PI_HIGH) //CCW
-        EncoderCounter2 ++;
+    if (ENB == PI_LOW)           EncoderCounter2 --;          //CW
+    else if (ENB == PI_HIGH)     EncoderCounter2 ++;          //CCW
 }
-
 void Interrupt3_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENA = gpio_read(motor1.pinum, R_Motor.motor_ENA);
-    if (ENA == PI_LOW)  //CW
-        EncoderCounter1 --;
-    else if (ENA == PI_HIGH) //CCW
-        EncoderCounter1 ++;
+    if (ENA == PI_LOW)           EncoderCounter1 --;           //CW
+    else if (ENA == PI_HIGH)     EncoderCounter1 ++;           //CCW
 }
 void Interrupt3_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENA = gpio_read(motor1.pinum, R_Motor.motor_ENA);
-    if (ENA == PI_LOW)  //CCW
-        EncoderCounter1 ++;
-    else if (ENA == PI_HIGH) //CW  
-        EncoderCounter1 --;
-  
+    if (ENA == PI_LOW)           EncoderCounter1 ++;           //CCW
+    else if (ENA == PI_HIGH)     EncoderCounter1 --;           //CW  
 }
 void Interrupt4_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENA = gpio_read(motor2.pinum, L_Motor.motor_ENA);
-    if (ENA == PI_LOW)       //CW
-        EncoderCounter2 --;
-    else if (ENA == PI_HIGH) //CCW 
-        EncoderCounter2 ++;
+    if (ENA == PI_LOW)            EncoderCounter2 --;           //CW
+    else if (ENA == PI_HIGH)      EncoderCounter2 ++;           //CCW 
 }
 void Interrupt4_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENA = gpio_read(motor2.pinum, L_Motor.motor_ENA);
-    if (ENA == PI_LOW)       //CCW
-        EncoderCounter2 ++;
-    else if (ENA == PI_HIGH) //CW 
-        EncoderCounter2 --;
+    if (ENA == PI_LOW)            EncoderCounter2 ++;           //CCW
+    else if (ENA == PI_HIGH)      EncoderCounter2 --;           //CW 
 }
+
 int Limit_Function(int pwm){
     int output;
 
-    if(pwm > PWM_limit) output = PWM_limit;
-    else if(pwm < 0) output = 0;
-    else output = pwm;
+    if(pwm > PWM_limit)     output = PWM_limit;
+    else if(pwm < 0)        output = 0;
+    else                    output = pwm;
+
     return output; 
 }
 
-int main(int argc, char** argv){
-  ros::init(argc, argv, "motor_node");
-  ros::NodeHandle nh;
-  Initialize();
-  ros::Rate loop_rate(10);
+void Theta_Turn (float Theta, int PWM){
+    double local_encoder;
+    int local_PWM = Limit_Function(PWM);
+    if(Theta_Distance_Flag == 1) {
+        EncoderCounter1 = 0;
+        EncoderCounter2 = 0;
+        Theta_Distance_Flag = 2;
+    }
+    if(Theta > 0) {
+        local_encoder = Theta; //(Round_Encoder/360)*(Robot_Round/Wheel_Round)
+        motor1.Motor_Controller(true, local_PWM);
+        motor2.Motor_Controller(true, local_PWM);
+        //motor1.Accel_Controller(true, local_PWM);
+        //motor2.Accel_Controller(true, local_PWM);
+    }
+    else {
+        local_encoder = -Theta; //(Round_Encoder/360)*(Robot_Round/Wheel_Round)
+        motor1.Motor_Controller(false, local_PWM);
+        motor2.Motor_Controller(false, local_PWM);
+        //motor1.Accel_Controller(false, local_PWM);
+        //motor2.Accel_Controller(false, local_PWM);
+    }
 
-  while(ros::ok()){
-    //Switch_Turn_Example(100, 100);
-    //Theta_Distance(400,100,-200,110);
-    //motor1.Accel_Controller(false, 100);
-    //motor2.Accel_Controller(true, 100);
-    ros::spinOnce();
-    loop_rate.sleep();
-  }
-
-  motor1.Motor_Controller(true, 0);
-  motor2.Motor_Controller(true, 0);
-  return 0;
+    if(EncoderCounter1 > local_encoder) {
+        //ROS_INFO("Encoder A1 is %d", EncoderCounter1);
+        //ROS_INFO("Encoder A2 is %d", EncoderCounter2);
+        EncoderCounter1 = 0;
+        EncoderCounter2 = 0;
+        motor1.Motor_Controller(true, 0);
+        motor2.Motor_Controller(true, 0);
+        //motor1.Motor_Controller(true, 0);
+        //motor2.Motor_Controller(true, 0);
+        Theta_Distance_Flag = 3;
+    }
 }
+
+int main (int argc, char **argv) {
+    printf("Motor node Start \n");
+    // ros::init(argc, argv, "motor_node");
+    // ros::NodeHandle nh;
+
+    Initialize();
+
+    std::cout << EncoderCounter1 << std::endl;
+    ros::Rate loop_rate(10);
+
+    ros::Subscriber motor_first_command_sub  = nh.subscribe("/motor_1", 10, motor_first_command_callback);
+    ros::Subscriber motor_second_command_sub = nh.subscribe("/motor_2", 10, motor_second_command_callback);
+
+    while(ros::ok()) {
+        ros::spinOnce();
+        loop_rate.sleep();
+    }
+
+    motor1.Motor_Controller(true, 0);
+    motor2.Motor_Controller(true, 0);
+
+    return 0;
+}
+
+
