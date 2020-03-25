@@ -142,20 +142,23 @@ bool motor2_enb_falling;
 DCMotor R_Motor = DCMotor(MOTOR_DIR_R, MOTOR_PWM_R, MOTOR_ENA_R, MOTOR_ENB_R);
 DCMotor L_Motor = DCMotor(MOTOR_DIR_L, MOTOR_PWM_L, MOTOR_ENA_L, MOTOR_ENB_L);
 
+
+void Interrupter(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
+	//pass 
+}
+
+
 //ENA 
 //R_Motor
 void Interrupt1_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENB = gpio_read(R_Motor.pinum, R_Motor.motor_ENB);
     if (ENB == PI_LOW)          EncoderCounter1 --;          //CCW
     else if (ENB == PI_HIGH)    EncoderCounter1 ++;          //CW
-	std::cout << EncoderCounter1 << std::endl;
-	std::cout << "Interrupt1_Falling" << std::endl;
 }
 void Interrupt1_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENB = gpio_read(R_Motor.pinum, R_Motor.motor_ENB);
     if (ENB == PI_LOW)          EncoderCounter1 ++;          //CW
     else if (ENB == PI_HIGH)    EncoderCounter1 --;          //CCW
-	std::cout << "Interrupt1_R" << std::endl;
 }
 
 //L_Motor
@@ -163,14 +166,12 @@ void Interrupt2_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tic
     int ENB = gpio_read(L_Motor.pinum, L_Motor.motor_ENB);
     if (ENB == PI_LOW)          EncoderCounter2 --;           //CCW
     else if (ENB == PI_HIGH)    EncoderCounter2 ++;           //CW
-	std::cout << "Interrupt2_F" << std::endl;
 }
 void Interrupt2_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENB = gpio_read(L_Motor.pinum, L_Motor.motor_ENB);
     if (ENB == PI_LOW)           EncoderCounter2 ++;          //CW
     else if (ENB == PI_HIGH)     EncoderCounter2 --;          //CCW
-	std::cout << EncoderCounter2 << std::endl;
-	std::cout << "Interrupt2_R" << std::endl;
+
 }
 
 
@@ -180,33 +181,28 @@ void Interrupt3_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tic
     int ENA = gpio_read(R_Motor.pinum, R_Motor.motor_ENA);
     if (ENA == PI_LOW)           EncoderCounter1 ++;           //CW
     else if (ENA == PI_HIGH)     EncoderCounter1 --;           //CCW
-	std::cout << "Interrupt3_F" << std::endl;
 }
 void Interrupt3_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENA = gpio_read(R_Motor.pinum, R_Motor.motor_ENA);
     if (ENA == PI_LOW)           EncoderCounter1 --;           //CCW
     else if (ENA == PI_HIGH)     EncoderCounter1 ++;           //CW 
-	std::cout << "Interrupt3_R" << std::endl;
+
 }
 
 //L_Motor
 void Interrupt4_Falling(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENA = gpio_read(L_Motor.pinum, L_Motor.motor_ENA);
-    if (ENA == PI_LOW){            EncoderCounter2 ++;
-	std::cout << "Interrupt4_F1" << std::endl;
-}           //CW
-    else if (ENA == PI_HIGH){      EncoderCounter2 --;           //CCW 
-	std::cout << "Interrupt4_F2" << std::endl;
-}
+    if ( ENA == PI_LOW)            EncoderCounter2 ++;      //CW
+    else if (ENA == PI_HIGH)      EncoderCounter2 --;           //CCW 
+
 }
 void Interrupt4_Rising(int pi, unsigned user_gpio, unsigned level, uint32_t tick){
     int ENA = gpio_read(L_Motor.pinum, L_Motor.motor_ENA);
-    if (ENA == PI_LOW){            EncoderCounter2 --;   
-	std::cout << "Interrupt4_R1" << std::endl;}        //CCW
-    else if (ENA == PI_HIGH){      EncoderCounter2 ++;           //CW
-	std::cout << "Interrupt4_R2" << std::endl; 
+    if (ENA == PI_LOW)            EncoderCounter2 -- ;        //CCW
+    else if (ENA == PI_HIGH)      EncoderCounter2 ++;            //CW
+ 
 }
-}
+
 
 
 void Initialize(){
@@ -303,8 +299,10 @@ int main (int argc, char **argv) {
     ros::init(argc, argv, "motor_node");
     ros::NodeHandle nh;
 
-    Initialize();
+    double time_now = time_time(); 
 
+    Initialize();
+	
 
     ros::Rate loop_rate(10);
  
@@ -312,6 +310,11 @@ int main (int argc, char **argv) {
     while(ros::ok()) {
 	//Theta_Turn(90, 100);
         ros::spinOnce();
+
+	if (time_time() - time_now > 1){
+		time_now = time_time();
+		std::cout << "E1 : " << EncoderCounter1 << "    " << "E2 : " << EncoderCounter2;
+	}
         //loop_rate.sleep();
 
     }
