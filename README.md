@@ -18,14 +18,14 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 #### ~~bada/cmd_vel(geometry_msgs/Twist)~~
 #### bada/real_vel(geometry_msgs/Twist)
 
-<a> bada/real_vel <a> is bada's velocity in realworld. 
+_bada/real_vel_ is bada's velocity in realworld. 
 The linear and angular velocity of bada. Twists.linear.x is the forward velocity [m/s] and Twists.angular.z is the angular velocity [rad/sec]. 
 
 ### Subscribed Topic
 
 #### bada/cmd_vel(geometry_msgs/Twist)
 
-<a> bada/cmd_vel <a> is a velocity commanded to reach.
+_bada/cmd_vel_ is a velocity commanded to reach.
 
 
 ### Parameters
@@ -47,7 +47,6 @@ The linear and angular velocity of bada. Twists.linear.x is the forward velocity
 ## Sound Recognition
  - [x] YamNet 
  - [ ] Make Yamnet as ROS Program.
- - [ ] 
  
 ## SLAM 
  - [x] Pointcloud using RealSense T265 & D435 
