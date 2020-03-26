@@ -15,11 +15,18 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 
 ### Published Topic
 
-#### bada/cmd_vel(geometry_msgs/Twist)
+#### ~~bada/cmd_vel(geometry_msgs/Twist)~~
+#### bada/real_vel(geometry_msgs/Twist)
 
+**bada/real_vel** is bada's velocity in realworld. 
 The linear and angular velocity of bada. Twists.linear.x is the forward velocity [m/s] and Twists.angular.z is the angular velocity [rad/sec]. 
 
 ### Subscribed Topic
+
+#### bada/cmd_vel(geometry_msgs/Twist)
+
+**bada/cmd_vel** is a velocity commanded to reach.
+
 
 ### Parameters
 
