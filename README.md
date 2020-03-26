@@ -13,3 +13,11 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 - [ ] SLAM
 - [ ] Sound Recognition
 
+# TodoLIST
+
+## Mobile Robot
+
+ - [x] Encoder value setting
+ - [ ] Twist Motion Publlsh
+
+## Sound Localization
