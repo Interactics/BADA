@@ -1,13 +1,5 @@
 #include <ros/ros.h>
 #include <pigpiod_if2.h>
-#include <thread>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-#include <unistd.h>
-
 #include <bada_motor/RED.h>
 
 const int MOTOR_DIR_R = 26;
@@ -20,6 +12,8 @@ const int MOTOR_PWM_L = 13;
 const int MOTOR_ENA_L = 22; 
 const int MOTOR_ENB_L = 27;
 
+const int WheelSize = 20; // mm
+const int WheelBase = 10; //mm
 
 int PWM_Limit;
 
@@ -36,29 +30,25 @@ int Theta_Distance_Flag;
 class DCMotor{
 private:
     int nPin_;
+
     int MTR_ENA_;
     int MTR_ENB_;
     int MTR_DIR_;
     int MTR_PWM_;
+
     int PWM_range_;
     int PWM_frequency_;
     int PWM_currunt_;
     int pinum_;
 
-// NEW ADD
-
-    int optMode = RED_MODE_DETENT;
-
-    RED_t* Encoder_;
-
+    int optGlitch_;
+    int optMode_;
+    RED_t* Encoder_;  //Encoder Setting
+    
+    static void cbf_(int pos);
+    
 public:
-    int pinum;
-    int motor_ENA;
-    int motor_ENB;
-    int motor_DIR;
-    int motor_PWM;
-    int PWM_range;
-    int PWM_frequency;
+
     int current_PWM;
     bool current_Direction;
     int acceleration;
@@ -66,12 +56,10 @@ public:
     DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB, int Pi_Num);
     ~DCMotor();
 
-    void EncoderPos();
+    int EncoderPos();
     void MotorCtrl(bool Dir, int PWM);
     void AccelCtrl(bool Dir, int PWM_needed);
-
-    //NEW ADD 
-    static void cbf(int pos);
+    static void printEncoderPos(int pos);
 
 };
 
@@ -80,32 +68,26 @@ public:
 ************************************************************************/
 
 DCMotor::DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB, int Pi_Num)
-        : motor_DIR(M_Dir), motor_PWM(M_PWM), motor_ENA(M_encA), motor_ENB(M_encB), pinum_(Pi_Num){
+        : MTR_DIR_(M_Dir), MTR_PWM_(M_PWM), MTR_ENA_(M_encA), MTR_ENB_(M_encB), pinum_(Pi_Num){
 
-    int optGpioA = -1;
-    int optGpioB = -1;
-    int optGlitch = 1000;
-    int optSeconds = 0;
+    optGlitch_ = 1000;
+    optMode_ = RED_MODE_DETENT;
+    PWM_range_ = 512;          
+    PWM_frequency_ = 40000;    
 
-    if(pinum_ < 0){
-      ROS_INFO("Setup failed");
-      ROS_INFO("pinum is %d", pinum_);
-    }
+    Encoder_ = RED(pinum_, MTR_ENA_, MTR_ENB_, optMode_, NULL);
 
-    PWM_range = 512;          
-    PWM_frequency = 40000;    
+    RED_set_glitch_filter(Encoder_, optGlitch_);  
 
-    Encoder_ = RED(pinum_, motor_ENA, motor_ENB, optMode, cbf);
-    RED_set_glitch_filter(Encoder_, optGlitch);  
+    set_mode(Pi_Num, MTR_DIR_, PI_OUTPUT);
+    set_mode(Pi_Num, MTR_PWM_, PI_OUTPUT);
 
-    set_mode(Pi_Num, motor_DIR, PI_OUTPUT);
-    set_mode(Pi_Num, motor_PWM, PI_OUTPUT);
+    set_PWM_range(Pi_Num, MTR_PWM_, PWM_range_);
+    set_PWM_frequency(Pi_Num, MTR_PWM_, PWM_frequency_);
 
-    set_PWM_range(Pi_Num, motor_PWM, PWM_range);
-    set_PWM_frequency(Pi_Num, motor_PWM, PWM_frequency);
-    gpio_write(Pi_Num, motor_DIR, PI_LOW);
-    set_PWM_dutycycle(Pi_Num, motor_PWM, 0);
-    
+    gpio_write(Pi_Num, MTR_DIR_, PI_LOW);
+    set_PWM_dutycycle(Pi_Num, MTR_PWM_, 0);
+
     current_PWM = 0;
     current_Direction = true;
     acceleration = 5; // Acceleration
@@ -118,19 +100,19 @@ DCMotor::~DCMotor(){
 
 }
 
-void DCMotor::EncoderPos(){
-    std::cout << RED_get_position(Encoder_) << std::endl;
+int DCMotor::EncoderPos(){
+    return RED_get_position(Encoder_);
 }
 
 void DCMotor::MotorCtrl(bool Dir, int PWM){
     if(Dir == true) { // CW
-        gpio_write(pinum_, motor_DIR, PI_LOW);
-        set_PWM_dutycycle(pinum_, motor_PWM, PWM);
+        gpio_write(pinum_, MTR_DIR_, PI_LOW);
+        set_PWM_dutycycle(pinum_, MTR_PWM_, PWM);
         current_PWM = PWM;
         current_Direction = true;
     } else { // CCW
-        gpio_write(pinum_, motor_DIR, PI_HIGH);
-        set_PWM_dutycycle(pinum_, motor_PWM, PWM);
+        gpio_write(pinum_, MTR_DIR_, PI_HIGH);
+        set_PWM_dutycycle(pinum_, MTR_PWM_, PWM);
         current_PWM = PWM;
         current_Direction = false;
     } 
@@ -154,7 +136,7 @@ void DCMotor::AccelCtrl(bool Dir, int PWM_desired){
     //ROS_INFO("Current_PWM is %d", current_PWM);
 }
 
-void DCMotor::cbf(int pos){
+void DCMotor::cbf_(int pos){
     std::cout << pos << std::endl;
 }
 
@@ -163,8 +145,8 @@ void DCMotor::cbf(int pos){
 /////////////////////////////////////////////////////////////////////////////////////
 
 
+//if it were connected with pigpiod, 0 value is returend.
 int pinum = pigpio_start(NULL, NULL);
-//pigpiod와 연결되면 0 이상의 값으로 리턴
 DCMotor R_Motor = DCMotor(MOTOR_DIR_R, MOTOR_PWM_R, MOTOR_ENA_R, MOTOR_ENB_R, pinum);
 DCMotor L_Motor = DCMotor(MOTOR_DIR_L, MOTOR_PWM_L, MOTOR_ENA_L, MOTOR_ENB_L, pinum);
 
@@ -225,19 +207,18 @@ void Theta_Turn (float Theta, int PWM){
 }
 
 int main (int argc, char **argv) {
-    printf("Motor node Start \n");
     ros::init(argc, argv, "motor_node");
     ros::NodeHandle nh;
-
+    ROS_INFO("---BADA Node Start---");
     Initialize();
-	
+
     ros::Rate loop_rate(10);
  
-
     while(ros::ok()) {
-	//Theta_Turn(90, 100);
-      //loop_rate.sleep();
-//	std::cout << "E1 : " << EncoderCounter1 << "    " << "E2 : " << EncoderCounter2 <<std::endl;
+        std::cout << R_Motor.EncoderPos() << std::endl;
+        std::cout << L_Motor.EncoderPos() << std::endl;
+	    //Theta_Turn(90, 100);
+        //loop_rate.sleep();
     }
 
     R_Motor.MotorCtrl(true, 0);
