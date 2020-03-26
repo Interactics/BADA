@@ -12,8 +12,11 @@ const int MOTOR_PWM_L = 13;
 const int MOTOR_ENA_L = 22; 
 const int MOTOR_ENB_L = 27;
 
-const int WheelSize = 20; // mm
-const int WheelBase = 10; //mm
+const int WHEELSIZE = 50; // mm
+const int WHEELBASE = 100; //mm
+const int ENCODER_RESOLUTION = 370;
+
+const double PI = 3.141592;
 
 int PWM_Limit;
 
@@ -206,18 +209,139 @@ void Theta_Turn (float Theta, int PWM){
     }
 }
 
+//void calculate_RPM(int time, Motor* ENC){
+//
+//}
+
+//TIME Interrupt
+volatile bool t100ms_flag = false;
+int t100ms_index = 0;
+
+
+void timer_CB(const ros::TimerEvent &event){
+	t100ms_flag = true;
+}
+
+int encoderR_now = 0;
+int encoderL_now = 0;
+int encoderR_prev = 0;
+int encoderL_prev = 0;
+int encoderR_diff = 0;
+int encoderL_diff = 0;
+double RPM_R = 0; // [ROUND per min]
+double RPM_L = 0;
+double Vel_R = 0; // [m/s]
+double Vel_L = 0;
+double aVel_R = 0; // anguler velocities [Rad/sec]
+double aVel_L = 0; 
+double Linear_Vel = 0; // [m/s]
+double Angular_Vel = 0; // [Rad/sec]
+
+
 int main (int argc, char **argv) {
     ros::init(argc, argv, "motor_node");
     ros::NodeHandle nh;
+
     ROS_INFO("---BADA Node Start---");
     Initialize();
 
+    ros::Timer timer =nh.createTimer(ros::Duration(0.01), timer_CB);
+
     ros::Rate loop_rate(10);
- 
+    ros::Time begin = ros::Time::now();
+
     while(ros::ok()) {
-        std::cout << R_Motor.EncoderPos() << std::endl;
-        std::cout << L_Motor.EncoderPos() << std::endl;
-	    //Theta_Turn(90, 100);
+        //std::cout << R_Motor.EncoderPos() << std::endl;
+        //std::cout << L_Motor.EncoderPos() << std::endl;
+	//std::cout << ros::Time::now() << std::endl;
+	ros::spinOnce();
+	
+	if(t100ms_flag){
+		t100ms_flag = false;	
+ 
+        switch(t100ms_index){
+	    case 0: 
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 1 ;
+		    break;
+	    case 1: 
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 2;
+		    break;
+	    case 2: 
+		   //Wheel Spd(50msec) 
+		    encoderR_now = R_Motor.EncoderPos();
+		    encoderL_now = L_Motor.EncoderPos();
+
+		    encoderR_diff = encoderR_now - encoderR_prev;
+		    encoderL_diff = encoderL_now - encoderL_prev;
+
+		    encoderR_prev = encoderR_now;
+		    encoderL_prev = encoderL_now;
+	 	    ROS_INFO("time is %d", t100ms_index);
+		   
+		    t100ms_index = 3;
+		    break;
+	    case 3: 
+		    ROS_INFO("time is %d", t100ms_index); 
+		    RPM_R = double(encoderR_diff)/100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION; 
+	            RPM_L = double(encoderL_diff)/100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION;
+                    std::cout << RPM_R << std::endl;
+		    t100ms_index = 4;
+		    break;
+	    case 4: 
+
+		    Vel_R = RPM_R / 1 * 1 / 60 * 2 * WHEELSIZE * PI / 1 * 1 / 1000;
+		    Vel_L = RPM_L / 1 * 1 / 60 * 2 * WHEELSIZE * PI / 1 * 1 / 1000;
+	            aVel_R = Vel_R / (2*WHEELSIZE);
+		    aVel_L = Vel_L / (2*WHEELSIZE);
+
+		    Linear_Vel  = (Vel_R + Vel_L) / 2;
+		    Angular_Vel = (Vel_R - Vel_L) / WHEELBASE * 1000 ;
+
+		    ROS_INFO("velocity : %.2f m/s ", Angular_Vel);
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 5;
+		    break;
+	    case 5: 
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 6;
+ 		    break;
+	    case 6: 
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 7;
+		    break;
+	    case 7: 
+	        /*    encoderR_now = R_Motor.EncoderPos();
+		    encoderL_now = L_Motor.EncoderPos();
+
+		    encoderR_diff = encoderR_now - encoderR_prev;
+		    encoderL_diff = encoderL_now - encoderL_prev;
+
+		    encoderR_prev = encoderR_now;
+		    encoderL_prev = encoderL_now;
+	 	    
+		    std::cout << encoderR_diff << std::endl;
+*/
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 8;
+		    break;
+	    case 8: 
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 9;
+		    break;
+	    case 9:
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 0;
+		    break;
+            defalut:
+		    ROS_INFO("time is %d", t100ms_index); 
+		    t100ms_index = 0;
+		    break;
+	    }
+   	    
+	}
+	//Theta_Turn(90, 100);
         //loop_rate.sleep();
     }
 
