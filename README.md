@@ -39,5 +39,19 @@ bada/cmd_vel(geometry_msgs/Twist)
  
 ## Sound Recognition
  - [x] YamNet 
+ - [ ] Make Yamnet as ROS Program.
+ - [ ] 
  
 ## SLAM 
+ - [x] Pointcloud using RealSense T265 & D435 
+ - [ ] Making SLAM Information
+
+## WebAPP
+ - [ ] Interaction Design
+ - [ ] Connect WebAPP with ROS 
+ - [ ] Visualizing SLAM Information
+ 
+ ## Human-Robot-Interaction
+ - [ ] What if the person sleeps.
+ - [ ] What if the person is far from their phone.
+ - [ ] How to transfer information about danger situation.
