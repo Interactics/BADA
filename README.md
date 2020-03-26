@@ -1,23 +1,23 @@
 2019-2020 Robot Capstone Project Team : [사과가 쿵]
 
 
-# 1. Bada
-## 1.1 Overview
+# Bada
+## Overview
 
->Bada is a Social Robot made for Hearing-impaired people.
+Bada is a Social Robot made for Hearing-impaired people.
 The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and South Korean first assistance dog's name.
 
-## 1.2 Purpose
+## Purpose
 
-# 2. Nodes
+# Nodes
 
-## 2.1 Bada_node
+## Bada_node
 
-### 2.1.1 Published Topic
+### Published Topic
 
 bada/cmd_vel(geometry_msgs/Twist)
 
-> The linear and angular velocity of bada. Twists.linear.x is the forward velocity [m/s] and Twists.angular.z is the angular velocity [rad/sec]. 
+The linear and angular velocity of bada. Twists.linear.x is the forward velocity [m/s] and Twists.angular.z is the angular velocity [rad/sec]. 
 
 ### 2.1.2 Subscribed Topic
 
