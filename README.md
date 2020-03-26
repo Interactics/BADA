@@ -19,12 +19,12 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 
 The linear and angular velocity of bada. Twists.linear.x is the forward velocity [m/s] and Twists.angular.z is the angular velocity [rad/sec]. 
 
-### 2.1.2 Subscribed Topic
+### Subscribed Topic
 
-### 2.1.3 Parameters
+### Parameters
 
 
-# 0. TodoLIST
+# TodoLIST
 
 ## Mobile Robot 
  - [x] Encoder value setting
