@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include <pigpiod_if2.h>
+#include <geometry_msgs/Twist.h>
 #include <bada_motor/RED.h>
 
 const int MOTOR_DIR_R = 26;
@@ -239,14 +240,16 @@ double Angular_Vel = 0; // [Rad/sec]
 
 
 int main (int argc, char **argv) {
-    ros::init(argc, argv, "motor_node");
+    ros::init(argc, argv, "bada");
     ros::NodeHandle nh;
 
     ROS_INFO("---BADA Node Start---");
     Initialize();
 
     ros::Timer timer =nh.createTimer(ros::Duration(0.01), timer_CB);
+    geometry_msgs::Twist cmd_vel;
 
+    ros::Publisher bada_cmd_vel = nh.advertise<geometry_msgs::Twist>("/bada/cmd_vel", 1);
     ros::Rate loop_rate(10);
     ros::Time begin = ros::Time::now();
 
@@ -256,6 +259,8 @@ int main (int argc, char **argv) {
 	//std::cout << ros::Time::now() << std::endl;
 	ros::spinOnce();
 	
+
+
 	if(t100ms_flag){
 		t100ms_flag = false;	
  
@@ -274,7 +279,7 @@ int main (int argc, char **argv) {
 		    encoderL_now = L_Motor.EncoderPos();
 
 		    encoderR_diff = encoderR_now - encoderR_prev;
-		    encoderL_diff = encoderL_now - encoderL_prev;
+		    encoderL_diff = -(encoderL_now - encoderL_prev);
 
 		    encoderR_prev = encoderR_now;
 		    encoderL_prev = encoderL_now;
@@ -284,8 +289,8 @@ int main (int argc, char **argv) {
 		    break;
 	    case 3: 
 		    ROS_INFO("time is %d", t100ms_index); 
-		    RPM_R = double(encoderR_diff)/100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION; 
-	            RPM_L = double(encoderL_diff)/100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION;
+		    RPM_R = double(encoderR_diff) / 100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION; 
+	            RPM_L = double(encoderL_diff) / 100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION;
                     std::cout << RPM_R << std::endl;
 		    t100ms_index = 4;
 		    break;
@@ -293,8 +298,8 @@ int main (int argc, char **argv) {
 
 		    Vel_R = RPM_R / 1 * 1 / 60 * 2 * WHEELSIZE * PI / 1 * 1 / 1000;
 		    Vel_L = RPM_L / 1 * 1 / 60 * 2 * WHEELSIZE * PI / 1 * 1 / 1000;
-	            aVel_R = Vel_R / (2*WHEELSIZE);
-		    aVel_L = Vel_L / (2*WHEELSIZE);
+	            aVel_R = Vel_R / (2 * WHEELSIZE);
+		    aVel_L = Vel_L / (2 * WHEELSIZE);
 
 		    Linear_Vel  = (Vel_R + Vel_L) / 2;
 		    Angular_Vel = (Vel_R - Vel_L) / WHEELBASE * 1000 ;
@@ -304,7 +309,12 @@ int main (int argc, char **argv) {
 		    t100ms_index = 5;
 		    break;
 	    case 5: 
-		    ROS_INFO("time is %d", t100ms_index); 
+		    //Publish
+		    ROS_INFO("time is %d", t100ms_index);
+
+		    cmd_vel.linear.x = Linear_Vel;
+		    cmd_vel.angular.z = Angular_Vel;
+		    bada_cmd_vel.publish(cmd_vel);
 		    t100ms_index = 6;
  		    break;
 	    case 6: 
