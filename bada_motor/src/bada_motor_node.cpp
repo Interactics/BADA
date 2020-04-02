@@ -1,7 +1,8 @@
 #include <ros/ros.h>
 #include <pigpiod_if2.h>
-#include <geometry_msgs/Twist.h>
 #include <bada_motor/RED.h>
+#include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
 
 enum MotorPosition{LEFT, RIGHT};
 
@@ -64,11 +65,16 @@ private:
 
     static void cbf_(int pos);
 
-    double VelEnc_Transform_(double vel);
-    double EncVel_Transform_(int diff_Enc);
+    //encoder Cal 
+
+	int Pos_now;
+    int Pos_diff;
+	int Pos_prev;
+
+
     
 public:
-
+	double VELOCITY;
     int current_PWM;
     bool current_Direction;
     int acceleration;
@@ -81,9 +87,11 @@ public:
     void AccelCtrl(bool Dir, int PWM_needed);
     static void printEncoderPos(int pos);
     void PIDgainSET(float P_gain, float I_gain, float D_gain );
-    void PIDCtrl_(float TargetSpd, float Spd);
+    void PIDCtrl_(float TargetSpd);
     double VelEnc_Transform_(double vel);
     double EncVel_Transform_(int diff_Enc);
+    void EncoderDiff();
+	void CalVel();
 };
 
 /************************************************************************
@@ -121,6 +129,11 @@ DCMotor::DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB, int Pi_Num, Motor
     err_k_1_ = 0;
     err_sum_ = 0;
 
+    //For Encoder Diff
+	Pos_now =0;
+    Pos_diff = 0;
+	Pos_prev = 0;
+
     ROS_INFO("Setup Fin");
 }
 
@@ -139,6 +152,8 @@ double DCMotor::VelEnc_Transform_(double vel){
 }
 
 double DCMotor::EncVel_Transform_(int diff_Enc){
+// RPM = [del(encoder)/ms] * [1000ms/1sec] * [60sec/1 min] * [1round/1roundEncoder]
+// Velocity = [(RPM)Round/1min] * [1min/60sec] * [2pi*r/1Round] * [1m/1000sec]
 	double temp_RPM;
     temp_RPM = double(diff_Enc) / 100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION; 
     return temp_RPM / 1 * 1 / 60 * 2*WHEELSIZE*PI / 1 * 1 / 1000; // Velocity
@@ -182,13 +197,26 @@ void DCMotor::cbf_(int pos){
     std::cout << pos << std::endl;
 }
 
+void DCMotor::EncoderDiff(){
+	Pos_now  = EncoderPos();
+	Pos_diff = Pos_now - Pos_prev;	
+	if (MotorPosition_ == LEFT)
+        Pos_diff = -1*Pos_diff;
+	Pos_prev = Pos_now;
+}
+
+void DCMotor::CalVel(){
+    VELOCITY = EncVel_Transform_(Pos_diff);
+}
+
 void DCMotor::PIDgainSET(float P_gain, float I_gain, float D_gain ){
 	P_gain_ = P_gain;
 	I_gain_ = I_gain;
 	D_gain_ = D_gain;
 }
 
-void DCMotor::PIDCtrl_(float TargetSpd, float Spd){
+void DCMotor::PIDCtrl_(float TargetSpd){
+    float Spd = VELOCITY;
     float err = 0;
     float uP = 0, uI = 0, uD =0;
     float input_u = 0;
@@ -202,9 +230,6 @@ void DCMotor::PIDCtrl_(float TargetSpd, float Spd){
 	
 	TargetENC = 	VelEnc_Transform_(TargetSpd);
 	ENC 	  = 	VelEnc_Transform_(Spd);
-	
-    //err_k_1_ = 	0;
-    //err_sum_ = 	0;
 
     err = 			TargetENC - ENC;
     err_sum_ += 	err;
@@ -241,9 +266,9 @@ void DCMotor::PIDCtrl_(float TargetSpd, float Spd){
     else u_val = input_u;
     
     input_spd = EncVel_Transform_(u_val);
-    
-    if(MotorPosition_ == LEFT) std::cout << "\n\n--------LEFT--------" << std::endl;
-    else if(MotorPosition_ == RIGHT) std::cout << "\n\n--------RIGHT--------" << std::endl;
+
+    if(MotorPosition_ == LEFT) std::cout << "--------LEFT--------" << std::endl;
+    else if(MotorPosition_ == RIGHT) std::cout << "--------RIGHT--------" << std::endl;
     std::cout << "TargetENC : " << TargetENC << " ENC : " << ENC << 
     " input_u : " << input_u << std::endl;
     std::cout << "ERR : " << err << " u_val : " << u_val 
@@ -260,18 +285,16 @@ void DCMotor::PIDCtrl_(float TargetSpd, float Spd){
 
 
 //if it were connected with pigpiod, 0 value is returend.
-
 int pinum = pigpio_start(NULL, NULL);
 
 DCMotor R_Motor = DCMotor(MOTOR_DIR_R, MOTOR_PWM_R, MOTOR_ENA_R, MOTOR_ENB_R, pinum, RIGHT);
 DCMotor L_Motor = DCMotor(MOTOR_DIR_L, MOTOR_PWM_L, MOTOR_ENA_L, MOTOR_ENB_L, pinum, LEFT) ;
 
-
 void Initialize(){
     PWM_Limit = 250;
     switch_direction = true;
     Theta_Distance_Flag = 0;
-    
+
     R_Motor.PIDgainSET(0.8, 0.3, 0.1);
 	L_Motor.PIDgainSET(0.8, 0.3, 0.1);
 
@@ -326,22 +349,12 @@ void Theta_Turn (float Theta, int PWM){
 
 //TIME Interrupt
 volatile bool t100ms_flag = false;
-
 int t100ms_index = 0;
 
 void timer_CB(const ros::TimerEvent &event){
 	t100ms_flag = true;
 }
 
-int encoderR_now = 0;
-int encoderL_now = 0;
-int encoderR_prev = 0;
-int encoderL_prev = 0;
-int encoderR_diff = 0;
-int encoderL_diff = 0;
-
-double RPM_R = 0; 			// [ROUND per min]
-double RPM_L = 0;
 double Vel_R = 0; 			// [m/s]
 double Vel_L = 0;
 double aVel_R = 0; 			// anguler velocities [Rad/sec]
@@ -350,111 +363,84 @@ double Linear_Vel = 0; 		// [m/s]
 double Angular_Vel = 0; 	// [Rad/sec]
 
 int main (int argc, char **argv) {
-
     ros::init(argc, argv, "bada");
     ros::NodeHandle nh;
-
     Initialize();
 
     ros::Timer timer =nh.createTimer(ros::Duration(0.01), timer_CB);
     geometry_msgs::Twist cmd_vel;
+
+    ros::Publisher bada_cmd_odom = nh.advertise<nav_msgs::Odometry>("/bada/odom", 1);
     ros::Publisher bada_cmd_vel = nh.advertise<geometry_msgs::Twist>("/bada/cmd_vel", 1);
     ros::Time begin = ros::Time::now();
     ros::Rate loop_rate(10);
     
     while(ros::ok()) {
 		ros::spinOnce();
-		
 		if(t100ms_flag){
 			t100ms_flag = false;	
 			
 		    switch(t100ms_index){
 			case 0: 
-				//ROS_INFO("time is %d", t100ms_index); 
 				t100ms_index = 1 ;
 				break;
 			case 1: 
-				//ROS_INFO("time is %d", t100ms_index); 
 				t100ms_index = 2;
 				break;
 			case 2: 
-		 	    //ROS_INFO("time is %d", t100ms_index);
-				encoderR_now = R_Motor.EncoderPos();
-				encoderL_now = L_Motor.EncoderPos();
-				
-				encoderR_diff = encoderR_now - encoderR_prev;
-				encoderL_diff = -(encoderL_now - encoderL_prev);
-				
-				encoderR_prev = encoderR_now;
-				encoderL_prev = encoderL_now;
-			   
+				R_Motor.EncoderDiff();
+				L_Motor.EncoderDiff();
 				t100ms_index = 3;
 				break;
 			case 3: 
-				//ROS_INFO("time is %d", t100ms_index); 
-				RPM_R = double(encoderR_diff) / 100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION; 
-			    RPM_L = double(encoderL_diff) / 100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION;
-			   // RPM = [del(encoder)/ms] * [1000ms/1sec] * [60sec/1 min] * [1round/1roundEncoder]
-			    
-		        std::cout << "R : "<<RPM_R << "   L : " <<  RPM_L << std::endl;
 				t100ms_index = 4;
 				break;
 			case 4: 
-				//ROS_INFO("time is %d", t100ms_index);
-				Vel_R = RPM_R / 1 * 1 / 60 * 2*WHEELSIZE*PI / 1 * 1 / 1000;
-				Vel_L = RPM_L / 1 * 1 / 60 * 2*WHEELSIZE*PI / 1 * 1 / 1000;
-				
-				//Velocity = [(RPM)Round/1min] * [1min/60sec] * [2pi*r/1Round] * [1m/1000sec]
-			    
-			    aVel_R = Vel_R / (2 * WHEELSIZE);
+				R_Motor.CalVel();
+				L_Motor.CalVel();
+
+				Vel_R = R_Motor.VELOCITY;
+				Vel_L = L_Motor.VELOCITY;
+
+				aVel_R = Vel_R / (2 * WHEELSIZE);
 				aVel_L = Vel_L / (2 * WHEELSIZE);
 
 				Linear_Vel  = (Vel_R + Vel_L) / 2;
 				Angular_Vel = (Vel_R - Vel_L) / WHEELBASE * 1000 ;
 				
-				ROS_INFO("velocity : %.2f m/s     Ang : %.2f rad", Linear_Vel, Angular_Vel);
-				ROS_INFO("Vel_L : %.2f m/s \t    Vel_R : %.2f m/s", Vel_L, Vel_R);
-				
-				//PIDCtrl(0.15, Vel_R);
-				R_Motor.PIDCtrl_(0.15, Vel_R);
-				L_Motor.PIDCtrl_(0.15, Vel_L);
+				ROS_INFO("Linear : %.2f m/s\tAng : %.2f rad", Linear_Vel, Angular_Vel);
+				ROS_INFO("Vel_L : %.2f m/s \tVel_R : %.2f m/s", Vel_L, Vel_R);
+
+				R_Motor.PIDCtrl_(0.15);
+				L_Motor.PIDCtrl_(0.15);
+
 				t100ms_index = 5;
-				
 				break;
-			case 5: 
-				//ROS_INFO("time is %d", t100ms_index);
-				//Publish
-				
+			case 5: //PublishPart
 				cmd_vel.linear.x = Linear_Vel;
 				cmd_vel.angular.z = Angular_Vel;
 				bada_cmd_vel.publish(cmd_vel);
-				
 				t100ms_index = 6;
 	 		    break;
 			case 6: 
-				//ROS_INFO("time is %d", t100ms_index); 
-				t100ms_index = 7;
+  				t100ms_index = 7;
 				break;
 			case 7: 
-				//ROS_INFO("time is %d", t100ms_index); 
 				t100ms_index = 8;
 				break;
 			case 8: 
-				//ROS_INFO("time is %d", t100ms_index); 
 				t100ms_index = 9;
 				break;
 			case 9:
-				//ROS_INFO("time is %d", t100ms_index); 
 				t100ms_index = 0;
 				break;
 		    defalut:
-				//ROS_INFO("time is %d", t100ms_index); 
 				t100ms_index = 0;
 				break;
 			}
 		}
     }
-    
+
     R_Motor.MotorCtrl(true, 0);
     L_Motor.MotorCtrl(true, 0);
     pigpio_stop(pinum);
