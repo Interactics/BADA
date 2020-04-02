@@ -16,7 +16,7 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 ### Published Topic
 
 #### ~~bada/cmd_vel(geometry_msgs/Twist)~~
-#### bada/real_vel(geometry_msgs/Twist)
+#### bada/odom(nav_msgs/Odometry)
 
 _bada/real_vel_ is bada's velocity in realworld. 
 
@@ -37,8 +37,14 @@ _bada/cmd_vel_ is a velocity commanded to reach.
 ## Mobile Robot 
  - [x] Encoder value setting
  - [x] Publish Twist message
- - [ ] PID Control
- - [ ] Refactoring code
+ - [x] PID Control
+ - [x] Code Refactoring 
+ - [ ] Dead Reckoning Information (Odometry / Pose)
+ - [ ] Trajectory 
+ - [ ] Navigation
+ - [ ] TF message Generation
+ - [ ] Making roslaunch
+ - [ ] Code Refactoring
  
 ## Sound Localization
  - [x] Measure the direction of sound using TDoA Sensor
@@ -51,8 +57,10 @@ _bada/cmd_vel_ is a velocity commanded to reach.
  
 ## SLAM 
  - [x] Pointcloud using RealSense T265 & D435 
- - [ ] Making SLAM Information
-
+ - [x] Making SLAM Information
+ - [x] GMAPPing 
+ - [ ] Navigation
+ 
 ## WebAPP
  - [ ] Interaction Design
  - [ ] Connect WebAPP with ROS 
