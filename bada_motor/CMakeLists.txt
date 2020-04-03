@@ -10,6 +10,9 @@ project(bada_motor)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  nav_msgs
+  tf
+  dynamic_reconfigure
 )
 
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -47,9 +50,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
 # add_message_files(
 #   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+#    std_msgs
+#    nav_msgs
+#)
 
 ## Generate services in the 'srv' folder
 # add_service_files(

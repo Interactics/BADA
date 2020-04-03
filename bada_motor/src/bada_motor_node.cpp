@@ -2,7 +2,9 @@
 #include <pigpiod_if2.h>
 #include <bada_motor/RED.h>
 #include <geometry_msgs/Twist.h>
+#include <tf/transform_broadcaster.h>
 #include <nav_msgs/Odometry.h>
+#include <cmath>
 
 enum MotorPosition{LEFT, RIGHT};
 
@@ -102,7 +104,7 @@ DCMotor::DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB, int Pi_Num, Motor
         : MTR_DIR_(M_Dir), MTR_PWM_(M_PWM), MTR_ENA_(M_encA), MTR_ENB_(M_encB), pinum_(Pi_Num),
           MotorPosition_(MPosition) 
 {
-    optGlitch_ = 1000;
+    optGlitch_ = 100;
     optMode_ = RED_MODE_DETENT;
     PWM_range_ = 512;          
     PWM_frequency_ = 40000;    
@@ -262,7 +264,7 @@ void DCMotor::PIDCtrl_(float TargetSpd){
 		}
 	}
 
-    if (input_u > 150) u_val = 150;
+    if (input_u > 255) u_val = 255;
     else u_val = input_u;
     
     input_spd = EncVel_Transform_(u_val);
@@ -291,7 +293,7 @@ DCMotor R_Motor = DCMotor(MOTOR_DIR_R, MOTOR_PWM_R, MOTOR_ENA_R, MOTOR_ENB_R, pi
 DCMotor L_Motor = DCMotor(MOTOR_DIR_L, MOTOR_PWM_L, MOTOR_ENA_L, MOTOR_ENB_L, pinum, LEFT) ;
 
 void Initialize(){
-    PWM_Limit = 250;
+    PWM_Limit = 255;
     switch_direction = true;
     Theta_Distance_Flag = 0;
 
@@ -347,6 +349,10 @@ void Theta_Turn (float Theta, int PWM){
     }
 }
 
+void Odometry();
+
+
+
 //TIME Interrupt
 volatile bool t100ms_flag = false;
 int t100ms_index = 0;
@@ -361,20 +367,32 @@ double aVel_R = 0; 			// anguler velocities [Rad/sec]
 double aVel_L = 0; 
 double Linear_Vel = 0; 		// [m/s]
 double Angular_Vel = 0; 	// [Rad/sec]
+double x_dist, y_dist = 0;
+double Angle_delta = 0, Angle = 0;
+double Distance_delta = 0;
 
 int main (int argc, char **argv) {
     ros::init(argc, argv, "bada");
     ros::NodeHandle nh;
     Initialize();
+    
+    ros::Time current_time;
 
-    ros::Timer timer =nh.createTimer(ros::Duration(0.01), timer_CB);
+    ros::Timer timer = nh.createTimer(ros::Duration(0.01), timer_CB);
     geometry_msgs::Twist cmd_vel;
+    
+    //Odometry Inform
+    ros::Publisher bada_odom = nh.advertise<nav_msgs::Odometry>("/bada/odom", 1);
+    tf::TransformBroadcaster odom_broadcaster;
 
-    ros::Publisher bada_cmd_odom = nh.advertise<nav_msgs::Odometry>("/bada/odom", 1);
-    ros::Publisher bada_cmd_vel = nh.advertise<geometry_msgs::Twist>("/bada/cmd_vel", 1);
+    ros::Publisher bada_cmd_vel = nh.advertise<geometry_msgs::Twist>("/bada/cmd_vel", 1); 
+
     ros::Time begin = ros::Time::now();
     ros::Rate loop_rate(10);
-    
+   
+    nav_msgs::Odometry odom;
+    geometry_msgs::Quaternion odom_quat;
+    geometry_msgs::TransformStamped odom_trans;
     while(ros::ok()) {
 		ros::spinOnce();
 		if(t100ms_flag){
@@ -411,21 +429,63 @@ int main (int argc, char **argv) {
 				ROS_INFO("Linear : %.2f m/s\tAng : %.2f rad", Linear_Vel, Angular_Vel);
 				ROS_INFO("Vel_L : %.2f m/s \tVel_R : %.2f m/s", Vel_L, Vel_R);
 
-				R_Motor.PIDCtrl_(0.15);
-				L_Motor.PIDCtrl_(0.15);
+				R_Motor.PIDCtrl_(0.30);
+				L_Motor.PIDCtrl_(0.30);
 
 				t100ms_index = 5;
 				break;
-			case 5: //PublishPart
+			case 5: //Publish Part
 				cmd_vel.linear.x = Linear_Vel;
 				cmd_vel.angular.z = Angular_Vel;
 				bada_cmd_vel.publish(cmd_vel);
 				t100ms_index = 6;
 	 		    break;
-			case 6: 
+			case 6:
+			        Distance_delta = Linear_Vel*0.1;
+			        Angle_delta = Angular_Vel*0.1;
+
+				x_dist = x_dist + Distance_delta * cos(Angle + Angle_delta/2);
+			        y_dist = y_dist + Distance_delta * sin(Angle + Angle_delta/2);
+				Angle = Angle + Angle_delta;
+				
+				std::cout << "(x, y) = (" << x_dist << ", " << y_dist << ")" << std::endl;	
   				t100ms_index = 7;
 				break;
 			case 7: 
+				current_time = ros::Time::now();
+				//compute odom of robot 
+				odom_quat = tf::createQuaternionMsgFromYaw(Angle);
+
+				//Pub TF
+				odom_trans.header.stamp = current_time;
+				odom_trans.header.frame_id = "odom";
+				odom_trans.child_frame_id = "bada_chasis";
+
+				odom_trans.transform.translation.x = x_dist;
+				odom_trans.transform.translation.y = y_dist;
+				odom_trans.transform.translation.z = 0.0;
+				odom_trans.transform.rotation = odom_quat;
+				
+				//Send the TF
+				odom_broadcaster.sendTransform(odom_trans);
+
+				//Pub Odometry 
+				odom.header.stamp = current_time;
+				odom.header.frame_id = "odom";
+
+				odom.pose.pose.position.x = x_dist;
+				odom.pose.pose.position.y = y_dist;
+				odom.pose.pose.position.z = 0.0;
+				odom.pose.pose.orientation = odom_quat;
+
+				//set the velocity
+				odom.child_frame_id = "bada_chasis";
+				odom.twist.twist.linear.x  = Linear_Vel;
+				odom.twist.twist.linear.y  = 0.0 ;
+				odom.twist.twist.angular.z = Angular_Vel;
+
+				bada_odom.publish(odom);
+
 				t100ms_index = 8;
 				break;
 			case 8: 

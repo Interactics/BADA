@@ -164,6 +164,7 @@ RED_t *RED(int pi, int gpioA, int gpioB, int mode, RED_CB_t cb_func)
 
    /* pull up is needed as encoder common is grounded */
 
+
    set_pull_up_down(pi, gpioA, PI_PUD_UP);
    set_pull_up_down(pi, gpioB, PI_PUD_UP);
 
