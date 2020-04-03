@@ -15,18 +15,13 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 
 ### Published Topic
 
-#### ~~bada/cmd_vel(geometry_msgs/Twist)~~
+#### bada/cmd_vel(geometry_msgs/Twist)
 #### bada/odom(nav_msgs/Odometry)
-
-_bada/real_vel_ is bada's velocity in realworld. 
+#### /TF
 
 The linear and angular velocity of bada. `Twists.linear.x` is the forward velocity [m/s] and `Twists.angular.z` is the angular velocity [rad/sec]. 
 
 ### Subscribed Topic
-
-#### bada/cmd_vel(geometry_msgs/Twist)
-
-_bada/cmd_vel_ is a velocity commanded to reach.
 
 
 ### Parameters
@@ -39,10 +34,10 @@ _bada/cmd_vel_ is a velocity commanded to reach.
  - [x] Publish Twist message
  - [x] PID Control
  - [x] Code Refactoring 
- - [ ] Dead Reckoning Information (Odometry / Pose)
+ - [x] Dead Reckoning Information (Odometry / Pose)
  - [ ] Trajectory 
  - [ ] Navigation
- - [ ] TF message Generation
+ - [x] TF message Generation
  - [ ] Making roslaunch
  - [ ] Code Refactoring
  
