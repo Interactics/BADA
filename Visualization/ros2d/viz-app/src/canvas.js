@@ -1,3 +1,6 @@
+"use strict";
+import ROSLIB from 'roslib';
+// const ROSLIB=require('roslib');
 var canvas;
 var ctx;
 var start;
@@ -18,6 +21,74 @@ export function init() {
   // Start the first frame request
   window.requestAnimationFrame(loop);
   
+  // Connecting to ROS
+  // -----------------
+  var ros = new ROSLIB.Ros();
+
+  // If there is an error on the backend, an 'error' emit will be emitted.
+  ros.on('error', function(error) {
+    // document.getElementById('connecting').style.display = 'none';
+    // document.getElementById('connected').style.display = 'none';
+    // document.getElementById('closed').style.display = 'none';
+    // document.getElementById('error').style.display = 'inline';
+    console.log(error);
+  });
+
+  // Find out exactly when we made a connection.
+  ros.on('connection', function() {
+    console.log('Connection made!');
+    // document.getElementById('connecting').style.display = 'none';
+    // document.getElementById('error').style.display = 'none';
+    // document.getElementById('closed').style.display = 'none';
+    // document.getElementById('connected').style.display = 'inline';
+  });
+
+  ros.on('close', function() {
+    console.log('Connection closed.');
+    // document.getElementById('connecting').style.display = 'none';
+    // document.getElementById('connected').style.display = 'none';
+    // document.getElementById('closed').style.display = 'inline';
+  });
+
+  // Create a connection to the rosbridge WebSocket server.
+  ros.connect('ws://localhost:9090');
+
+  // Like when publishing a topic, we first create a Topic object with details of the topic's name
+  // and message type. Note that we can call publish or subscribe on the same topic object.
+  var listener = new ROSLIB.Topic({
+    ros : ros,
+    name : '/listener',
+    messageType : 'std_msgs/String'
+  });
+
+  // Then we add a callback to be called every time a message is published on this topic.
+  listener.subscribe(function(message) {
+    console.log('Received message on ' + listener.name + ': ' + message.data);
+
+    // If desired, we can unsubscribe from the topic as well.
+    listener.unsubscribe();
+  });
+
+
+    // Like when publishing a topic, we first create a Topic object with details of the topic's name
+  // and message type. Note that we can call publish or subscribe on the same topic object.
+  var turtle1 = new ROSLIB.Topic({
+    ros : ros,
+    name : '/turtle1/pose',
+    messageType : 'turtlesim/Pose'
+  });
+
+  // Then we add a callback to be called every time a message is published on this topic.
+  var count=0;
+  turtle1.subscribe(function(message) {
+    console.log(message);
+    console.log('Received message on ' + turtle1.name + ': ' + message.data);
+
+    // If desired, we can unsubscribe from the topic as well.
+    if(count>50){
+      turtle1.unsubscribe();
+    }
+  });
 }
 
 function loop(timeStamp) {
