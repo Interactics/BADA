@@ -15,14 +15,18 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 
 ### Published Topic
 
-#### /bada/cmd_vel(geometry_msgs/Twist)
 #### /bada/odom(nav_msgs/Odometry)
+
+Odometry Information of Bada. `Pose` and `velocity` are the Position and Velocity of Bada in Global reference frame.
+
 #### /TF
 
-The linear and angular velocity of bada. `Twists.linear.x` is the forward velocity [m/s] and `Twists.angular.z` is the angular velocity [rad/sec]. 
+TF Information of Bada.
 
 ### Subscribed Topic
+#### /bada/cmd_vel(geometry_msgs/Twist) - Futurework.
 
+The linear and angular velocity of Bada in Bada's Local reference fream. `Twists.linear.x` is the forward velocity [m/s], `Twists.angular.z` is the angular velocity [rad/s].
 
 ### Parameters
 
