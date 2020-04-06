@@ -15,19 +15,18 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 
 ### Published Topic
 
-#### ~~bada/cmd_vel(geometry_msgs/Twist)~~
-#### bada/odom(nav_msgs/Odometry)
+#### /bada/odom(nav_msgs/Odometry)
 
-_bada/real_vel_ is bada's velocity in realworld. 
+Odometry Information of Bada. `Pose` and `velocity` are the Position and Velocity of Bada in Global reference frame.
 
-The linear and angular velocity of bada. `Twists.linear.x` is the forward velocity [m/s] and `Twists.angular.z` is the angular velocity [rad/sec]. 
+#### /TF
+
+TF Information of Bada.
 
 ### Subscribed Topic
+#### /bada/cmd_vel(geometry_msgs/Twist) - Futurework.
 
-#### bada/cmd_vel(geometry_msgs/Twist)
-
-_bada/cmd_vel_ is a velocity commanded to reach.
-
+The linear and angular velocity of Bada in Bada's Local reference fream. `Twists.linear.x` is the forward velocity [m/s], `Twists.angular.z` is the angular velocity [rad/s].
 
 ### Parameters
 
@@ -39,10 +38,10 @@ _bada/cmd_vel_ is a velocity commanded to reach.
  - [x] Publish Twist message
  - [x] PID Control
  - [x] Code Refactoring 
- - [ ] Dead Reckoning Information (Odometry / Pose)
+ - [x] Dead Reckoning Information (Odometry / Pose)
  - [ ] Trajectory 
  - [ ] Navigation
- - [ ] TF message Generation
+ - [x] TF message Generation
  - [ ] Making roslaunch
  - [ ] Code Refactoring
  
@@ -61,7 +60,8 @@ _bada/cmd_vel_ is a velocity commanded to reach.
  - [x] GMAPPing 
  - [ ] Navigation
  
-## WebAPP
+## [WebAPP](Visualization/README.md)
+
  - [ ] Interaction Design
  - [ ] Connect WebAPP with ROS 
  - [ ] Visualizing SLAM Information
