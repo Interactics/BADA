@@ -349,9 +349,22 @@ void Theta_Turn (float Theta, int PWM){
     }
 }
 
-void Odometry();
+void TwistToMotor_CB(const geometry_msgs::Twist &msg){
+    
+    double dx = 0, dy = 0, dr = 0;
+    double RIGHT_V = 0, LEFT_V = 0; 
 
+    dx = msg.linear.x;
+    dy = msg.linear.y;
+    dr = msg.angular.z;
+   
+    RIGHT_V = dx + dr * WHEELBASE / 2000;
+    LEFT_V = dx - dr * WHEELBASE / 2000;
 
+    R_Motor.PIDCtrl_(RIGHT_V);
+    L_Motor.PIDCtrl_(LEFT_V); 
+
+}
 
 //TIME Interrupt
 volatile bool t100ms_flag = false;
@@ -371,6 +384,9 @@ double x_dist, y_dist = 0;
 double Angle_delta = 0, Angle = 0;
 double Distance_delta = 0;
 
+
+
+
 int main (int argc, char **argv) {
     ros::init(argc, argv, "bada");
     ros::NodeHandle nh;
@@ -383,9 +399,10 @@ int main (int argc, char **argv) {
     
     //Odometry Inform
     ros::Publisher bada_odom = nh.advertise<nav_msgs::Odometry>("/bada/odom", 1);
+    ros::Subscriber sub_vel = nh.subscribe("cmd_vel", 1, TwistToMotor_CB);
     tf::TransformBroadcaster odom_broadcaster;
 
-    ros::Publisher bada_cmd_vel = nh.advertise<geometry_msgs::Twist>("/bada/cmd_vel", 1); 
+//    ros::Publisher bada_cmd_vel = nh.advertise<geometry_msgs::Twist>("/bada/cmd_vel", 1); 
 
     ros::Time begin = ros::Time::now();
     ros::Rate loop_rate(10);
@@ -429,15 +446,16 @@ int main (int argc, char **argv) {
 				ROS_INFO("Linear : %.2f m/s\tAng : %.2f rad", Linear_Vel, Angular_Vel);
 				ROS_INFO("Vel_L : %.2f m/s \tVel_R : %.2f m/s", Vel_L, Vel_R);
 
-				R_Motor.PIDCtrl_(0.30);
-				L_Motor.PIDCtrl_(0.30);
+		           	//R_Motor.PIDCtrl_(0.30);
+			        //L_Motor.PIDCtrl_(0.30);
 
 				t100ms_index = 5;
 				break;
 			case 5: //Publish Part
 				cmd_vel.linear.x = Linear_Vel;
 				cmd_vel.angular.z = Angular_Vel;
-				bada_cmd_vel.publish(cmd_vel);
+				//bada_cmd_vel.publish(cmd_vel);
+                                //ros::spinOnce();				
 				t100ms_index = 6;
 	 		    break;
 			case 6:
