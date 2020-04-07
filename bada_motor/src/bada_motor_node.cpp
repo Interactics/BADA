@@ -68,15 +68,15 @@ private:
     static void cbf_(int pos);
 
     //encoder Cal 
-
-	int Pos_now;
+    int Pos_now;
     int Pos_diff;
-	int Pos_prev;
+    int Pos_prev;
 
+    //PID Velocity Target
+    double Vel_Target_;
 
-    
 public:
-	double VELOCITY;
+    double VELOCITY;
     int current_PWM;
     bool current_Direction;
     int acceleration;
@@ -89,11 +89,13 @@ public:
     void AccelCtrl(bool Dir, int PWM_needed);
     static void printEncoderPos(int pos);
     void PIDgainSET(float P_gain, float I_gain, float D_gain );
+    void SetVel_Target(double Vel);
     void PIDCtrl_(float TargetSpd);
     double VelEnc_Transform_(double vel);
     double EncVel_Transform_(int diff_Enc);
     void EncoderDiff();
-	void CalVel();
+    void CalVel();
+    void PIDUpdate();
 };
 
 /************************************************************************
@@ -281,6 +283,14 @@ void DCMotor::PIDCtrl_(float TargetSpd){
     MotorCtrl(m_dir, u_val);
 }
 
+void DCMotor::SetVel_Target(double Vel){
+    Vel_Target_ = Vel;
+}
+
+void DCMotor::PIDUpdate(){
+    PIDCtrl_(Vel_Target_);
+}
+
 //==================================DCMotor Class========================= 
 //========================================================================
 /////////////////////////////////////////////////////////////////////////////////////
@@ -350,7 +360,7 @@ void Theta_Turn (float Theta, int PWM){
 }
 
 void TwistToMotor_CB(const geometry_msgs::Twist &msg){
-    
+	
     double dx = 0, dy = 0, dr = 0;
     double RIGHT_V = 0, LEFT_V = 0; 
 
@@ -360,9 +370,11 @@ void TwistToMotor_CB(const geometry_msgs::Twist &msg){
    
     RIGHT_V = dx + dr * WHEELBASE / 2000;
     LEFT_V = dx - dr * WHEELBASE / 2000;
-
-    R_Motor.PIDCtrl_(RIGHT_V);
-    L_Motor.PIDCtrl_(LEFT_V); 
+    
+    R_Motor.SetVel_Target(RIGHT_V);
+    L_Motor.SetVel_Target(LEFT_V);
+    //R_Motor.PIDCtrl_(RIGHT_V);
+    //L_Motor.PIDCtrl_(LEFT_V); 
 
 }
 
@@ -403,6 +415,7 @@ int main (int argc, char **argv) {
     tf::TransformBroadcaster odom_broadcaster;
 
 //    ros::Publisher bada_cmd_vel = nh.advertise<geometry_msgs::Twist>("/bada/cmd_vel", 1); 
+
 
     ros::Time begin = ros::Time::now();
     ros::Rate loop_rate(10);
@@ -448,6 +461,8 @@ int main (int argc, char **argv) {
 
 		           	//R_Motor.PIDCtrl_(0.30);
 			        //L_Motor.PIDCtrl_(0.30);
+			        R_Motor.PIDUpdate();
+				L_Motor.PIDUpdate();
 
 				t100ms_index = 5;
 				break;
@@ -523,6 +538,6 @@ int main (int argc, char **argv) {
     L_Motor.MotorCtrl(true, 0);
     pigpio_stop(pinum);
     return 0;
-}
+} 
 
 
