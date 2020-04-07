@@ -24,7 +24,7 @@ Odometry Information of Bada. `Pose` and `velocity` are the Position and Velocit
 TF Information of Bada.
 
 ### Subscribed Topic
-#### /bada/cmd_vel(geometry_msgs/Twist)
+#### /cmd_vel(geometry_msgs/Twist)
 
 The linear and angular velocity of Bada in Bada's Local reference fream. `Twists.linear.x` is the forward velocity [m/s], `Twists.angular.z` is the angular velocity [rad/s].
 
