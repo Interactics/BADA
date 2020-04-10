@@ -39,11 +39,11 @@ The linear and angular velocity of Bada in Bada's Local reference fream. `Twists
  - [x] PID Control
  - [x] Code Refactoring 
  - [x] Dead Reckoning Information (Odometry / Pose)
+ - [x] Code Refactoring
+ - [x] TF message Generation
  - [ ] Trajectory 
  - [ ] Navigation
- - [x] TF message Generation
  - [ ] Making roslaunch
- - [ ] Code Refactoring
  
 ## Sound Localization
  - [x] Measure the direction of sound using TDoA Sensor
