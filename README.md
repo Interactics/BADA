@@ -64,7 +64,7 @@ The linear and angular velocity of Bada in Bada's Local reference fream. `Twists
 
  - [ ] Interaction Design
  - [ ] Connect WebAPP with ROS 
- - [ ] Visualizing SLAM Information
+ - [x] Visualizing SLAM Information
  
  ## Human-Robot-Interaction
  - [ ] What if the person sleeps.
