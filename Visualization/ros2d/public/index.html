@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="utf-8" />
 
-<script type="text/javascript" src="http://static.robotwebtools.org/EaselJS/current/easeljs.min.js"></script>
-<script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
-<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
-<script type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js"></script>
+<head>
+  <meta charset="utf-8" />
+
+  <script type="text/javascript" src="http://static.robotwebtools.org/EaselJS/current/easeljs.min.js"></script>
+  <script type="text/javascript"
+    src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+  <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+  <script type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js"></script>
 
   <link rel="stylesheet" href="index.css">
-<script type="text/javascript" src="index.js"></script>
+  <script type="text/javascript" src="index.js"></script>
 </head>
 
 <body>
   <h1>Simple Map Example</h1>
+  <div class="tab_wrap">
+    <div class="tab_menu_container"></div>
+    <button class="tab_menu_menu_btn on" type="button">real-time Topic</button>
+    <button class="tab_munu_btn" type="button">recorded Topic</button>
+  </div>
+
   <button onclick="init()">draw</button>
   <button onclick="tryConnectWebsocket()">connect</button>
   <div id="map"></div>
@@ -21,7 +29,17 @@
     <canvas id="canvas" width="640" height="480">
 
     </canvas>
-    
-  </div>  
+  </div>
+  <div class="tab_box_container">
+    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
+    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
+    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
+    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
+    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
+    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
+  </div>
+
+
 </body>
+
 </html>
