@@ -2,8 +2,11 @@ var canvas;
 var ctx;
 var start;
 var oldTimeStamp;
+var x;
+var y;
+var theta;
 
-const FRAMES_PER_SECOND = 30;  // Valid values are 60,30,20,15,10...
+const FRAMES_PER_SECOND = 10;  // Valid values are 60,30,20,15,10...
 const FRAME_MIN_TIME = (1000/60) * (60 / FRAMES_PER_SECOND) - (1000/60) * 0.5;
 var lastFrameTime = 0;  // the last frame time
 
@@ -51,7 +54,7 @@ function tryConnectWebsocket(){
 
   // Then we add a callback to be called every time a message is published on this topic.
   listener.subscribe(function(message) {
-    console.log('Received message on ' + listener.name + ': ' + message.data);
+    // console.log('Received message on ' + listener.name + ': ' + message.data);
 
     // If desired, we can unsubscribe from the topic as well.
     listener.unsubscribe();
@@ -68,13 +71,18 @@ function tryConnectWebsocket(){
   // Then we add a callback to be called every time a message is published on this topic.
   var count=0;
   turtle1.subscribe(function(message) {
-    console.log('received a turtlesim message');
-    console.log(message);
-
-    // If desired, we can unsubscribe from the topic as well.
-    if(count>50){
-      turtle1.unsubscribe();
+    if(count){
+      console.log(message);
     }
+    // console.log('received a turtlesim message');
+    // console.log(message);
+    x=message.x*50;
+    y=message.y*50;
+    theta=message.theta;
+    // If desired, we can unsubscribe from the topic as well.
+    // if(count>5000){
+    //   turtle1.unsubscribe();
+    // }
   });
 }
 
@@ -96,8 +104,6 @@ function loop(timeStamp) {
     return; // return as there is nothing to do
   }
   lastFrameTime = timeStamp; // remember the time of the rendered frame
-
-  // console.log('drawing');
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
@@ -122,22 +128,27 @@ function loop(timeStamp) {
   }else{
     window.requestAnimationFrame(loop);
   }
-  
 }
 
 function draw(timestamp) {
-  if (!start) start = timestamp;
-  var progress = timestamp - start;
+  // if (!start) start = timestamp;
+  // var progress = timestamp - start;
 
-  const cx = 200;
-  const cy = 40;
-  const radius = progress / 10;
-  const startangle = 3/2*Math.PI;
-  const endangle = 1/2*Math.PI;
-  ctx.fillStyle = 'rgba(255,100,50,0.5)';
-  ctx.moveTo(cx, cy);
-  ctx.arc(cx, cy, radius, startangle, endangle);
-  ctx.lineTo(cx, cy);    
+  //Draw number to the screen
+  const radius = 1500;
+  const startangle = theta-1/16*Math.PI;
+  const endangle = theta+1/16*Math.PI;
+  ctx.fillStyle = 'rgba(255,100,50,0.3)';
+  
+  ctx.beginPath();//ADD THIS LINE!<<<<<<<<<<<<<
+  ctx.moveTo(x, y);
+  ctx.arc(x, y, radius, startangle, endangle);
+  ctx.lineTo(x, y);
+  ctx.fill(); // or context.fill()
+
+  ctx.beginPath();//ADD THIS 
+  ctx.fillStyle = 'red';//#DC143C
+  ctx.arc(x, y, 5, 0, 2*Math.PI);
   ctx.fill(); // or context.fill()
 }
 
