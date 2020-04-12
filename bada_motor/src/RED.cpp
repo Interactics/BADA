@@ -1,17 +1,7 @@
-/*
-RED.c
-2015-11-18
-Public Domain
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <pigpiod_if2.h>
-
-#include "./RED.h"
-
-/* PRIVATE ---------------------------------------------------------------- */
+#include <bada_ctrl/RED.h>
 
 struct _RED_s
 {
@@ -56,7 +46,7 @@ static int transits[16]=
 static void _cb(
    int pi, unsigned gpio, unsigned level, uint32_t tick, void *user)
 {
-   RED_t *self=user;
+   RED_t *self = (RED_t*)user;
    int newState, inc, detent;
 
    if (level != PI_TIMEOUT)
@@ -96,7 +86,7 @@ RED_t *RED(int pi, int gpioA, int gpioB, int mode, RED_CB_t cb_func)
 {
    RED_t *self;
 
-   self = malloc(sizeof(RED_t));
+   self = (RED_t*)malloc(sizeof(RED_t));
 
    if (!self) return NULL;
 
@@ -113,6 +103,7 @@ RED_t *RED(int pi, int gpioA, int gpioB, int mode, RED_CB_t cb_func)
    set_mode(pi, gpioB, PI_INPUT);
 
    /* pull up is needed as encoder common is grounded */
+
 
    set_pull_up_down(pi, gpioA, PI_PUD_UP);
    set_pull_up_down(pi, gpioB, PI_PUD_UP);
@@ -183,4 +174,3 @@ void RED_set_glitch_filter(RED_t *self, int glitch)
       }
    }
 }
-

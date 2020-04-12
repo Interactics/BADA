@@ -1,8 +1,4 @@
-/*
-RED.h
-2015-11-18
-Public Domain
-*/
+// RED_H_
 
 #ifndef RED_H
 #define RED_H
@@ -27,7 +23,7 @@ If cb_func in not null it will be called at each position
 change with the new position.
 
 The current position can be read with RED_get_position and
-set with RED_set_position.
+set with RED_set_position.ls
 
 Mechanical encoders may suffer from switch bounce.
 RED_set_glitch_filter may be used to filter out edges
@@ -46,12 +42,12 @@ RED_t *RED                   (int pi,
                               RED_CB_t cb_func);
 
 void   RED_cancel            (RED_t *renc);
-
 void   RED_set_glitch_filter (RED_t *renc, int glitch);
-
 void   RED_set_position      (RED_t *renc, int position);
-
 int    RED_get_position      (RED_t *renc);
 
 #endif
+
+
+
 
