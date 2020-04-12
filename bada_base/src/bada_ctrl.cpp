@@ -106,8 +106,8 @@ void DCMotor::cbf_(int pos){
 void DCMotor::EncoderDiff(){
     Pos_now  = EncoderPos();
     Pos_diff = Pos_now - Pos_prev;	
-    if (MotorPosition_ == LEFT)
-	Pos_diff = -1*Pos_diff;
+    if (MotorPosition_ == RIGHT)
+	Pos_diff =-Pos_diff;
     Pos_prev = Pos_now;
 }
 
@@ -146,7 +146,6 @@ void DCMotor::PIDCtrl_(float TargetSpd){
     	
     err_k_1_ = err;
     input_u = uP + uI + uD;
-
     
     if(MotorPosition_ == RIGHT){
         if(input_u < 0 ){
@@ -160,15 +159,15 @@ void DCMotor::PIDCtrl_(float TargetSpd){
 	
     if(MotorPosition_ == LEFT){
 	    if(input_u < 0 ){
-	        m_dir = true ;
+	        m_dir = false ;
 		    input_u *= -1;
 	    }
 	    else {
-	        m_dir = false;
+	        m_dir = true;
 	    }
     }
 
-    if (input_u > 255) u_val = 255;
+    if (input_u > 512) u_val = 512;
     else u_val = input_u; input_spd = EncVel_Transform_(u_val);
 
     if(MotorPosition_ == LEFT) std::cout << "--------LEFT--------" << std::endl;
