@@ -10,19 +10,19 @@
 #include <cmath>
 
 enum MotorPosition{LEFT, RIGHT};
-
+//M2
 const int MOTOR_ENA_L = 17;
 const int MOTOR_ENB_L = 4;
 const int MOTOR_DIR_L = 24;
 const int MOTOR_PWM_L = 13;
-
+//M1
 const int MOTOR_ENA_R = 22; 
 const int MOTOR_ENB_R = 27;
 const int MOTOR_DIR_R = 26;
 const int MOTOR_PWM_R = 12;
 
-const int WHEELSIZE = 35;          	    // [mm] radius
-const int WHEELBASE = 116;         	    // [mm] wheel to wheel
+const int WHEELSIZE = 42;          	    // [mm] radius
+const int WHEELBASE = 274;         	    // [mm] wheel to wheel
 const int ENCODER_RESOLUTION = 374; 	    // count per cycle
 
 const double PI = 3.141592;

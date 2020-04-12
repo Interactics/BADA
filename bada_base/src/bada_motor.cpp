@@ -83,7 +83,7 @@ int main (int argc, char **argv) {
 					ROS_INFO("Linear : %.2f m/s\tAng : %.2f rad", Linear_Vel, Angular_Vel);
 					ROS_INFO("Vel_L : %.2f m/s \tVel_R : %.2f m/s", Vel_L, Vel_R);
 	
-				    R_Motor.PIDUpdate();
+				        R_Motor.PIDUpdate();
 					L_Motor.PIDUpdate();
 	
 					t100ms_index = 5;
@@ -161,8 +161,8 @@ int main (int argc, char **argv) {
 
 
 void Initialize(){
-    R_Motor.PIDgainSET(1, 0.5, 0.2);
-    L_Motor.PIDgainSET(2, 0.3, 0.1);
+    R_Motor.PIDgainSET(2, 1.5, 1.0);
+    L_Motor.PIDgainSET(2, 2, 1.0);
 
     ROS_INFO("Initialize Complete");
     ROS_INFO("---BADA Node Start---");
@@ -179,7 +179,7 @@ void TwistToMotor_CB(const geometry_msgs::Twist &msg){
    
     RIGHT_V = dx + dr * WHEELBASE / 2000;
     LEFT_V = dx - dr * WHEELBASE / 2000;
-    
+   
     R_Motor.SetVel_Target(RIGHT_V);
     L_Motor.SetVel_Target(LEFT_V);
 }
