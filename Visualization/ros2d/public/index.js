@@ -15,16 +15,20 @@ var lastFrameTime = 0;  // the last frame time
 
 
 //Tab design 왜 안되냐..jquery 동작안해, html에서 jquery 소스 불러왔는데도 연결 안되는듯.
-$('.tab_menu_btn').on('click',function(){
-  //버튼 색 제거,추가
-  $('.tab_menu_btn').removeClass('on');
-  $(this).addClass('on')
-  
-  //컨텐츠 제거 후 인덱스에 맞는 컨텐츠 노출
-  var idx = $('.tab_menu_btn').index(this);
-  
-  $('.tab_box').hide();
-  $('.tab_box').eq(idx).show();
+
+$(document).ready(function(){
+  // process.. 
+  $('.tab_menu_btn').on('click',function(){
+    //버튼 색 제거,추가
+    $('.tab_menu_btn').removeClass('on');
+    $(this).addClass('on')
+    
+    //컨텐츠 제거 후 인덱스에 맞는 컨텐츠 노출
+    var idx = $('.tab_menu_btn').index(this);
+    
+    $('.tab_box').hide();
+    $('.tab_box').eq(idx).show();
+  });
 });
 
 
