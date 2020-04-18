@@ -63,7 +63,7 @@ The linear and angular velocity of Bada in Bada's Local reference fream. `Twists
 ## [WebAPP](Visualization/README.md)
 
  - [ ] Interaction Design
- - [ ] Connect WebAPP with ROS 
+ - [x] Connect WebAPP with ROS 
  - [ ] Visualizing SLAM Information
  
  ## Human-Robot-Interaction
