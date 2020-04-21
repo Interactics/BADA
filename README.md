@@ -9,6 +9,20 @@ The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and Sou
 
 ## Purpose
 
+
+## Requirement
+
+### Raspberry pi 3B+
+
+#### install pigpiod
+
+    wget https://github.com/joan2937/pigpio/archive/master.zip
+    unzip master.zip
+    cd pigpio-master 
+    make
+    sudo make install
+
+
 # Nodes
 
 ## Bada_node
