@@ -4,41 +4,41 @@ import json
 from std_msgs.msg import String
 
 pub=''
-signals={}
+keys=['Speech','Alarm','Door','Television', 'Silence']
+signals=dict.fromkeys(keys, 0.0)
+picked=dict.fromkeys(keys, 0.0)
+detected=dict.fromkeys(keys, False)
+detectThreshold=0.6
+resetThreshold=0.3
 
 def callback(data):
-    global pub
+    global pub, keys, signals, picked
     # rospy.loginfo(rospy.get_caller_id() + "I heard %s", data.data)
     dat=json.loads(data.data)
     rospy.loginfo("hello world %s" % rospy.get_time())
 
     # hello_str = "hello world %s" % rospy.get_time()
-    keys=['Speech','Alarm','Door','Television']
-    picked=[]
-    for i,v in enumerate(dat):
+    picked=dict.fromkeys(keys, 0.0)
+    for _,v in enumerate(dat[0]):
+        [key, prob]=v
 
-        if(v[0][0] in keys):
-            rospy.loginfo(v[0][0] in keys)
-            picked.append(v[0])
-    
-    # algorithm: 
-    # for all keys;
-    #  if the key is picked
-    #  update 
-    for i, v in enumerate(picked):
-        if(v[0] not in signals):
-            rospy.loginfo(v[0])
-            print('d',v[1])
-            signals[v[0]]=float(v[1])
-        else:
-            rospy.loginfo(signals[v[0]])
-            rospy.loginfo(v[1])
+        if(key in keys):
+            # rospy.loginfo(key in keys)
+            picked[key]=float(prob)
 
-            signals[v[0]]=(float(signals[v[0]])*0.5+float(v[1])*0.5)
+    # update 
+    for _, v in enumerate(keys):
+        # rospy.loginfo(signals[v])
+        signals[v]=signals[v]*0.3+picked[v]*0.7
 
-    rospy.loginfo(signals)
-    hello_str=json.dumps(dat)
-    pub.publish(hello_str)
+    # detect
+    for _, v in enumerate(keys):
+        if(signals[v]> detectThreshold and detected[v]==False):
+            detected[v]=True
+            rospy.loginfo('publish:'+v)
+            pub.publish(v)
+        if(detected[v]==True and signals[v]<resetThreshold):
+            detected[v]=False
     
 def signal_node():
     global pub
