@@ -11,6 +11,7 @@
   <maintainer email="zz3123@hanyang.ac.kr">Interactics</maintainer>
 
   <author>Hoyeon Yu</author>
+  <license>Todo</license>
 
   <buildtool_depend>catkin</buildtool_depend>
 
