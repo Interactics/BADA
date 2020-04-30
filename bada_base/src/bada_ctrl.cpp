@@ -9,7 +9,7 @@ DCMotor::DCMotor(int M_Dir, int M_PWM, int M_encA, int M_encB, int Pi_Num, Motor
 {
 
     optGlitch_ = 100;
-    optMode_ = RED_MODE_DETENT;
+    optMode_ = RED_MODE_STEP;
     PWM_range_ = 512;          
     PWM_frequency_ = 40000;    
 
@@ -61,9 +61,9 @@ double DCMotor::EncVel_Transform_(int diff_Enc){
 // RPM = [del(encoder)/ms] * [1000ms/1sec] * [60sec/1 min] * [1round/1roundEncoder]
 // Velocity = [(RPM)Round/1min] * [1min/60sec] * [2pi*r/1Round] * [1m/1000sec]
     double temp_RPM;
-    temp_RPM = double(diff_Enc) / 100 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION; 
+    temp_RPM = double(diff_Enc) /20 * 60 / 1 * 1000 / 1 * 1 / ENCODER_RESOLUTION; 
     return temp_RPM / 1 * 1 / 60 * 2*WHEELSIZE*PI / 1 * 1 / 1000; // Velocity
-}
+} //Control Freq == 20ms
 
 void DCMotor::MotorCtrl(bool Dir, int PWM){
     if(Dir == true) { // CW
@@ -130,9 +130,9 @@ void DCMotor::PIDCtrl_(float TargetSpd){
     int u_val = 0;
     bool m_dir = 0;
 
-    double TargetENC;
-    double ENC;
-    double input_spd;
+    long double TargetENC;
+    long double ENC;
+    long double input_spd;
 
     TargetENC = VelEnc_Transform_(TargetSpd);
     ENC       = VelEnc_Transform_(Spd);
@@ -170,16 +170,16 @@ void DCMotor::PIDCtrl_(float TargetSpd){
     if (input_u > 512) u_val = 512;
     else u_val = input_u; input_spd = EncVel_Transform_(u_val);
 
-    if(MotorPosition_ == LEFT) std::cout << "--------LEFT--------" << std::endl;
-    else if(MotorPosition_ == RIGHT) std::cout << "--------RIGHT--------" << std::endl;
-    std::cout << "TargetENC : " << TargetENC << " ENC : " << ENC 
-    << " input_u : " << input_u << std::endl;
+//    if(MotorPosition_ == LEFT) std::cout << "--------LEFT--------" << std::endl;
+//    else if(MotorPosition_ == RIGHT) std::cout << "--------RIGHT--------" << std::endl;
+//    std::cout << "TargetENC : " << TargetENC << " ENC : " << ENC 
+//    << " input_u : " << input_u << std::endl;
     
-    std::cout << "ERR : " << err << " u_val : " << u_val 
-    << " input_spd : " << input_spd << std::endl 
-    << " m_dir : " << m_dir << std::endl;
+//    std::cout << "ERR : " << err << " u_val : " << u_val 
+//    << " input_spd : " << input_spd << std::endl 
+//    << " m_dir : " << m_dir << std::endl;
     
-    std::cout << "---------------------------" << std::endl << std::endl;
+//    std::cout << "---------------------------" << std::endl << std::endl;
     MotorCtrl(m_dir, u_val);
 }
 
