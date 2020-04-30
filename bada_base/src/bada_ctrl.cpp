@@ -79,30 +79,9 @@ void DCMotor::MotorCtrl(bool Dir, int PWM){
 	current_Direction = false;
     } 
 }
-
-void DCMotor::AccelCtrl(bool Dir, int PWM_desired){
-    // P ctrl
-    int PWM_local;
-    
-    if(PWM_desired > current_PWM) {
-        PWM_local = current_PWM + acceleration;
-        MotorCtrl(Dir, PWM_local);
-    } 
-    else if (PWM_desired < current_PWM) {
-        PWM_local = current_PWM - acceleration;
-        MotorCtrl(Dir, PWM_local);
-    } 
-    else {
-        PWM_local = current_PWM;
-        MotorCtrl(Dir, PWM_local);
-    }
-    //ROS_INFO("Current_PWM is %d", current_PWM);
-}
-
 void DCMotor::cbf_(int pos){
     std::cout << pos << std::endl;
 }
-
 void DCMotor::EncoderDiff(){
     Pos_now  = EncoderPos();
     Pos_diff = Pos_now - Pos_prev;	
@@ -169,17 +148,7 @@ void DCMotor::PIDCtrl_(float TargetSpd){
 
     if (input_u > 512) u_val = 512;
     else u_val = input_u; input_spd = EncVel_Transform_(u_val);
-
-//    if(MotorPosition_ == LEFT) std::cout << "--------LEFT--------" << std::endl;
-//    else if(MotorPosition_ == RIGHT) std::cout << "--------RIGHT--------" << std::endl;
-//    std::cout << "TargetENC : " << TargetENC << " ENC : " << ENC 
-//    << " input_u : " << input_u << std::endl;
     
-//    std::cout << "ERR : " << err << " u_val : " << u_val 
-//    << " input_spd : " << input_spd << std::endl 
-//    << " m_dir : " << m_dir << std::endl;
-    
-//    std::cout << "---------------------------" << std::endl << std::endl;
     MotorCtrl(m_dir, u_val);
 }
 

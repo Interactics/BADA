@@ -10,6 +10,8 @@
 void Initialize();
 void TwistToMotor_CB(const geometry_msgs::Twist &msg);
 void timer_CB(const ros::TimerEvent &event);
+void MotorVelControling();
+void PubMotRLSpd(ros::Publisher *R, ros::Publisher *L);
 
 double Vel_R = 0,  Vel_L = 0; 			         // [m/s]
 double aVel_R = 0, aVel_L = 0; 			         // anguler velocities [Rad/sec]
@@ -58,42 +60,23 @@ int main (int argc, char **argv) {
             t100ms_flag = false;
             switch(t100ms_index){
                 case 0: 
-                    R_Motor.EncoderDiff();
-		    L_Motor.EncoderDiff();
-		    R_Motor.CalVel();
-		    L_Motor.CalVel();
-		    R_Motor.PIDUpdate();
-		    L_Motor.PIDUpdate();
+                    MotorVelControling();
                    
-		    std::cout <<  R_Motor.EncoderPos() << std::endl;
-
 	            t100ms_index = 1;
 	            break;
 		case 1: 
 		    t100ms_index = 2;
 		    break;
 		case 2: 
-		    R_Motor.EncoderDiff();
-		    L_Motor.EncoderDiff();
-		    R_Motor.CalVel();
-		    L_Motor.CalVel();
-		    R_Motor.PIDUpdate();
-		    L_Motor.PIDUpdate();
+                    MotorVelControling();
                    
-
 		    t100ms_index = 3;
 		    break;
 		case 3: 
 		    t100ms_index = 4;
 		    break;
 		case 4:  
-		    R_Motor.EncoderDiff();
-		    L_Motor.EncoderDiff();
-		    R_Motor.CalVel();
-		    L_Motor.CalVel();
-		    R_Motor.PIDUpdate();
-		    L_Motor.PIDUpdate();
-                   
+                    MotorVelControling();
 
 		    Vel_R = R_Motor.VELOCITY;
 		    Vel_L = L_Motor.VELOCITY;
@@ -109,27 +92,26 @@ int main (int argc, char **argv) {
 		    t100ms_index = 5;
 		    break;
 	        case 5: //Publish Part
+		    Vel_R = R_Motor.VELOCITY;
+		    Vel_L = L_Motor.VELOCITY;
+	            aVel_R = Vel_R / (2 * WHEELSIZE);
+		    aVel_L = Vel_L / (2 * WHEELSIZE);
 
+		    Linear_Vel  = (Vel_R + Vel_L) / 2;
+		    Angular_Vel = (Vel_R - Vel_L) / WHEELBASE * 1000 ;
+	
 	            cmd_vel.linear.x = Linear_Vel;
 		    cmd_vel.angular.z = Angular_Vel;
 		    t100ms_index = 6;
 		    break;
 		case 6:
-                     R_Motor.EncoderDiff();
-		    L_Motor.EncoderDiff();
-		    R_Motor.CalVel();
-		    L_Motor.CalVel();
-		    R_Motor.PIDUpdate();
-		    L_Motor.PIDUpdate();
-
+                    MotorVelControling();
+		    
 		    Distance_delta = Linear_Vel*0.1;
-                 
 		    Angle_delta = Angular_Vel*0.1;
-
 		    x_dist = x_dist + Distance_delta * cos(Angle + Angle_delta/2);
 		    y_dist = y_dist + Distance_delta * sin(Angle + Angle_delta/2);
 		    Angle = Angle + Angle_delta;
-//		    std::cout << "(x, y) = (" << x_dist << ", " << y_dist << ")" << std::endl;	
   		    t100ms_index = 7;
 		    break;
 		case 7: 
@@ -168,15 +150,10 @@ int main (int argc, char **argv) {
 		    t100ms_index = 8;
 		    break;
 		case 8:
-                    R_Motor.EncoderDiff();
-		    L_Motor.EncoderDiff();
-		    R_Motor.CalVel();
-		    L_Motor.CalVel();
-		    R_Motor.PIDUpdate();
-		    L_Motor.PIDUpdate();
-
-                   t100ms_index = 9;
-		    break;
+                   MotorVelControling();
+                  
+		   t100ms_index = 9;
+		   break;
 		case 9:
 		    t100ms_index = 0;
 		    break;
@@ -184,57 +161,11 @@ int main (int argc, char **argv) {
 		    t100ms_index = 0;
 		    break;
 	    }//Switch END
-	    	    Vel_R = R_Motor.VELOCITY;
-		    Vel_L = L_Motor.VELOCITY;
-	            aVel_R = Vel_R / (2 * WHEELSIZE);
-		    aVel_L = Vel_L / (2 * WHEELSIZE);
-
-		    Linear_Vel  = (Vel_R + Vel_L) / 2;
-		    Angular_Vel = (Vel_R - Vel_L) / WHEELBASE * 1000 ;
-                    std_msgs::Float64 RIGHTV;
-	            RIGHTV.data = Vel_R;
-		    std_msgs::Float64 LEFTV;
-	             LEFTV.data = Vel_L;
-                    bada_MotorR.publish(RIGHTV);		    
-	            bada_MotorL.publish(LEFTV);		    
-	//	    ROS_INFO("Linear : %.2f m/s\tAng : %.2f rad", Linear_Vel, Angular_Vel);
-		 //   ROS_INFO("Vel_L : %.2f m/s \tVel_R : %.2f m/s", Vel_L, Vel_R);
-			    current_time = ros::Time::now();
-		    //compute odom of robot 
-		    odom_quat = tf::createQuaternionMsgFromYaw(Angle);
-	            //Pub TF
-		    odom_trans.header.stamp = current_time;
-		    odom_trans.header.frame_id = "odom";
-		    odom_trans.child_frame_id = "bada_chasis";
-	
-		    odom_trans.transform.translation.x = x_dist;
-		    odom_trans.transform.translation.y = y_dist;
-		    odom_trans.transform.translation.z = 0.0;
-		    odom_trans.transform.rotation = odom_quat;
-					
-		    //Send the TF
-		    odom_broadcaster.sendTransform(odom_trans);
-		
-		    //Pub Odometry 
-		    odom.header.stamp = current_time;
-		    odom.header.frame_id = "odom";
-	
-	            odom.pose.pose.position.x = x_dist;
-		    odom.pose.pose.position.y = y_dist;
-		    odom.pose.pose.position.z = 0.0;
-		    odom.pose.pose.orientation = odom_quat;
-	
-		    //set the velocity
-		    odom.child_frame_id = "bada_chasis";
-		    odom.twist.twist.linear.x  = Linear_Vel;
-		    odom.twist.twist.linear.y  = 0.0 ;
-		    odom.twist.twist.angular.z = Angular_Vel;
-	
-		    bada_odom.publish(odom);
-	
-
+	    //For Debugging
+            PubMotRLSpd(&bada_MotorR, &bada_MotorL);
         }//if END
     }//while END
+
     R_Motor.MotorCtrl(true, 0);
     L_Motor.MotorCtrl(true, 0);
     pigpio_stop(pinum);
@@ -245,7 +176,6 @@ int main (int argc, char **argv) {
 void Initialize(){
     R_Motor.PIDgainSET(2.5,0.35,0.6);
     L_Motor.PIDgainSET(2.5,0.35,0.6); 
-
 
     ROS_INFO("Initialize Complete~");
     ROS_INFO("---BADA Node Start---");
@@ -269,5 +199,28 @@ void TwistToMotor_CB(const geometry_msgs::Twist &msg){
 
 void timer_CB(const ros::TimerEvent &event){
 	t100ms_flag = true;
+}
+
+void MotorVelControling(){
+    R_Motor.EncoderDiff();
+    L_Motor.EncoderDiff();
+    R_Motor.CalVel();
+    L_Motor.CalVel();
+    R_Motor.PIDUpdate();
+    L_Motor.PIDUpdate();
+}
+
+void PubMotRLSpd(ros::Publisher *R, ros::Publisher *L ) {
+    float SpdR, SpdL;
+    std_msgs::Float64 SpdR_F;
+    std_msgs::Float64 SpdL_F;
+
+    SpdR = R_Motor.VELOCITY;
+    SpdL = L_Motor.VELOCITY;
+
+    SpdR_F.data = SpdR;
+    SpdL_F.data = SpdL;
+    R->publish(SpdR_F);
+    L->publish(SpdL_F);
 
 }
