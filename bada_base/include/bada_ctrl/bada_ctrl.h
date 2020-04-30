@@ -22,8 +22,8 @@ const int MOTOR_DIR_R = 26;
 const int MOTOR_PWM_R = 12;
 
 const int WHEELSIZE = 42;          	    // [mm] radius
-const int WHEELBASE = 274;         	    // [mm] wheel to wheel
-const int ENCODER_RESOLUTION = 374; 	    // count per cycle
+const int WHEELBASE = 264;         	    // [mm] wheel to wheel
+const int ENCODER_RESOLUTION = 390*4; 	    // count per cycle
 
 const double PI = 3.141592;
 
