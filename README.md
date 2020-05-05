@@ -46,6 +46,8 @@ The linear and angular velocity of Bada in Bada's Local reference fream. `Twists
 
 
 # TodoLIST
+## Robot System Architecture Design
+ - [ ] Architecture Design
 
 ## Mobile Robot 
  - [x] Encoder value setting
