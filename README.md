@@ -66,7 +66,7 @@ The linear and angular velocity of Bada in Bada's Local reference fream. `Twists
  - [ ] Merge TDoA sensor and mobile robot.
  - [ ] Create movement toward where sound is ocurred.
  
-## Sound Recognition
+## [Sound Recognition](Sound/README.md)
  - [x] YamNet 
  - [ ] Make Yamnet as ROS Program.
  
