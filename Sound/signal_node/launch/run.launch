@@ -1,0 +1,14 @@
+<launch>
+
+  <node pkg="signal_node" name="signal_node.py" type="signal_node"/>
+<!-- 
+  <group ns="signal_node2">
+    <node pkg="signal_node" name="sim" type="signal_node_node"/>
+  </group>
+
+  <node pkg="signal_node" name="mimic" type="mimic">
+    <remap from="input" to="signal_node1/turtle1"/>
+    <remap from="output" to="signal_node2/turtle1"/>
+  </node> -->
+
+</launch>
