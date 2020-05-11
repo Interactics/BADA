@@ -13,9 +13,17 @@ const FRAME_MIN_TIME = (1000/60) * (60 / FRAMES_PER_SECOND) - (1000/60) * 0.5;
 var lastFrameTime = 0;  // the last frame time
 
 
+//kakao API
+Kakao.init('b886eede39b9d47bc9d3cb6e91483799');
+console.log(Kakao.isInitialized());
 
-//Tab design 왜 안되냐..jquery 동작안해, html에서 jquery 소스 불러왔는데도 연결 안되는듯.
 
+Kakao.Link.sendScrap({
+  requestUrl: 'http://192.168.43.254'
+});
+
+
+//Tab design 
 $(document).ready(function(){
   // process.. 
   $('.tab_menu_btn').on('click',function(){
@@ -30,7 +38,6 @@ $(document).ready(function(){
     $('.tab_box').eq(idx).show();
   });
 });
-
 
 
 
@@ -66,7 +73,7 @@ function tryConnectWebsocket(){
   });
 
   // Create a connection to the rosbridge WebSocket server.
-  ros.connect('ws://localhost:9090');
+  ros.connect('ws://192.168.43.254:9090');
 
   // Like when publishing a topic, we first create a Topic object with details of the topic's name
   // and message type. Note that we can call publish or subscribe on the same topic object.
@@ -98,6 +105,7 @@ function tryConnectWebsocket(){
     if(count){
       console.log(message);
     }
+
     // console.log('received a turtlesim message');
     // console.log(message);
     x=message.x*50;
@@ -109,6 +117,8 @@ function tryConnectWebsocket(){
     // }
   });
 }
+
+
 
 function init() {
   canvas = document.getElementById('canvas');
