@@ -33,9 +33,12 @@ sudo service apache2 status
 ## 권한 수정   
 /etc/apache2/apache2.conf 파일 중반부의 코드를 수정한다.(denied->granted)   
    
-   <Directory />   
+   <Directory />
+   
       AllowOverride None   
+      
       Require all granted   
+      
    </Directory>   
    
    
