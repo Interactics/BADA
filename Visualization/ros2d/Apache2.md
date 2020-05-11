@@ -7,6 +7,8 @@ apache2 -v
    
    
    
+   
+   
 ## Apache 상태 확인과 시작/중지/재시작   
 sudo service apache2 status   
 ->sudo service apache2 start    
@@ -17,9 +19,14 @@ sudo service apache2 status
    
    
    
+   
+   
 ## Document Root 수정   
 /etc/apache2/sites-available/000-default.con 파일의 DocumentRoot를 수정   
 나는 '<생략>/ros2d/public' 으로 해뒀음   
+   
+   
+   
    
    
    
