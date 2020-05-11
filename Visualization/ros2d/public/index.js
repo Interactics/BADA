@@ -12,16 +12,29 @@ const FRAMES_PER_SECOND = 10;  // Valid values are 60,30,20,15,10...
 const FRAME_MIN_TIME = (1000/60) * (60 / FRAMES_PER_SECOND) - (1000/60) * 0.5;
 var lastFrameTime = 0;  // the last frame time
 
-
+/*
 //kakao API
 Kakao.init('b886eede39b9d47bc9d3cb6e91483799');
 console.log(Kakao.isInitialized());
+*/
 
+function shareKakaotalk() {
+  Kakao.init("b886eede39b9d47bc9d3cb6e91483799");      // 사용할 앱의 JavaScript 키를 설정
+  Kakao.Link.sendDefault({
+        objectType:"feed"
+      , content : {
+            title:"test"   // 콘텐츠의 타이틀
+          , description:"Sound event!!"   // 콘텐츠 상세설명
+          , imageUrl:"/mnt/c/Users/giwon/Downloads/BADA.jpg"   // 썸네일 이미지 이거 링크로 바꿔야할듯
+          , link : {
+                mobileWebUrl:"http://192.168.137.1"   // 모바일 카카오톡에서 사용하는 웹 링크 URL
+              , webUrl:"http://192.168.137.1" // PC버전 카카오톡에서 사용하는 웹 링크 URL
+          }
+      }
+  });
+}
 
-Kakao.Link.sendScrap({
-  requestUrl: 'http://192.168.43.254'
-});
-
+shareKakaotalk();
 
 //Tab design 
 $(document).ready(function(){
