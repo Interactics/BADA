@@ -33,13 +33,13 @@ sudo service apache2 status
 ## 권한 수정   
 /etc/apache2/apache2.conf 파일 중반부의 코드를 수정한다.(denied->granted)   
    
-   <Directory />
+    <Directory />
    
       AllowOverride None   
       
       Require all granted   
       
-   </Directory>   
+    </Directory>   
    
    
 **위 과정을 완료하면 http://<ip주소>로 접속하면 index.html 파일의 웹페이지가 나와야함**   
