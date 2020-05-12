@@ -11,9 +11,9 @@
   <script type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js"></script>
 
   <link rel="stylesheet" href="index.css">
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>  
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script type="text/javascript" src="index.js"></script>
-
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
 
 </head>
@@ -21,37 +21,53 @@
 <body>
   <h1>Simple Map Example</h1>
 
-    <div class="tab_menu_container">
-      <button class="tab_menu_btn on" type="button">real-time Topic</button>
-      <button class="tab_menu_btn" type="button">recorded Topic</button>
+  <div class="tab_menu_container">
+    <button class="tab_menu_btn on" type="button">real-time Topic</button>
+    <button class="tab_menu_btn" type="button">recorded Topic</button>
+  </div>
+
+  <div class="tab_box_container">
+
+    <div class="tab_box on">
+
+      <button class="temp" onclick="init()">draw</button>
+      <button class="temp" onclick="tryConnectWebsocket()">connect</button>
+      <div id="map">
+
+        <canvas id="canvas" width="640" height="480">
+        </canvas>
+
+      </div>
+      <p>
+        <div style="color:red;font-size:large;font-weight:bold;">
+          <li><span id="first_topic_name"></span></li>
+        </div>
+        <div style="color:black;font-size:large;font-weight:bold;">
+          <li><span id="first_topic_proba"></span></li>
+        </div>
+      </p>
+      
+      
+      
+        <div style="color:red;font-size:large;font-weight:bold;">
+          <li><span id="second_topic_name"></span></li>
+        </div>
+        <div style="color:black;font-size:large;font-weight:bold;">
+          <li><span id="second_topic_proba"></span></li>
+        </div>
+      
     </div>
 
-    <div class= "tab_box_container">
-      
-      <div class="tab_box on">
-        
-        <button class="temp" onclick="init()" >draw</button>
-        <button class="temp" onclick="tryConnectWebsocket()">connect</button>
-        <div id="map">
- 
-          <canvas id="canvas" width="640" height="480">
-          </canvas>
- 
-        </div>
-        <div id="realtime_topic">real time topic, map, etc.</div>
-        
+    <div class="tab_box">
+      <div id="recorded_topic">
+        recorded topic and history
       </div>
-      
-      <div class="tab_box"> 
-        <div id="recorded_topic">
-          recorded topic and history 
-        </div>
-      </div>
-      
     </div>
 
+  </div>
 
-  
+
+
 
   <!--
     <div class="tab_box_container">
