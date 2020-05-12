@@ -1,5 +1,3 @@
-
-
 var canvas;
 var ctx;
 var start;
@@ -7,12 +5,10 @@ var oldTimeStamp;
 var x;
 var y;
 var theta;
-
+var str;
 const FRAMES_PER_SECOND = 10;  // Valid values are 60,30,20,15,10...
 const FRAME_MIN_TIME = (1000/60) * (60 / FRAMES_PER_SECOND) - (1000/60) * 0.5;
 var lastFrameTime = 0;  // the last frame time
-
-
 
 //Tab design 왜 안되냐..jquery 동작안해, html에서 jquery 소스 불러왔는데도 연결 안되는듯.
 
@@ -120,7 +116,50 @@ function init() {
   tryConnectWebsocket();
 }
 
+///////////////////////////
+var ros = new ROSLIB.Ros({
+  url : 'ws://localhost:9090'
+});
+
+var audio_topic = new ROSLIB.Topic({
+  ros : ros,
+  name : '/audio',
+  messageType : 'std_msgs/String'
+});
+
+//////////////////////////////////////////////////////
+audio_topic.subscribe(function(m){
+  str = m.data;
+  for(var i=0;i<100;i++) str = str.replace("\"","");
+  str = str.substring(1);
+  str = str.substring(1);
+  str = str.slice(0,-1);
+  str = str.slice(0,-1);
+  //JSON.parse doesn't work. Failed to fix the syntax error.
+  str = str.replace("[","");
+  str = str.replace("]","");
+  str = str.replace("[","");
+  str = str.replace("]","");
+  str = str.replace("[","");
+  str = str.replace("]","");
+  str = str.substring(0,str.indexOf("["));
+  
+  
+  str = str.slice(0,-1);
+  str = str.slice(0,-1);
+  str = str.split(","); 
+  console.log(str);
+
+  document.getElementById("first_topic_name").innerHTML=str[0];
+  document.getElementById("first_topic_proba").innerHTML=str[1];
+  document.getElementById("second_topic_name").innerHTML=str[2];
+  document.getElementById("second_topic_proba").innerHTML=str[3];
+  
+});
+
 function loop(timeStamp) {
+
+ 
   
   // Keep requesting new frames
   if(timeStamp-lastFrameTime < FRAME_MIN_TIME){ //skip the frame if the call is too early
@@ -174,7 +213,30 @@ function draw(timestamp) {
   ctx.fillStyle = 'red';//#DC143C
   ctx.arc(x, y, 5, 0, 2*Math.PI);
   ctx.fill(); // or context.fill()
+
+
+
 }
+
+
+
+/*
+function publishEncoded(topic, obj){
+  var msg = new ROSLIB.Message({
+    data: JSON.stringify(obj)
+  });
+  topic.publish(msg);
+}
+
+function decodeMessage(msg){
+  return JSON.parse(msg.data);
+}
+
+audio_topic.subscribe(audio_topic) {
+  var decoded = JSON.parse(msg.data);
+  console.log(decoded);
+});
+*/
 
 
 
