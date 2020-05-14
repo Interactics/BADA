@@ -1,0 +1,7 @@
+image: /home/robot/catkin_ws/src/bada_2dnav/maps/map.2.pgm
+resolution: 0.050000
+origin: [-6.079506, -6.875781, 0.000000]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

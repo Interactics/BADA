@@ -1,0 +1,60 @@
+<launch>
+  <arg name="rgb_topic"          value="/d400/color/image_raw"/>
+  <arg name="depth_topic"        value="/d400/aligned_depth_to_color/image_raw"/>
+  <arg name="camera_info_topic"  value="/d400/color/camera_info"/>
+  <arg name="odom_topic" default="/t265/odom/sample"/>
+  <arg name="localization"      default="false"/>
+  <arg if="$(arg localization)" name="args"  default=""/>
+  <arg unless="$(arg localization)" name="args"  default="--delete_db_on_start"/>
+  <arg name="wait_for_transform"  default="0.2"/>
+  <arg name="rviz"              default="true"/>
+
+
+ <include file="$(find bada_2dnav)/launch/move_base.launch"/>
+
+ <group ns="rtabmap">
+    <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="">
+	<remap from="odom" to="$(arg odom_topic)"/>
+        <remap from="rgb/image" to="$(arg rgb_topic)"/>
+        <remap from="depth/image" to="$(arg depth_topic)"/>
+        <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+          <param name="frame_id" type="string" value="d400_link"/>
+	  <param name="depth_topic" type="string" value="d400/aligned_depth_to_color/image_raw "/>
+          <param name="visual_odometry" type="bool" value="false"/>
+	  <param name="odom_topic" type="string" value="t265/odom/sample"/>
+	  <param name="rgb_topic" type="string" value="d400/color/image_raw"/>
+	  <param name="camera_info_topic" type="string" value="d400/color/camera_info"/>
+          <param name="queue_size" type="int" value="200"/>
+          <param name="rviz" type="bool" value="true"/>
+          <param name="rtabmapviz" type="bool" value="true"/>
+	  <param name="approx_sync" type="string" value="false"/>
+
+	  <param name="use_action_for_goal" type="bool" value="true"/>
+          <remap from="move_base"            to="/move_base"/>
+
+	 <!-- output -->
+  	  <remap from="grid_map" to="/map"/>
+
+
+<param name="RGBD/ProximityBySpace"        type="string" value="true"/>   <!-- Local loop closure detection (using estimated position) with locations in WM -->
+	  <param name="RGBD/OptimizeFromGraphEnd"    type="string" value="false"/>  <!-- Set to false to generate map correction between /map and /odom -->
+	  <param name="Kp/MaxDepth"                  type="string" value="4.0"/>
+	  <param name="Reg/Strategy"                 type="string" value="0"/>      <!-- Loop closure transformation: 0=Visual, 1=ICP, 2=Visual+ICP -->
+	  <param name="Icp/CorrespondenceRatio"      type="string" value="0.3"/>
+	  <param name="Vis/MinInliers"               type="string" value="15"/>      <!-- 3D visual words minimum inliers to accept loop closure -->
+	  <param name="Vis/InlierDistance"           type="string" value="0.1"/>    <!-- 3D visual words correspondence distance -->
+	  <param name="RGBD/AngularUpdate"           type="string" value="0.1"/>    <!-- Update map only if the robot is moving -->
+	  <param name="RGBD/LinearUpdate"            type="string" value="0.1"/>    <!-- Update map only if the robot is moving -->
+	  <param name="RGBD/ProximityPathMaxNeighbors" type="string" value="0"/> 
+	  <param name="Rtabmap/TimeThr"              type="string" value="0"/>
+	  <param name="Mem/RehearsalSimilarity"      type="string" value="0.30"/>
+	  <param name="Reg/Force3DoF"                type="string" value="true"/>
+	  <param name="GridGlobal/MinSize"           type="string" value="20"/>
+
+
+	<param if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
+        <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
+        <param name="Mem/InitWMWithAllNodes" type="string" value="$(arg localization)"/>
+    </node>
+  </group>
+</launch>

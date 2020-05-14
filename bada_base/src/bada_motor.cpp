@@ -64,7 +64,7 @@ int main (int argc, char **argv) {
                    
 	            t100ms_index = 1;
 	            break;
-		case 1: 
+		    case 1: 
 		    t100ms_index = 2;
 		    break;
 		case 2: 
@@ -105,7 +105,7 @@ int main (int argc, char **argv) {
 		    t100ms_index = 6;
 		    break;
 		case 6:
-                    MotorVelControling();
+            MotorVelControling();
 		    
 		    Distance_delta = Linear_Vel*0.1;
 		    Angle_delta = Angular_Vel*0.1;
@@ -150,9 +150,9 @@ int main (int argc, char **argv) {
 		    t100ms_index = 8;
 		    break;
 		case 8:
-                   MotorVelControling();
+            MotorVelControling();
                   
-		   t100ms_index = 9;
+		    t100ms_index = 9;
 		   break;
 		case 9:
 		    t100ms_index = 0;
