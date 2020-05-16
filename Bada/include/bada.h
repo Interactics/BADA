@@ -138,61 +138,19 @@ void DCMotor::AccelCtrl(bool Dir, int PWM_desired){
     //ROS_INFO("Current_PWM is %d", current_PWM);
 }
 
+
+
+
+
+
+
+
+
+
 //==================================DCMotor Class========================= 
 //========================================================================
 /////////////////////////////////////////////////////////////////////////////////////
 
-
-//----------------------------------------------------------------------------------
-/************************************************************************
-*                                Bada Class                              *
-************************************************************************/
-
-class Bada {
-private:
-    ros::NodeHandle nh_;
-
-    ros::Subscriber vel_sub_;
-    ros::Publisher pos_pub_;
-    ros::WallTime last_command_time_;
-
-    float lin_vel_;
-    float angular_vel_;
-
-    float motor_vel_right_;
-    float motor_vel_left_;
-
-public:
-    Bada(const ros::NodeHandl& nh);
-    void velocityCb(const geometry_msgs::Twist::ConstPtr& vel);
-    void twistToMotor();
-
-    friend void DCMotor::controllingMotor();
-};
-
-Bada::Bada(const ros::NodeHandle& nh)
-    :nh_(nh), lin_vel_(0), angular_vel_(0), motor_vel_right_(0), motor_vel_left_(0) {
-    vel_sub_ = nh -> subscribe("/bada/cmd_vel", 1, &Bada::velocityCb, this);
-    pos_pub_ = nh -> advertise<Pose>("/bada/pose", 1);
-}
-
-void Bada::velocityCb(const geometry_msgs::Twist::ConstPtr& vel){
-  last_command_time_ = ros::WallTime::now();
-  lin_vel_ = vel -> linear.x;
-  angular_vel_= vel -> angular.z;
-}
-
-void Bada::twistToMotor(){
-    motor_vel_right_ = lin_vel_ - ROBOT_WHEEL_BASE * angular_vel_ / 2;
-    motor_vel_left_ = lin_vel_ + ROBOT_WHEEL_BASE * angular_vel_ / 2;
-}
-
-
-//===========================Method of Bada Class ======================
-//======================================================================
-/////////////////////////////////////////////////////////////////////////////////////
-
-} //end namespace bada
 
 bool motor1_ena_uprising;
 bool motor1_ena_falling;
@@ -313,3 +271,55 @@ int Limit_Function(int pwm){
 
 
 #endif // BADA_H_
+
+
+//----------------------------------------------------------------------------------
+/************************************************************************
+*                                Bada Class                              *
+************************************************************************/
+
+class Bada {
+private:
+    ros::NodeHandle nh_;
+
+    ros::Subscriber vel_sub_;
+    ros::Publisher pos_pub_;
+    ros::WallTime last_command_time_;
+
+    float lin_vel_;
+    float angular_vel_;
+
+    float motor_vel_right_;
+    float motor_vel_left_;
+
+public:
+    Bada(const ros::NodeHandl& nh);
+    void velocityCb(const geometry_msgs::Twist::ConstPtr& vel);
+    void twistToMotor();
+
+    friend void DCMotor::controllingMotor();
+};
+
+Bada::Bada(const ros::NodeHandle& nh)
+    :nh_(nh), lin_vel_(0), angular_vel_(0), motor_vel_right_(0), motor_vel_left_(0) {
+    vel_sub_ = nh -> subscribe("/bada/cmd_vel", 1, &Bada::velocityCb, this);
+    pos_pub_ = nh -> advertise<Pose>("/bada/pose", 1);
+}
+
+void Bada::velocityCb(const geometry_msgs::Twist::ConstPtr& vel){
+  last_command_time_ = ros::WallTime::now();
+  lin_vel_ = vel -> linear.x;
+  angular_vel_= vel -> angular.z;
+}
+
+void Bada::twistToMotor(){
+    motor_vel_right_ = lin_vel_ - ROBOT_WHEEL_BASE * angular_vel_ / 2;
+    motor_vel_left_ = lin_vel_ + ROBOT_WHEEL_BASE * angular_vel_ / 2;
+}
+
+
+//===========================Method of Bada Class ======================
+//======================================================================
+/////////////////////////////////////////////////////////////////////////////////////
+
+} //end namespace bada
