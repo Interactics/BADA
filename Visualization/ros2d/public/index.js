@@ -7,24 +7,27 @@ var oldTimeStamp;
 var x;
 var y;
 var theta;
-
+var data;
+var time;
+const today = new Date();
+today.setTime(0);
 const FRAMES_PER_SECOND = 10;  // Valid values are 60,30,20,15,10...
 const FRAME_MIN_TIME = (1000/60) * (60 / FRAMES_PER_SECOND) - (1000/60) * 0.5;
 var lastFrameTime = 0;  // the last frame time
-
+Kakao.init("b886eede39b9d47bc9d3cb6e91483799");   // 사용할 앱의 JavaScript 키를 설정
 /*
 //kakao API
 Kakao.init('b886eede39b9d47bc9d3cb6e91483799');
 console.log(Kakao.isInitialized());
 */
 
-function shareKakaotalk() {
-  Kakao.init("b886eede39b9d47bc9d3cb6e91483799");      // 사용할 앱의 JavaScript 키를 설정
+function shareKakaotalk(data) {
+  var n=data;
   Kakao.Link.sendDefault({
         objectType:"feed"
       , content : {
-            title:"test"   // 콘텐츠의 타이틀
-          , description:"Sound event!!"   // 콘텐츠 상세설명
+            title:"이벤트 발생"   // 콘텐츠의 타이틀
+          , description: n/* 콘텐츠 상세설명*/   
           , imageUrl:"/mnt/c/Users/giwon/Downloads/BADA.jpg"   // 썸네일 이미지 이거 링크로 바꿔야할듯
           , link : {
                 mobileWebUrl:"http://192.168.137.1"   // 모바일 카카오톡에서 사용하는 웹 링크 URL
@@ -34,7 +37,7 @@ function shareKakaotalk() {
   });
 }
 
-shareKakaotalk();
+
 
 //Tab design 
 $(document).ready(function(){
@@ -52,7 +55,60 @@ $(document).ready(function(){
   });
 });
 
+class List{
+  constructor()
+  {
+    this.listSize=0;
+    this.pos=0;
+    this.dataStore=[];
+  } 
 
+  append(element){
+    this.dataStore[this.listSize++]=element;
+  }
+
+  length()
+  {
+    return this.listSize;
+  }
+
+  search(){
+    var cnt=0;
+    for(var i=0; i<this.dataStore.length;i++)
+    {
+      if((this.dataStore[i]-time)>1800000) //30분 이상이면 반복문탈출
+      {
+        break;
+      }
+      else{
+        cnt++;
+        console.log("cnt++");
+      }
+    }
+    if(cnt>=3)
+    { console.log("cnt>=3");
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+
+  remove(){
+    var pos=this.listSize-1;
+    this.dataStore.splice(pos,1);
+    --this.listSize;
+  }
+}
+
+//overflow 막기위해서 10분에한번씩 water.remove실행
+w_remove = setInterval(function() {
+  if(water.listSize>0){
+    water.remove();}
+}, 600000);
+
+
+var water = new List();
 
 function tryConnectWebsocket(){
 
@@ -86,7 +142,7 @@ function tryConnectWebsocket(){
   });
 
   // Create a connection to the rosbridge WebSocket server.
-  ros.connect('ws://192.168.43.254:9090');
+  ros.connect('ws://192.168.0.7:9090');
 
   // Like when publishing a topic, we first create a Topic object with details of the topic's name
   // and message type. Note that we can call publish or subscribe on the same topic object.
@@ -129,6 +185,36 @@ function tryConnectWebsocket(){
     //   turtle1.unsubscribe();
     // }
   });
+
+
+  var signal = new ROSLIB.Topic({
+    ros : ros,
+    name : '/signal',
+    messageType : 'std_msgs/String'
+  });
+
+  signal.subscribe(function(m){
+    data=m.data;
+    time=today.getTime();
+    if(data=='Water')
+    {
+      //먼저 검색해
+      if(water.search())
+      {
+        console.log("발생한적있어.");
+      //발생한적있다면
+      shareKakaotalk(data);
+      }
+      else
+      {
+      //발생한적없다면
+      water.append(time);
+      }
+  
+    }
+  }
+  );
+  
 }
 
 
@@ -198,6 +284,15 @@ function draw(timestamp) {
   ctx.arc(x, y, 5, 0, 2*Math.PI);
   ctx.fill(); // or context.fill()
 }
+
+
+
+
+
+
+
+
+
 
 
 
