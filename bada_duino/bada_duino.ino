@@ -1,6 +1,8 @@
-#include <RGBmatrixPanel.h>
 #include <DynamixelMotor.h>
-//#include <ros.h>
+#include <RGBmatrixPanel.h>
+#include <ros.h>
+#include <std_msgs/Bool.h>
+#include <std_msgs/Int16.h>
 
 #define CLK 11
 #define OE   9
@@ -9,43 +11,22 @@
 #define B   A1
 #define C   A2
 #define D   A3
-
 #define D_ID 144  ///Dynmixel ID
+
+unsigned long          previousTime = millis();
+unsigned long          currentTime;
+const long             timeInterval = 100; //ms
+bool                   t_flag       = false;
+char                   t_index      = 0;
+float                  t_val        = 0;
+int16_t speed = 125;                          // speed, between 0 and 1023
+const long unsigned int DX_baudrate = 1000000;// communication baudrate
+
 enum Events {
-  NOTHING,
+  NOTHING = 0,
   A_UP, A_DOWN, A_LEFT, A_RIGHT,
   FIRE_EVENT, WATER_EVENT, DOOR_EVENT, BELL_EVENT, BOILING_EVENT, CRYING_EVENT
 };
-int ledState1                    = LOW;
-
-void Dynamixel_startUP();
-void LEDMatrix_startUP();
-void LEDMatrix_Control(Events event);
-float VelocityCtrl(int pos1, int pos2, float t);
-
-void MotorCtrl(bool cmd);
-
-
-//-------------------ROS--------------------------//
-
-//std_msgs::Bool CameraState_msg;
-//std_msgs::Bool DisplayState_msg;
-//std_msgs::Bool ButtonState_msg;
-//
-//ros::Publisher CameraState ("Cameara_State", &CameraState_msg);
-//ros::Publisher DisplayState("Display_State", &DisplayState_msg);
-//ros::Publisher ButtonState ("Button_State", &ButtonState_msg);
-//
-//void CameraCommand (const std_msgs::Bool& cmd);
-//void DisplayCommand(const std_msgs::Bool& cmd);
-
-
-bool Camera_cmd = true, Button_cmd = false;
-Events Display_cmd = NOTHING; // need convert function
-
-//-------------------ROS--------------------------//
-//------------------------------------------------//
-
 
 const unsigned char PROGMEM ARROW_UP[] =
 { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x80, 0x00, 0x00, 0x03, 0xc0, 0x00,
@@ -119,39 +100,52 @@ const unsigned char PROGMEM FIRE2[] =
   0x03, 0xf8, 0x3f, 0x80, 0x01, 0xff, 0xff, 0x80, 0x00, 0xff, 0xfe, 0x00, 0x00, 0x3f, 0xf8, 0x00
 };
 
+std_msgs::Bool CameraState_msg;
+std_msgs::Bool DisplayState_msg;
+std_msgs::Bool ButtonState_msg;
 
-//--------------Dynamixel Setup---------------
-const long unsigned int DX_baudrate = 1000000;// communication baudrate
+bool Camera_cmd = false, Button_cmd = false;
+int Display_cmd = 0; // need convert function
+
+void Dynamixel_startUP();
+void LEDMatrix_startUP();
+void LEDMatrix_Control(Events event);
+void MotorCtrl(bool cmd);
+float VelocityCtrl(int pos1, int pos2, float t);
+
+ros::Publisher CameraState ("Cameara_State", &CameraState_msg);
+ros::Publisher DisplayState("Display_State", &DisplayState_msg);
+ros::Publisher ButtonState ("Button_State", &ButtonState_msg);
+ros::Subscriber<std_msgs::Bool> CameraSUB("bada/duino/camera_cmd", &CameraCommand);
+ros::Subscriber<std_msgs::Int16> DisplaySUB("bada/duino/display_cmd", &DisplayCommand );
+
+//callback
+void CameraCommand(const std_msgs::Bool& cmd);
+void DisplayCommand(const std_msgs::Int16& cmd);
+
 HardwareDynamixelInterface interface(Serial2);// Serial1 -- RX2 TX2, Serial -- RX1 TX1
-int16_t speed = 125;                          // speed, between 0 and 1023
+
 DynamixelMotor motor(interface, D_ID);
-///////////////////////////////////////////////
-
-//--------------LED Matrix Setup---------------
 RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false);
-///////////////////////////////////////////////
 
-float t_val = 0;
-unsigned long previousTime = millis();
-unsigned long currentTime;
+ros::NodeHandle  nh;
 
-const long             timeInterval = 100; //ms
-bool                   t_flag       = false;
-char                   t_index      = 0;
-
-
-////////////TEST
-int green = 52;
-
-////////////
 void setup() {
-  pinMode(green, OUTPUT);
-  Serial.begin(9600);
-
+  nh.initNode();
+  
+  nh.advertise(CameraState);
+  nh.advertise(DisplayState);
+  nh.advertise(ButtonState);
+  
+  nh.subscribe(CameraSUB);
+  nh.subscribe(DisplaySUB);
+  
   Dynamixel_startUP();
   LEDMatrix_startUP();
   motor.goalPosition(205);
-
+  delay(1000);
+  
+  nh.loginfo("BADA_DUINO ON");
 }
 
 void loop() {
@@ -162,13 +156,13 @@ void loop() {
     t_flag = false;
     switch (t_index) {
       case 0:
-        //        nh.spinOnce();
+        nh.spinOnce();
         t_index = 1;
         break;
       case 1:
         t_index = 2;
       case 2:
-        //        ButtonState.publish(&ButtonState_msg);
+        ButtonState.publish(&ButtonState_msg);
         t_index = 3;
         break;
       case 3:
@@ -176,13 +170,14 @@ void loop() {
         break;
       case 4:
         t_index = 5;
-        //        DisplayState.publish(&DisplayState_msg);
+        DisplayState.publish(&DisplayState_msg);
+        if (Display_cmd >= 0) LEDMatrix_Control(static_cast<Events>(Display_cmd));
         break;
       case 5:
         t_index = 6;
         break;
       case 6:
-        //        CameraState.publish(&CameraState_msg);
+        CameraState.publish(&CameraState_msg);
         t_index = 7;
         break;
       case 7:
@@ -190,7 +185,7 @@ void loop() {
         break;
       case 8:
         t_index = 9;
-        LEDMatrix_Control(FIRE_EVENT);
+        //LEDMatrix_Control(FIRE_EVENT);
         break;
       case 9:
         t_index = 0;
@@ -202,31 +197,30 @@ void loop() {
   }
   if (Camera_cmd == true) MotorCtrl(Camera_cmd);
   else MotorCtrl(Camera_cmd);
-  if (Display_cmd == true) LEDMatrix_Control(Display_cmd);
   if (Button_cmd == true); //motion that go backward, turn 180 and wait. or following situation.
-  
 }
 
-//void CameraCommand (const std_msgs::Bool& cmd){
-// camera_cmd = cmd.data;
-//}
-//
-//void DisplayCommand(const std_msgs::Bool& cmd){
-// Display_cmd = cmd.data;
-//}
+void CameraCommand (const std_msgs::Bool& cmd) {
+  Camera_cmd = cmd.data;
+}
+
+void DisplayCommand(const std_msgs::Int16& cmd) {
+  Display_cmd = cmd.data;
+}
 
 void Dynamixel_startUP() {
   interface.begin(DX_baudrate);
   delay(200);
   uint8_t status = motor.init();
-  if (status != DYN_STATUS_OK) { //Failure check
+  while (status != DYN_STATUS_OK) { //Failure check
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
-    while (1);
+    nh.loginfo("Dynamixel is not conected ");
+    delay(1000);
   }
-  
+
   motor.enableTorque();  // joint mode 180° angle range
-  motor.jointMode(204, 820);  // 0~180
+  motor.jointMode(204, 820);  //Change this code after Design.
   motor.speed(speed);
 }
 
@@ -243,17 +237,23 @@ void LEDMatrix_startUP() {
 }
 
 void LEDMatrix_Control(Events event) {
+  static Events current = -1;
+
+  if (current != event){
+    matrix.fillScreen(matrix.Color333(0, 0, 0));
+    current = event;
+  }
   // A_UP,A_DOWN, A_LEFT, A_RIGHT,
   // FIRE_EVENT, WATER_EVENT, DOOR_EVENT, BELL_EVENT, BOILING_EVENT, CRYING_EVENT
-  matrix.fillScreen(matrix.Color333(0, 0, 0));
 
   switch (event) {
-    case NOTHING:
+    case NOTHING : 
       matrix.fillScreen(matrix.Color333(0, 0, 0));
-    case A_UP:
+      break;
+    case A_UP : 
       matrix.drawBitmap(0, 0,  ARROW_UP, 32, 32, matrix.Color333(3, 7, 1));
       break;
-    case A_DOWN:
+    case A_DOWN : 
       matrix.drawBitmap(0, 0,  ARROW_DOWN, 32, 32, matrix.Color333(3, 7, 1));
       break;
     case A_LEFT:
@@ -263,13 +263,12 @@ void LEDMatrix_Control(Events event) {
       matrix.drawBitmap(0, 0,  ARROW_RIGHT, 32, 32, matrix.Color333(3, 7, 1));
       break;
     case FIRE_EVENT:
+      matrix.fillScreen(matrix.Color333(0, 0, 0));
       matrix.drawBitmap(0, 0,  FIRE1, 32, 32, matrix.Color333(7, 0, 0));
       matrix.fillScreen(matrix.Color333(0, 0, 0));
       matrix.drawBitmap(0, 0,  FIRE2, 32, 32, matrix.Color333(7, 0, 0));
       break;
   }
-  matrix.fillScreen(matrix.Color333(0, 0, 0));
-  matrix.drawBitmap(0, 0,  FIRE1, 32, 32, matrix.Color333(7, 0, 0));
 }
 
 void LEDMatrix_Erasing() {
@@ -279,18 +278,4 @@ void LEDMatrix_Erasing() {
 void MotorCtrl(bool cmd) {
   if (cmd) motor.goalPosition(500); // Changed!
   else  motor.goalPosition(210);    // Defalut
-}
-
-////Legacy
-int VelocityCtrl(int pos1, int pos2, long t_value) {
-  // ax^2 + bx^ + c = v(t) velocity;
-  // move while 2sec
-
-  digitalWrite(green, HIGH);
-
-  float t = float(t_value) / 1000;
-  float a = float(pos2 - pos1) / -4.5;
-  float c = pos1;
-
-  return (a / 3.0 * (t * t * t) - 3.0 / 2.0 * a * (t * t) + c);
 }
