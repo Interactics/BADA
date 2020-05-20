@@ -1,0 +1,28 @@
+<launch>
+
+
+
+     <group ns="planner">
+        <remap from="/d400/depth/color/points" to="/planner_cloud"/>
+        <remap from="base_scan" to="/scan"/>
+        <remap from="map" to="/rtabmap/proj_map"/>
+        <remap from="move_base_simple/goal" to="/planner_goal"/>
+        
+        <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    	  <rosparam file="$(find bada_2dnav)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+     	  <rosparam file="$(find bada_2dnav)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    	  <rosparam file="$(find bada_2dnav)/config/local_costmap_params_3d.yaml" command="load" />
+    	  <rosparam file="$(find bada_2dnav)/config/global_costmap_params.yaml" command="load" ns="global_costmap"/>
+    	  <rosparam file="$(find bada_2dnav)/config/base_local_planner_params.yaml" command="load" />
+
+
+   		</node>
+   		
+        <param name="cmd_vel/abtr_priority" value="10"/>
+    </group>
+
+
+</launch> 
+
+
+
