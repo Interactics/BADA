@@ -90,22 +90,6 @@ curl -v -X POST "https://kapi.kakao.com/v2/api/talk/memo/scrap/send" \
 */
 
 
-//Tab design 
-$(document).ready(function(){
-  // process.. 
-  $('.tab_menu_btn').on('click', function () {
-    //버튼 색 제거,추가
-    $('.tab_menu_btn').removeClass('on');
-    $(this).addClass('on')
-
-    //컨텐츠 제거 후 인덱스에 맞는 컨텐츠 노출
-    var idx = $('.tab_menu_btn').index(this);
-
-    $('.tab_box').hide();
-    $('.tab_box').eq(idx).show();
-  });
-});
-
 function Queue(){
 
     this.dataStore = [];
@@ -124,8 +108,9 @@ function dequeue()
     return this.dataStore.shift();
 }
 
+var cnt=0;
 function search(){
-    var cnt=0;
+    
     for(var i=0; i<this.dataStore.length;i++)
     {
       if((this.dataStore[i]-time)>1800000) //30분 이상이면 반복문탈출
@@ -185,7 +170,7 @@ function tryConnectWebsocket() {
   });
 
   // Create a connection to the rosbridge WebSocket server.
-  ros.connect('ws://192.168.0.7:9090');
+  ros.connect('ws://192.168.10.105:9090');
 
   // Like when publishing a topic, we first create a Topic object with details of the topic's name
   // and message type. Note that we can call publish or subscribe on the same topic object.
@@ -238,14 +223,25 @@ function tryConnectWebsocket() {
 
   signal.subscribe(function(m){
     sig_name=m.data;
+
+
     console.log("NOW SIGNAL : "+sig_name);
+    document.getElementById("signal").innerHTML = sig_name;
     time=today.getTime();
+
+
     if(sig_name=='Water')
     {
       //먼저 검색해 
       if(water.search())
       { 
         //총 3번 이상 발생했다면
+        for(var i=1; i<=3; i++)
+        {
+          water.dequeue();
+        }
+      
+        cnt=0;
         shareKakaotalk(sig_name);
       }
       else
@@ -285,9 +281,11 @@ var audio_topic = new ROSLIB.Topic({
 });
 
 //////////////////////////////////////////////////////
-audio_topic.subscribe(function (m) {
-  str = m.data;
-  str = str.replace("\"", "").replace("\"", "");
+
+
+//audio_topic.subscribe(function (m) {
+  //str = m.data;
+  //str = str.replace("\"", "").replace("\"", "");
   /*
   for(var i=0;i<100;i++) str = str.replace("\"","");
   
@@ -308,15 +306,15 @@ audio_topic.subscribe(function (m) {
   str = str.slice(0,-1);
   str = str.slice(0,-1);
   str = str.split(","); */
-  console.log(str);
+ // console.log(str);
 
-  document.getElementById("signal").innerHTML = str;
+ // document.getElementById("signal").innerHTML = str;
   /*
   document.getElementById("first_topic_proba").innerHTML=str[1];
   document.getElementById("second_topic_name").innerHTML=str[2];
   document.getElementById("second_topic_proba").innerHTML=str[3];
   */
-});
+//});
 
 function loop(timeStamp) {
 
