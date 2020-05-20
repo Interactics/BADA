@@ -11,15 +11,21 @@
   <script type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js"></script>
 
   <link rel="stylesheet" href="index.css">
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script> 
+  <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script type="text/javascript" src="index.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
 
 
 </head>
 
 <body>
   <h1>Simple Map Example</h1>
+  <a id="kakao-login-btn"></a>
+	<button id="btn_srch" onclick="setAuth()">인증</button>
 
   <div class="tab_menu_container">
     <button class="tab_menu_btn on" type="button">real-time Topic</button>
@@ -79,7 +85,27 @@
     <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
   </div>
 -->
+<script>
+   Kakao.Auth.createLoginButton({ 
+    container: '#kakao-login-btn', 
+    success: function(authObj) { 
+      alert(JSON.stringify(authObj)); 
+    },
+    fail: function(err) { 
+      alert(JSON.stringify(err)); 
+    } }); 
 
+function setAuth(){
+	Kakao.Auth.login({
+	    scope: 'talk_message,friends',
+	    success: function(response) {
+	        console.log(response);
+	    },
+	    fail: function(error) {
+	        console.log(error);
+	    }
+	});}
+</script>
 
 </body>
 
