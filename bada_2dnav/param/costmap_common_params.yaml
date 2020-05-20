@@ -1,0 +1,16 @@
+obstacle_range: 2.5 
+raytrace_range: 3.0
+footprint: [[-0.175,-0.175],[-0.175,0.175], [0.175,0.175], [0.175,-0.175]]
+#robot_radius: ir_of_robot
+inflation_radius: 0.55
+#cost_scaling_factor:0.5
+map_type :  costmap
+#transform_tolerance:0.2
+transform_tolerance: 1.0
+#observation_sources: voxel_cloud
+#voxel_cloud: {data_type: PointCloud2, topic: voxel_cloud , marking: true, clearing: true}
+
+observation_sources: point
+point: {data_type: PointCloud2, topic: /d400/depth/color/points, marking: true, clearing: true}
+
+

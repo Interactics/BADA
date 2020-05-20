@@ -1,0 +1,44 @@
+<launch>
+  <arg name="database_path"     default="~/.ros/rtabmap.db"/>
+  <arg name="rtabmapviz"        default="false"/>
+  <arg name="rviz"              default="false"/>
+  <arg name="localization"      default="false"/>
+  <arg if="$(arg localization)" name="args"  default=""/>
+  <arg unless="$(arg localization)" name="args"  default="--delete_db_on_start"/>
+  <arg name="wait_for_transform"  default="0.2"/>
+
+  <arg name="rgb_topic"          value="/d400/color/image_raw"/>
+  <arg name="depth_topic"        value="/d400/aligned_depth_to_color/image_raw"/>
+  <arg name="camera_info_topic"  value="/d400/color/camera_info"/>
+  <arg name="depth_camera_info_topic" default="/d400/depth/camera_info"/>
+  <arg name="scan_topic" default="/scan"/>
+  <arg name="odom_topic" default="/t265/odom/sample"/>
+  <arg name="fixed_frame" default="t265_link"/> <!-- base_link-->
+
+  <!--cloud to laser scan -->
+  <node pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" name="depthimage_to_laserscan">
+    <remap from="image" to="$(arg depth_topic)"/>
+    <remap from="camera_info" to="$(arg depth_camera_info_topic)"/>
+    <remap from="scan" to="$(arg scan_topic)"/>
+    <param name="range_max" type="double" value="4"/>
+    <param name="output_frame_id" type="str" value="d400_depth_frame"/>
+  </node>
+
+  <!-- SLAM -->
+  <group ns="rtabmap">
+    <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="$(arg args)">
+        <remap from="odom" to="$(arg odom_topic)"/>
+        <remap from="scan" to="$(arg scan_topic)"/>
+        <remap from="rgb/image" to="$(arg rgb_topic)"/>
+        <remap from="depth/image" to="$(arg depth_topic)"/>
+        <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+        <remap from="grid_map" to="/map"/>
+
+                   <param name="visual_odometry" type="bool" value="false"/>
+        <!-- localization mode -->
+        <param if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
+        <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>
+        <param name="Mem/InitWMWithAllNodes" type="string" value="$(arg localization)"/>
+    </node>
+  </group>
+</launch>
