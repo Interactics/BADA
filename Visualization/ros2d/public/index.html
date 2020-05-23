@@ -3,19 +3,17 @@
 
 <head>
   <meta charset="utf-8" />
-
   <script type="text/javascript" src="http://static.robotwebtools.org/EaselJS/current/easeljs.min.js"></script>
   <script type="text/javascript"
     src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
   <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
   <script type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js"></script>
-
   <link rel="stylesheet" href="index.css">
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script> 
   <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script type="text/javascript" src="index.js"></script>
-
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
 
 
@@ -27,48 +25,41 @@
   <a id="kakao-login-btn"></a>
 	<button id="btn_srch" onclick="setAuth()">인증</button>
 
-    <div class="tab_menu_container">
-      <button class="tab_menu_btn on" type="button">real-time Topic</button>
-      <button class="tab_menu_btn" type="button">recorded Topic</button>
-    </div>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Anton', sans-serif;
+    }
+  </style>
+</head>
 
-    <div class= "tab_box_container">
-      
-      <div class="tab_box on">
-        
-        <button class="temp" onclick="init()" >draw</button>
-        <button class="temp" onclick="tryConnectWebsocket()">connect</button>
-        <div id="map">
- 
-          <canvas id="canvas" width="640" height="480">
-          </canvas>
- 
-        </div>
-        <div id="realtime_topic">real time topic, map, etc.</div>
-        
-      </div>
-      
-      <div class="tab_box"> 
-        <div id="recorded_topic">
-          recorded topic and history 
-        </div>
-      </div>
-      
-    </div>
-    
+<body>
+  <header style="text-align: center;">
+    <p style="font-size:83px;">BADA</p>
+    <p style="font-size:25px;">real-time visual web</p>
+  </header>
+  <br>
 
-  
 
-  <!--
-    <div class="tab_box_container">
-    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
-    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
-    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
-    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
-    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
-    <div class="tab_box">무슨무슨토픽아무거나넣으면됨</div>
+
+  <div>
+    <button class="temp" onclick="init()">draw</button>
+    <button class="temp" onclick="tryConnectWebsocket()">connect</button>
   </div>
--->
+
+  <div id="map">
+    <canvas id="canvas" width="640" height="480">
+    </canvas>
+  </div>
+
+  <div style="color:black; font-weight:light; font-size: 45px; width:33%; padding:50px;">
+    <span id="signal"></span>
+  </div>
+
+
+  <div style="color:black; font-weight:light; font-size: 30px; width:33%; padding:50px;">
+    <span id="History"></span>
+  </div>
 <script>
    Kakao.Auth.createLoginButton({ 
     container: '#kakao-login-btn', 
@@ -90,6 +81,7 @@ function setAuth(){
 	    }
 	});}
 </script>
+
 
 </body>
 
