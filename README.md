@@ -44,6 +44,27 @@ The linear and angular velocity of Bada in Bada's Local reference fream. `Twists
 
 ### Parameters
 
+## signal_node
+
+### Published Topic
+
+#### /signal
+
+Detected sound signal. type: std_msgs/String
+
+#### /audio
+
+Realtime sound detection informations.
+JSON array contains detected sound data with [name, probability] format.
+
+type: std_msgs/String 
+format: `{'data': <JSON array>}`
+
+##### usage
+
+```js
+var detectionData = JSON.parse(msg.data);
+```
 
 # TodoLIST
 
