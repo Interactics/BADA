@@ -61,35 +61,6 @@ Kakao.init("b886eede39b9d47bc9d3cb6e91483799");   // 사용할 앱의 JavaScript
   }
   shareKakaotalk("BADA 인증 완료");
 
-
-
-/*
-리스트방식으로 카카오톡 나에게로 메시지 보내기
-function shareKakaotalk(sig_name) {
-  var n=sig_name;
-  Kakao.Link.sendDefault({
-        objectType:"feed"
-      , content : {
-            title:"이벤트 발생"   // 콘텐츠의 타이틀
-          , description: n/ //콘텐츠 상세설명
-          , imageUrl:"/mnt/c/Users/giwon/Downloads/BADA.jpg"   // 썸네일 이미지 이거 링크로 바꿔야할듯
-          , link : {
-                mobileWebUrl:"http://192.168.137.1"   // 모바일 카카오톡에서 사용하는 웹 링크 URL
-              , webUrl:"http://192.168.137.1" // PC버전 카카오톡에서 사용하는 웹 링크 URL
-          }
-      }
-  });
-}
-*/
-
-/*
-카카오 디벨로퍼스에 소개된 카카오톡 스크랩 메시지 나에게 보내는 샘플
-curl -v -X POST "https://kapi.kakao.com/v2/api/talk/memo/scrap/send" \
-    -H "Authorization: Bearer t5lSxCO7Jilh9uIVAlL4sQLwUboITRLkpw8RmAo9cusAAAFyJ12yxA" \
-    -d 'request_url=http://localhost:3000'
-*/
-
-
 function Queue(){
 
     this.dataStore = [];

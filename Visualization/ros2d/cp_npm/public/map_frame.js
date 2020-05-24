@@ -10,12 +10,12 @@ var data;
 var time;
 var sig_name;
 var viewtime;
-var PrintHistory="Connection";
+var PrintHistory = "Connection";
 
 const today = new Date();
 today.setTime(0);
 
-var hidx=0;
+var hidx = 0;
 const FRAMES_PER_SECOND = 10;  // Valid values are 60,30,20,15,10...
 const FRAME_MIN_TIME = (1000 / 60) * (60 / FRAMES_PER_SECOND) - (1000 / 60) * 0.5;
 var lastFrameTime = 0;  // the last frame time
@@ -58,18 +58,18 @@ function tryConnectWebsocket() {
     listener.unsubscribe();
   });
 
-  
+
   var turtle1 = new ROSLIB.Topic({
     ros: ros,
     name: '/turtle1/pose',
     messageType: 'turtlesim/Pose'
   });
 
-  
+
   turtle1.subscribe(function (message) {
-    if (count) {
-      console.log(message);
-    }
+    // if (count) {
+    //   console.log(message);
+    // }
     x = message.x * 50;
     y = message.y * 50;
     theta = message.theta;
@@ -85,18 +85,13 @@ function init() {
   // Start the first frame request
   window.requestAnimationFrame(loop);
   tryConnectWebsocket();
-}
+};
 
 ///////////////////////////
 var ros = new ROSLIB.Ros({
   url: 'ws://localhost:9090'
 });
 
-var audio_topic = new ROSLIB.Topic({
-  ros: ros,
-  name: '/signal',
-  messageType: 'std_msgs/String'
-});
 
 
 function loop(timeStamp) {
@@ -106,7 +101,7 @@ function loop(timeStamp) {
     return; // return as there is nothing to do
   }
   lastFrameTime = timeStamp; // remember the time of the rendered frame
-
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   var secondsPassed = (timeStamp - oldTimeStamp) / 1000;
