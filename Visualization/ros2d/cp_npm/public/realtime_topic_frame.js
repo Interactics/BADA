@@ -44,7 +44,7 @@ ros.on('close', function () {
 });
 
 // Create a connection to the rosbridge WebSocket server.
-ros.connect('ws://192.168.0.6:9090');
+ros.connect('ws://localhost:9090');
 
 // Like when publishing a topic, we first create a Topic object with details of the topic's name
 // and message type. Note that we can call publish or subscribe on the same topic object.
@@ -75,7 +75,7 @@ var audio_topic = new ROSLIB.Topic({
     messageType: 'std_msgs/String'
 });
 
-audio_topic.subscribe(function (m) {
+audio_topic.subscribe(function (m){
     str = m.data;
     for (var i = 0; i < 100; i++) str = str.replace("\"", "");
     str = str.substring(1);
@@ -85,13 +85,9 @@ audio_topic.subscribe(function (m) {
     for (var i = 0; i < 100; i++) str = str.replace(",", "");
     for (var i = 0; i < 100; i++) str = str.replace("[", "");
 	str=str.split("]");
-	
-   	console.log(str[2]);
 
     document.getElementById("first_topic").innerHTML = str[0];
     document.getElementById("second_topic").innerHTML = str[1];
     document.getElementById("third_topic").innerHTML = str[2];
-   
-    
 });
 

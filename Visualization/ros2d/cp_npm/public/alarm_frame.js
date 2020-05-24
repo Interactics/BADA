@@ -40,7 +40,7 @@ ros.on('close', function () {
 });
 
 // Create a connection to the rosbridge WebSocket server.
-ros.connect('ws://192.168.0.6:9090');
+ros.connect('ws://localhost:9090');
 
 // Like when publishing a topic, we first create a Topic object with details of the topic's name
 // and message type. Note that we can call publish or subscribe on the same topic object.
@@ -70,4 +70,7 @@ var signal = new ROSLIB.Topic({
     messageType : 'std_msgs/String'
   });
 
-// document.getElementById("signal").innerHTML = sig_name;
+  signal.subscribe(function(m){
+    sig_name=m.data;
+    document.getElementById("signal").innerHTML = sig_name;
+  });
