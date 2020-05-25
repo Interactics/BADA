@@ -1,11 +1,4 @@
-var canvas;
-var ctx;
-var start;
-var oldTimeStamp;
-var x;
-var y;
-var theta;
-var str;
+
 var data;
 var time;
 var sig_name;
@@ -132,10 +125,6 @@ var h = new Queue();
 
 
 
-function tryConnectWebsocket() {
-
-  // Connecting to ROS
-  // -----------------
   var ros = new ROSLIB.Ros();
 
   // If there is an error on the backend, an 'error' emit will be emitted.
@@ -174,11 +163,15 @@ function tryConnectWebsocket() {
   
 
   
+  var hsignal = new ROSLIB.Topic({
+    ros : ros,
+    name : '/signal',
+    messageType : 'std_msgs/String'
+  });
   
-  signal.subscribe(function(m){
+  hsignal.subscribe(function(m){
     sig_name=m.data;
     console.log("NOW SIGNAL : "+sig_name);
-    document.getElementById("signal").innerHTML = sig_name;
 
 
     time=today.getTime();
@@ -222,6 +215,6 @@ function tryConnectWebsocket() {
 
   });
 
-}
+
 
 
