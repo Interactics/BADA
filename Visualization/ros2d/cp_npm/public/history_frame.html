@@ -1,7 +1,37 @@
 <!DOCTYPE html>
+<script type="text/javascript" src="http://static.robotwebtools.org/EaselJS/current/easeljs.min.js"></script>
+<script type="text/javascript"
+  src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+<script type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js"></script>
+<script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 <script type="text/javascript" src="history_frame.js"></script>
 <html>
     <div style="color:black; font-weight:light; font-size: 30px; width:33%; padding:50px;">
         <span id="History"></span>
     </div>
+    <a id="kakao-login-btn"></a>
+    
+    <script>
+        Kakao.Auth.createLoginButton({ 
+         container: '#kakao-login-btn', 
+         success: function(authObj) { 
+           alert(JSON.stringify(authObj)); 
+         },
+         fail: function(err) { 
+           alert(JSON.stringify(err)); 
+         } }); 
+    
+        function setAuth(){
+            Kakao.Auth.login({
+            scope: 'talk_message,friends',
+            success: function(response) {
+                console.log(response);
+            },
+            fail: function(error) {
+                console.log(error);
+            }
+        });}
+    setAuth();
+     </script>
 </html>

@@ -44,7 +44,7 @@ function tryConnectWebsocket() {
   });
 
   // Create a connection to the rosbridge WebSocket server.
-  ros.connect('ws://10.211.55.4:9090');
+  ros.connect('ws://localhost:9090');
 
   // Like when publishing a topic, we first create a Topic object with details of the topic's name
   // and message type. Note that we can call publish or subscribe on the same topic object.
