@@ -113,15 +113,17 @@ void LEDMatrix_Control(Events event);
 void MotorCtrl(bool cmd);
 float VelocityCtrl(int pos1, int pos2, float t);
 
+//callback
+void CameraCommand(const std_msgs::Bool& cmd);
+void DisplayCommand(const std_msgs::Int16& cmd);
+
 ros::Publisher CameraState ("Cameara_State", &CameraState_msg);
 ros::Publisher DisplayState("Display_State", &DisplayState_msg);
 ros::Publisher ButtonState ("Button_State", &ButtonState_msg);
 ros::Subscriber<std_msgs::Bool> CameraSUB("bada/duino/camera_cmd", &CameraCommand);
 ros::Subscriber<std_msgs::Int16> DisplaySUB("bada/duino/display_cmd", &DisplayCommand );
 
-//callback
-void CameraCommand(const std_msgs::Bool& cmd);
-void DisplayCommand(const std_msgs::Int16& cmd);
+
 
 HardwareDynamixelInterface interface(Serial2);// Serial1 -- RX2 TX2, Serial -- RX1 TX1
 
