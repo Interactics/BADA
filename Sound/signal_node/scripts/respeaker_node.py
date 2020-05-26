@@ -56,32 +56,36 @@ frames=[]
 last5secFrames=[]
 old5secFrames=[]
 
+frameQ=queue.Queue()
+qsize=0
 pub = rospy.Publisher('/signal', String, queue_size=10)
-
 def callback(msg):
-    global frames
-    # rospy.loginfo('log:')
-    # rospy.loginfo(msg)
+    global frames, qsize, yamnet
 
-    # rate = rospy.Rate(10) # 10hz
-
-    # while not rospy.is_shutdown():
-    #     rate.sleep()
-
-    #rospy.Subscriber("/audio", String, callback)
-
-#    for i in range(0, int(1 / (predictionRate)) * duration):
-    
     # read new data and update last 5 sec frames
     old=time.time()
     # data = stream.read(readChunkSize)
     #print('read time: ', time.time()-old)
-
-    frames+=[msg.data]
-    if(len(frames)<=int(predictionPeriod/predictionRate)):
+    print('run1')
+    for i, v in enumerate(msg.data):
+        qsize+=1
+        frameQ.put(v)
+    print('run2')
+    # frames+=[msg.data]
+    # if(len(frames)<=int(predictionPeriod/predictionRate)):
+    #     return
+    if(qsize<=int(sr*predictionPeriod/predictionRate)):
         return
-    waveform = np.frombuffer(b''.join(frames[-int(predictionPeriod/predictionRate):]), dtype=np.int16) / 32768.0
-    print(waveform)
+    current=[]
+    for i in range(sr):
+        qsize-=1
+        current.append(frameQ.get())
+        if(frameQ.empty()): break
+
+
+    waveform = np.array(current, np.int16) / 32768.0
+    print(type(waveform))
+    print(waveform.shape)
 
     old=time.time()
     scores, spectrogram = yamnet.predict(np.reshape(waveform, [1, -1]), steps=1)
