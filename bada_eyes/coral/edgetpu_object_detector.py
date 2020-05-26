@@ -95,8 +95,10 @@ class EdgeTPUObjectDetector(ConnectionBasedTransport):
         labels = []
         rect_msg = RectArray(header=msg.header)
         for obj in objs:
+            #### Edited Point
             if self.label_ids.index(int(obj.label_id)) != 0 :
                 continue
+            #### Edited Point
             x_min, y_min, x_max, y_max = obj.bounding_box.flatten().tolist()
             x_min = int(np.round(x_min * W))
             y_min = int(np.round(y_min * H))
