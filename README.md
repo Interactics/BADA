@@ -5,7 +5,7 @@
 ## Overview
 
 Bada is a Social Robot made for Hearing-impaired people.
-The word 'BADA' is coming from "Buddy for Auditory Detection Assistance" and South Korean first assistance dog's name.
+The word 'BADA' derive from "Buddy for Auditory Detecting Assistance" and South Korean first assistance dog's name.
 
 ## Purpose
 
