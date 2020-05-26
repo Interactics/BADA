@@ -6,6 +6,7 @@ import pyaudio
 import numpy as np
 from matplotlib import pyplot as plt
 
+import cmath
 import math
 
 import soundfile as sf
@@ -30,18 +31,13 @@ from geometry_msgs.msg import PoseStamped, Quaternion
 from audio_common_msgs.msg import AudioData
 from tf.transformations import quaternion_from_euler
 
-# so the data is signal based, so i have to consider whether two signal is related or not.
-# then i can use timestamp data for that purpose.
-# the problem is, the mean filter will be reset quite often, according to the threshold duration.
-# 
 reset_seconds=2 # max time difference between two signal
 last_second=0 # when the last message received
 reset=False # whether to reset queue state
 
 sq=queue.Queue()
 qsize=0
-sinesum=0
-cumsum=0
+cumsum=0j
 mean=0
 pub=''
 
@@ -50,20 +46,17 @@ pub=''
 def callback(msg):
     global sq, qsize, last_second, reset, pub, mean
     # print(msg)
+
     # (r, p, y) = tf.transformations.euler_from_quaternion([msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w])
-    # print(r,p,y)
-    # print(y*180/(math.pi))
+
     current_second=msg.header.stamp.secs
-    # print(current_second - last_second)
+
     if(current_second - last_second > reset_seconds):
         reset=True
         print('RESET QUEUE')
     last_second=current_second
-    # newmsg=PoseStamped(msg)
-    # print(type(msg.pose.orientation))
-    quat=quaternion_from_euler(0,0,mean*math.pi/180.0)
+    quat=quaternion_from_euler(0,0,mean)
     msg.pose.orientation=Quaternion(quat[0],quat[1],quat[2],quat[3])
-    # print(type(msg.pose.orientation))
     pub.publish(msg)
 
     print('-----------callback----------')
@@ -80,24 +73,18 @@ def callback_direction(msg):
     val=-msg.data+180
     if(val>360):
         val-=360
-
-    sq.put(val)
-    cumsum+=val
+    val=val*math.pi/180
+    sq.put(cmath.exp(1j*val))
+    cumsum+=cmath.exp(1j*val)
     qsize+=1
     
     if(qsize<3):
-        mean=cumsum/qsize
+        mean=cmath.phase(cumsum)
     else:
         qsize-=1
         cumsum-=sq.get()
-        mean=cumsum/qsize
+        mean=cmath.phase(cumsum)
     print('mean', mean)
-        
-    # sq.put(msg)
-    # qsize+=1
-    # if(qsize>5):
-    #     qsize-=1
-    #     now=
     print('----------callback_direction------------')
     
 
