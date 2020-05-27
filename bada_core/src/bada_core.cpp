@@ -4,6 +4,12 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Empty.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
+#include <tf/transform_listener.h>
+#include <turtlesim/Velocity.h>
+#include <turtlesim/Spawn.h>
+#include <math.h>       /* cos */
 
 
 //---------------- 노드 변경할 것 ----------------------------------------
@@ -42,8 +48,10 @@ bool sig_checker = false; 							// Roaming 단계에서 사용.
 void sig_income(const std_msgs::Empty &msg);        // Roaming 단계에서 사용. 소리가 발생할 경우에 쓸모가 있다. 
 void bada_roaming();     							// 배회하나 소리가 나면 다음으로 넘어간다.
 void bada_go_destination();							// 지정된 방으로 이동.
+void bada_get_person_position();					// calculate the person's position on map from robot position using detected angle and theta.
 void bada_rounding();       						// 회전하며 사람이 있는지를 검사한다.
 void bada_head_UP(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
+int getCurrentRobotPositionTODO();					// get current transform position(pose, quaternion) of robot
 bool bada_change_pos(float LPos, float APos); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
 													// 특정 위치만큼만 이동하기.
 													/* 리니어, 앵귤러에 도달할 때까지 회전하도록하기. 기본 속도는 정해져있다. 
@@ -58,6 +66,7 @@ int main(int argc, char **argv){
 	STATE state = FINDING_PEPL;
 	ros::init(argc, argv, "/bada/core");
     ros::Rate loop_rate(6);
+	geometry_msgs::Pose2D person_position;
 
 	while (ros::ok()){
 		switch (state){
@@ -69,6 +78,8 @@ int main(int argc, char **argv){
 				is_there_pepl = bada_rounding();
 				bada_head_UP(false); 				// HEAD_DOWN
 			} while (!is_there_pepl);
+			// save the person position
+			person_position=bada_get_person_position(); // calculate person position from robot's perspective
 			bada_next_state(state);
 			break;
 		case ROAMING:
@@ -122,6 +133,55 @@ void bada_go_destination(){
 void bada_head_UP(bool STATUS){
 	bada_camera.publish(STATUS);
 }
+
+
+void bada_get_person_position(){
+	// TODO: use realsense topic to get angle and theta
+
+	tf::StampedTransform tranform;
+	geometry_msgs::Pose2D pose2d;
+
+	distance, theta=REALSENSEANGLETHETATODO();
+	// theta: radian
+	tranform=getCurrentRobotPositionTODO();
+	double robotX=transform.pose.x;
+	double robotY=transform.pose.y;
+	
+	tf::Matrix3x3 m(q);
+	// https://gist.github.com/marcoarruda/f931232fe3490b7fa20dbb38da1195ac
+	double roll, pitch, yaw;
+	m.getRPY(roll, pitch, yaw);
+	
+    pose2d.theta = yaw+theta;
+	double deltaX=distance*cos(pose2d.theta);
+	double deltaY=distance*sin(pose2d.theta);
+
+    pose2d.x = robotX+deltaX;
+    pose2d.y = robotY+deltaY;
+	
+	return pose2d;
+}
+
+int getCurrentRobotPositionTODO(){
+	ros::init(argc, argv, "base_link_listener");
+
+	ros::NodeHandle node;
+
+	tf::TransformListener listener;
+
+	tf::StampedTransform tranform;
+
+    try{
+      listener.lookupTransform("/map", "/base_link",  
+                               ros::Time(0), transform);
+    }
+    catch (tf::TransformException ex){
+      ROS_ERROR("%s",ex.what());
+      ros::Duration(1.0).sleep();
+    }
+
+	return transform;
+};
 
 bool bada_rounding(){
 	bool pepl_detected;
