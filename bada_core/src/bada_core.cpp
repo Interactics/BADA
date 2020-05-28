@@ -18,10 +18,6 @@
 //---------------- 노드 변경할 것 ----------------------------------------
 	/*
 	TODO
-	1. bada_eyes 변경할 것
-	  bada_eyes에 활성화 여부 서브스크라이빙 기능으로 bool type 추가하기
-	  bada_eyes에 퍼블리싱하는 것으로 각도, 거리, 중앙포인트의 좌표 추가하기 
-	2. 목표 거리 이동, 목표 회전치 이동 함수 만들어서 테스트해볼것
 	3. 각 상태마다 디스플레이에 이미지 표현하도록. 변경
 	*/ 
 //================================================================================
@@ -34,6 +30,8 @@ enum STATE{
 	MOVING_WITH_PEPL
 };
 
+typedef std_msgs::Bool BoolMsg;
+
 std_msgs::Bool HEAD_STATUS;
 std_msgs::Int16 MAT_STATUS;
 
@@ -41,10 +39,9 @@ ros::NodeHandle nh;
 
 bool sig_check = false; 							// Roaming 단계에서 사용. 
 void bada_next_state(STATE& present_state);
-void sig_income(const std_msgs::Empty &msg);        // Roaming 단계에서 사용. 소리가 발생할 경우에 쓸모가 있다. 
 void bada_roaming(int currentPoint=0);     							// 배회하나 소리가 나면 다음으로 넘어간다.
 void bada_go_destination(double x, double y, double orien_z, double orien_w);							// 지정된 방으로 이동.
-void bada_get_person_position();					// calculate the person's position on map from robot position using detected angle and theta.
+void bada_save_current_position();					// calculate the person's position on map from robot position using detected angle and theta.
 bool bada_rounding();       						// 회전하며 사람이 있는지를 검사한다.
 void bada_head_UP(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
 int getCurrentRobotPositionTODO();					// get current transform position(pose, quaternion) of robot
@@ -56,7 +53,6 @@ void bada_aligned_pepl(); 							// 사람 찾고 로봇과 사람 위치 정렬
 void go_until_touch();							// 버튼이 눌릴 때까지 전진.
 void bada_go_to_pepl();
 void bada_go_until_touch();
-void bada_odometry_callback(const nav_msgs::Odometry &msg);
 void bada_save_sound_PT();					//로봇의 현재 위치와 소리나는 방향 저장하기.
 void bada_go_to_soundPT();   				// 소리가 발생한 지점으로 이동하기.
 void bada_display_inform();
@@ -64,27 +60,49 @@ void bada_emotion();
 
 void bada_wait_button();
 
+void save_sound_odom();
 void bada_sub_sound_odom();					//소리 발생하는 방향 인지하기
 void bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
 
-ros::Publisher bada_cmdvel   = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-ros::Publisher bada_camera   = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
-ros::Publisher bada_display  = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
-// ros::Publisher bada_eyes_open  = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
-ros::Subscriber bada_odometry   = nh.subscribe("/bada/odom", 1, bada_odometry_callback);
-ros::Subscriber pepl_checker = nh.subscribe("/bada/eyes/distance",1, sig_income );         //TODO: FIX CALLBACK FUNCTION
+
+void bada_open_eyes(bool Status);           //Open Eyes Function.
+
+
+/*--------------------------------------Callback----------------------------------------------*/
+
+void sub_pepl_checker_callback(const &msg));
+void sub_odometry_callback(const nav_msgs::Odometry &msg);
+void sub_sig_checker_callback(const std_msgs::Empty &msg);        // Roaming 단계에서 사용. 소리가 발생할 경우에 쓸모가 있다. 
+
+
+
+
+//==============================================================================================
+
+
+ros::Publisher pub_cmdvel     = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+ros::Publisher pub_camera     = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
+ros::Publisher pub_display    = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
+ros::Publisher pub_eyes_open  = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
+ros::Subscriber sub_odometry  = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
+ros::Subscriber sub_pepl_checker   = nh.subscribe("/bada/eyes/distance",1, sub_pepl_checker_callback );   //TODO: FIX CALLBACK FUNCTION
+ros::Subscriber sub_sig_checker  = nh.subscribe("/bada/signal/checker", 1, sub_sig_checker_callback);     
+
 //사람이 일정 ROI에 들어오는 것을 검사함. 만약 ROI에 들어온다면, Checker는 True로 바뀜.
 
-ros::Subscriber sig_checker  = nh.subscribe("/bada/signal/checker", 1, sig_income);     
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 MoveBaseClient ac("move_base", true); //move_base client 선언
 
-bool buttonpushed = false;
-ros::Rate loop_rate(6);                      // 과부하방지로 멈추기
-geometry_msgs::Pose2D person_position;
-nav_msgs::Odometry odom;
+bool BUTTON_PUSHED = false;
+bool PPL_DETECTED  = false;
 
+ros::Rate loop_rate(6);                      // 과부하방지로 멈추기
+geometry_msgs::Pose2D PERSON_POSITION;
+nav_msgs::Odometry CURRENT_ROBOT_POSITION;
+
+double soundPoint[4] = {0.0f,1.0f,2.0f,3.0f};
+double SAVED_ROBOT_POSITION[4]={0};
 
 double wayPoint[][4] = {{1.0,1.0,1.0,0.9},
 						{0.5,0.5,0.1,0.4},
@@ -165,22 +183,16 @@ void bada_go_destination(double x, double y, double orien_z, double orien_w){ //
 	goal.target_pose.pose.orientation.w = orien_w;
 
 	ac.sendGoal(goal);
-	ac.waitForResult();
-	if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
-		ROS_INFO("bada moving success!");
-	else
-		ROS_INFO("bada moving fail!");
 	return;
 }
 
 void bada_head_UP(bool status){
-	// bada_camera.publish(status);
+	// pub_camera.publish(status);
 }
 
 
-void bada_get_person_position(){
+void bada_save_current_position(){ //호출되면 로봇 현재 위치 저장
 	// // TODO: use realsense topic to get angle and theta
-
 	// tf::StampedTransform tranform;
 	// geometry_msgs::Pose2D pose2d;
 
@@ -227,44 +239,44 @@ int getCurrentRobotPositionTODO(){
 };
 
 bool bada_rounding(){
-	bool pepl_detected;
     geometry_msgs::Twist vel_cmd;          // 회전하기 위해 퍼블리시 용도로 만들어진 변수
 	//subscribing_odometry
 	//Save present angle
 	// BOOKMARK2
-	geometry_msgs::Quaternion initial_angle = odom.pose.pose.orientation;        // 현재 각도 정보를 저장
+	geometry_msgs::Quaternion initial_angle = CURRENT_ROBOT_POSITION.pose.pose.orientation;        // 현재 각도 정보를 저장
 	//http://docs.ros.org/melodic/api/nav_msgs/html/msg/Odometry.html
 	
 	vel_cmd.angular.z = (3.14f/4.0f);      // 회전하도록하기
 	
-	// bada_eyes_open.publish(true);      // 눈 뜨기. (정보 받기 시작)
+	pub_eyes_open.publish(true);      // 눈 뜨기. (정보 받기 시작)
 
-	// do{
-	// 	bada_cmdvel.publish(vel_cmd); 			//각속도 정보 pub, 통신 실패를 방지하기 위해 while문에 넣어놓음. 
-	// 	ros::spinOnce();  				// bada/eyes로부터 토픽 서브스크라이빙, 현재 오도메트리 정보 서브스크라이빙 목적으로 스핀
-	// 	if (pepl_detected){		        // 만약 사람 정보가 ROI에 들어왔다면 true
-	// 		//BOOKMARK1
+	do{
+		pub_cmdvel.publish(vel_cmd); 			//각속도 정보 pub, 통신 실패를 방지하기 위해 while문에 넣어놓음. 
+		ros::spinOnce();  				// bada/eyes로부터 토픽 서브스크라이빙, 현재 오도메트리 정보 서브스크라이빙 목적으로 스핀
+		if (PPL_DETECTED){		        // 만약 사람 정보가 ROI에 들어왔다면 true
+			//BOOKMARK1
 			
-	// 		// TODO : USE ROBOT POSITION
-	// 		person_position=bada_get_person_position(); // calculate person position from robot's perspective
+			// TODO : USE ROBOT POSITION
+			PERSON_POSITION=SAVED_ROBOT_POSITION(); // calculate person position from robot's perspective
 
-	// 		/** TODO : 각도와 거리를 이용하여 포인트를 저장한다.  **/
-	// 		// ~~맵에 사람의 위치 포인트를 저장하는 방법, 즉 데이터타입이 무엇인지 알아볼 것. ~~<<-- 사람 위치 저장하지 말 것
-	// 		// 지금 위치를 저장한다. (로봇의 위치) <<-- 이것을 사용할것
-	//         break;
-	// 	}
-	// 	loop_rate.sleep(); 				// 6헤르츠가 적당할 듯. 연산 과부화 방지용.
-	// } while ((bada_odometry.angle - initial_angle) > 360); //한바퀴 돌았는지?
-	// // bada_eyes_open.publish(false); 		// 눈 감기. /bada/eyes 작동 종료하도록한다.
-	// // bada_cmdvel.publish(new geometry_msgs::Twist([0,0,0],[0,0,0]));			// velocity pub 0, 0  로봇 회전 중단.
-	if (pepl_detected)
+			/** TODO : 각도와 거리를 이용하여 포인트를 저장한다.  **/
+			// ~~맵에 사람의 위치 포인트를 저장하는 방법, 즉 데이터타입이 무엇인지 알아볼 것. ~~<<-- 사람 위치 저장하지 말 것
+			// 지금 위치를 저장한다. (로봇의 위치) <<-- 이것을 사용할것
+	        break;
+		}
+		loop_rate.sleep(); 				// 6헤르츠가 적당할 듯. 연산 과부화 방지용.
+	} while ((sub_odometry.angle - initial_angle) > 360); //한바퀴 돌았는지?
+	bada_open_eyes(false)
+	//pub_eyes_open.publish(data); 		// 눈 감기. /bada/eyes 작동 종료하도록한다.
+	// pub_cmdvel.publish(new geometry_msgs::Twist([0,0,0],[0,0,0]));			// velocity pub 0, 0  로봇 회전 중단.
+	if (PPL_DETECTED)
 		return true;
 	else
 		return false;
 	//---끝---
 }
 
-void sig_income(const std_msgs::Empty &msg){
+void sub_sig_checker_callback(const std_msgs::Empty &msg){
 	sig_check = true;
 } // 소리가 발생하는지 체크하는 콜백함수
 
@@ -273,18 +285,26 @@ void bada_roaming(int currentPoint){ //현재위치에서 마지막 지점까지
 	currentPoint+=1;
 	for (int currentPoint; currentPoint<3; currentPoint++){
 		bada_go_destination(wayPoint[currentPoint][0],wayPoint[currentPoint][1],wayPoint[currentPoint][2],wayPoint[currentPoint][3]);
+			
+		while(1){
+			ros::spinOnce();                    //소리 검사 결과 받기.
+			if (sig_check) {
+
+				save_sound_odom();	                    //- 소리 정보 오도메트리 저장하기.
+				//-  배회 중단. 액션 메시지 취소 보내기
+				ac.cancelGoal();
+				return;
+			}
+			if (ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED /*--목표도착-- ACTION*/) {
+				// bada_go_destination();			//다음 지점으로 이동하기.
+				break;
+			}
+		}
+
 	}
-	// while(1){
-	// 	ros::spinOnce();                    //소리 검사 결과 받기.
-	// 	if (sig_checker) break;
-	// 	if (/*--목표도착-- ACTION*/) {
-	// 		bada_go_destination();			//다음 지점으로 이동하기.
-	// 	}
-	// }
-	// save_sound_odom();	                    //- 소리 정보 오도메트리 저장하기.
-	// //-  배회 중단. 액션 메시지 취소 보내기
-	// ac.cancelGoal();
 }
+
+
 
 void bada_go_to_pepl(){
 	// //사람에게 가기.
@@ -303,7 +323,7 @@ void bada_go_to_pepl(){
 }
 
 void bada_aligned_pepl(){
-	// bada_eyes_open.publish(true);      // 눈 뜨기.
+	// pub_eyes_open.publish(true);      // 눈 뜨기.
 	while(false){
 
 		/* velocity.publish 각속도*/
@@ -312,14 +332,14 @@ void bada_aligned_pepl(){
 	// 	/* velocity.publish 각속도*/;
 	// } //가운데로 맞추기
 	/* velocity.publish  0 */
-	// bada_eyes_open.publish(false); 		// 눈 감기. /bada/eyes 작동 종료하도록한다.
+	// pub_eyes_open.publish(false); 		// 눈 감기. /bada/eyes 작동 종료하도록한다.
 }
 
 void bada_go_until_touch(){
 	//cmd_vel.publish(); // 앞으로 전진
 	do{
 		ros::spinOnce();
-	}while(!buttonpushed);
+	}while(!BUTTON_PUSHED);
 	//cmd_vel.publish(); //스탑
 } // 버튼 눌리기 전까지 전진하기
 
@@ -330,8 +350,9 @@ void bada_change_pos(float line, float angle){
 	} while(true);
 }
 
-void bada_odometry_callback(const nav_msgs::Odometry &msg){
-	odom=msg;
+void sub_odometry_callback(const nav_msgs::Odometry &msg){
+	CURRENT_ROBOT_POSITION=msg;
+	SAVED_ROBOT_POSITION[4]={msg.pose.position.x, msg.pose.position.y, msg.pose.orientation.z, msg.pose.orientation.w}
 }
 
 // void bada_cancelAllGoal(){
@@ -362,4 +383,13 @@ void bada_sub_sound_odom(){
 
 void bada_go_to_sound(){
 
+}
+
+void save_sound_odom(){
+	
+}
+
+void bada_open_eyes(bool Status){
+	BoolMsg BoolStatus =  Status;
+	pub_eyes_open.publish(BoolStatus);
 }
