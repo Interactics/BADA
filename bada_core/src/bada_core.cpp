@@ -7,8 +7,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 #include <tf/transform_listener.h>
-#include <turtlesim/Velocity.h>
-#include <turtlesim/Spawn.h>
+//#include <turtlesim/Velocity.h>
+//#include <turtlesim/Spawn.h>
 #include <math.h>       /* cos */
 
 
@@ -36,15 +36,7 @@ std_msgs::Int16 MAT_STATUS;
 
 ros::NodeHandle nh;
 
-ros::Publisher bada_cmdvel   = nh.advertise<std_msgs::Bool> ("/cmd_vel", 1);
-ros::Publisher bada_camera   = nh.advertise<std_msgs::Bool> ("/bada/duino/camera_cmd", 1);
-ros::Publisher bada_display  = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
-ros::Subscriber pepl_checker = nh.subscribe<std_msgs::Int32>("/bada/eyes/distance",1, ?? );        
-//사람이 일정 ROI에 들어오는 것을 검사함. 만약 ROI에 들어온다면, Checker는 True로 바뀜.
-
-ros::Subscriber sig_checker  = nh.subscribe<std_msgs::Empty>("/bada/signal/checker", 1, sig_income);     
-
-bool sig_checker = false; 							// Roaming 단계에서 사용. 
+bool sig_check = false; 							// Roaming 단계에서 사용. 
 void sig_income(const std_msgs::Empty &msg);        // Roaming 단계에서 사용. 소리가 발생할 경우에 쓸모가 있다. 
 void bada_roaming();     							// 배회하나 소리가 나면 다음으로 넘어간다.
 void bada_go_destination();							// 지정된 방으로 이동.
@@ -52,15 +44,23 @@ void bada_get_person_position();					// calculate the person's position on map f
 void bada_rounding();       						// 회전하며 사람이 있는지를 검사한다.
 void bada_head_UP(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
 int getCurrentRobotPositionTODO();					// get current transform position(pose, quaternion) of robot
-bool bada_change_pos(float LPos, float APos); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
+void bada_change_pos(float LPos, float APos); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
 													// 특정 위치만큼만 이동하기.
 													/* 리니어, 앵귤러에 도달할 때까지 회전하도록하기. 기본 속도는 정해져있다. 
 													   보내는 것은 cmd_vel, 받는 것은 오도메트리 정보. */
 void bada_aligned_pepl(); 							// 사람 찾고 로봇과 사람 위치 정렬하기.
-void bada_while_touched();							// 버튼이 눌릴 때까지 전진.
+void go_until_touch();							// 버튼이 눌릴 때까지 전진.
 void bada_go_to_pepl();
 
+ros::Publisher bada_cmdvel   = nh.advertise<geometry_msgs::Twist> ("/cmd_vel", 1);
+ros::Publisher bada_camera   = nh.advertise<std_msgs::Bool> ("/bada/duino/camera_cmd", 1);
+ros::Publisher bada_display  = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
+ros::Publisher bada_eyes_open  = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
+ros::Subscriber bada_odometry   = nh.subscribe<nav_msgs::Odometry> ("/bada/odom", 1, bada_odometry_callback);
+ros::Subscriber pepl_checker = nh.subscribe<std_msgs::Int32>("/bada/eyes/distance",1, 123 );        
+//사람이 일정 ROI에 들어오는 것을 검사함. 만약 ROI에 들어온다면, Checker는 True로 바뀜.
 
+ros::Subscriber sig_checker  = nh.subscribe<std_msgs::Empty>("/bada/signal/checker", 1, sig_income);     
 
 int main(int argc, char **argv){
 	STATE state = FINDING_PEPL;
