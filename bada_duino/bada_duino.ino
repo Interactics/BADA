@@ -1,3 +1,5 @@
+// 20200528
+
 #include <DynamixelMotor.h>
 #include <RGBmatrixPanel.h>
 #include <ros.h>
@@ -7,10 +9,10 @@
 #define CLK 11
 #define OE   9
 #define LAT 10
-#define A   A0
-#define B   A1
-#define C   A2
-#define D   A3
+#define A   A1
+#define B   A2
+#define C   A3
+#define D   A4
 #define D_ID 144  ///Dynmixel ID
 
 unsigned long          previousTime = millis();
@@ -19,8 +21,8 @@ const long             timeInterval = 100; //ms
 bool                   t_flag       = false;
 char                   t_index      = 0;
 float                  t_val        = 0;
-int16_t speed = 125;                          // speed, between 0 and 1023
-const long unsigned int DX_baudrate = 1000000;// communication baudrate
+int16_t speed = 125;                                 // speed, between 0 and 1023
+const long unsigned int DX_baudrate = 1000000;       // communication baudrate
 
 enum Events {
   NOTHING = 0,
@@ -125,7 +127,7 @@ ros::Subscriber<std_msgs::Int16> DisplaySUB("bada/duino/display_cmd", &DisplayCo
 
 
 
-HardwareDynamixelInterface interface(Serial2);// Serial1 -- RX2 TX2, Serial -- RX1 TX1
+HardwareDynamixelInterface interface(Serial3);// Serial1 -- RX2 TX2, Serial -- RX1 TX1
 
 DynamixelMotor motor(interface, D_ID);
 RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false);
@@ -144,9 +146,10 @@ void setup() {
   
   Dynamixel_startUP();
   LEDMatrix_startUP();
-  motor.goalPosition(205);
+  motor.goalPosition(350);
   delay(1000);
-  
+  motor.goalPosition(500);
+
   nh.loginfo("BADA_DUINO ON");
 }
 
@@ -222,7 +225,7 @@ void Dynamixel_startUP() {
   }
 
   motor.enableTorque();  // joint mode 180° angle range
-  motor.jointMode(204, 820);  //Change this code after Design.
+  motor.jointMode(204, 820);
   motor.speed(speed);
 }
 
@@ -278,6 +281,6 @@ void LEDMatrix_Erasing() {
 }
 
 void MotorCtrl(bool cmd) {
-  if (cmd) motor.goalPosition(500); // Changed!
-  else  motor.goalPosition(210);    // Defalut
+  if (cmd) motor.goalPosition(350); // Changed!
+  else  motor.goalPosition(500);    // Defalut
 }
