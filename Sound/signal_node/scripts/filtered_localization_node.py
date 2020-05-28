@@ -2,14 +2,11 @@
 import sys
 print('python version: ',sys.version_info)
 
-import pyaudio
 import numpy as np
 from matplotlib import pyplot as plt
 
 import cmath
 import math
-
-import soundfile as sf
 
 import params
 import yamnet as yamnet_model
@@ -17,7 +14,6 @@ import yamnet as yamnet_model
 import time
 import queue
 
-import roslibpy
 import rospy
 import json
 
