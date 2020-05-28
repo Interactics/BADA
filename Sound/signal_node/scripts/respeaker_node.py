@@ -21,6 +21,7 @@ import json
 import os
 
 from std_msgs.msg import String
+from std_msgs.msg import Empty
 from audio_common_msgs.msg import AudioData
 import tensorflow as tf
 
@@ -30,11 +31,12 @@ os.chdir(dname+'/../..')
 
 pub=''
 keys=['Speech','Alarm','Door','Television', 'Silence', 'Water', 'Music']
+alarmKeys=['Alarm', 'Telephone bell ringing', 'Bell']
 signals=dict.fromkeys(keys, 0.0)
 picked=dict.fromkeys(keys, 0.0)
 detected=dict.fromkeys(keys, False)
-detectThreshold=0.2
-resetThreshold=0.05
+detectThreshold=0.3
+resetThreshold=0.1
 
 
 # Set up the YAMNet model.
@@ -60,6 +62,8 @@ old5secFrames=[]
 frameQ=queue.Queue()
 qsize=0
 pub = rospy.Publisher('/signal', String, queue_size=10)
+detectInfoPub = rospy.Publisher('/bada/signal/info', String, queue_size=10)
+checkPub = rospy.Publisher('/bada/signal/checker', Empty, queue_size=10)
 audioPub = rospy.Publisher('/audio', String, queue_size=10)
 
 yamnet._make_predict_function()
@@ -100,7 +104,7 @@ def signal(msg):
         qsize-=1
         current.append(frameQ.get())
         if(frameQ.empty()): break
-    print(current)
+    # print(current)
     waveform = np.frombuffer(bytearray(current), dtype=np.int16) / 32768.0
     print(type(waveform))
     print(waveform.shape)
@@ -118,16 +122,20 @@ def signal(msg):
     top_class_indices = np.argsort(mean_scores)[::-1][:top_N]
 
     dat=np.dstack((class_names[top_class_indices],mean_scores[top_class_indices])).tolist()
-
+    
     audioPub.publish(roslibpy.Message({'data': json.dumps(dat)}))
     # hello_str = "hello world %s" % rospy.get_time()
     picked=dict.fromkeys(keys, 0.0)
     for _,v in enumerate(dat[0]):
         [key, prob]=v
 
-        if(key in keys):
-            # rospy.loginfo(key in keys)
-            picked[key]=float(prob)
+        if(key in keys or key in alarmKeys):
+            if(key in alarmKeys):
+                picked['Alarm']+=float(prob)
+            else:
+                # rospy.loginfo(key in keys)
+                picked[key]=float(prob)
+    picked['Alarm']/=3
 
     # update 
     for _, v in enumerate(keys):
@@ -135,13 +143,21 @@ def signal(msg):
         signals[v]=signals[v]*0.3+picked[v]*0.7
 
     # detect
+    detectAny=False
     for _, v in enumerate(keys):
-        if(signals[v]> detectThreshold and detected[v]==False):
-            detected[v]=True
-            rospy.loginfo('publish:'+v)
-            pub.publish(v)
+        detectInfoPub.publish('key ' + v + str(signals[v]))
+        if(signals[v]> detectThreshold):
+            if(v != 'Silence'):
+                detectAny=True
+            if(detected[v]==False):
+                detected[v]=True
+                rospy.loginfo('publish:'+v)
+                pub.publish(v)
         if(detected[v]==True and signals[v]<resetThreshold):
             detected[v]=False
+    if(detectAny):
+        checkPub.publish()
+    
     print('prediction: ', dat)
 
 def callback(msg):
@@ -154,7 +170,7 @@ def respeaker_node():
     rospy.init_node('respeaker_node', anonymous=True)
     rospy.loginfo('starting')
 
-    rospy.Subscriber("/audio/channel1", AudioData, callback)
+    rospy.Subscriber("/audio/channel0", AudioData, callback)
 
     while(not rospy.is_shutdown()):
         # from_main_thread_blocking()

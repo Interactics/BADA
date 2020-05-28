@@ -162,7 +162,7 @@ def filtered_localization_node():
 
     rospy.Subscriber("/sound_localization", PoseStamped, callback)
     rospy.Subscriber("/sound_direction", Int32, callback_direction)
-    pub = rospy.Publisher('/sound_localization_filtered', PoseStamped)
+    pub = rospy.Publisher('/bada/signal/localization_filtered', PoseStamped)
     
     rospy.spin()
 
