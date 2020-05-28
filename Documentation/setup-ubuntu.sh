@@ -388,11 +388,13 @@ else
     ### respeaker_ros setup : https://github.com/furushchev/respeaker_ros
     cd ~/catkin_ws/src
     git clone https://github.com/furushchev/respeaker_ros
-    rosdep install --from-paths src -i -r -n -yamnet
-    cm
+    rosdep install --from-paths src -i -r -n -y #amnet
+    cm # build respeaker_ros
     sb
 
     roscd respeaker_ros
+    cd scripts
+    sudo chmod +x ./*
     sudo cp -f $(rospack find respeaker_ros)/config/60-respeaker.rules /etc/udev/rules.d/60-respeaker.rules
     sudo systemctl restart udev
 
