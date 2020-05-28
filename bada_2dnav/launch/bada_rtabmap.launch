@@ -2,36 +2,50 @@
   <arg name="rgb_topic"          value="/d400/color/image_raw"/>
   <arg name="depth_topic"        value="/d400/aligned_depth_to_color/image_raw"/>
   <arg name="camera_info_topic"  value="/d400/color/camera_info"/>
-  <arg name="odom_topic" default="/t265/odom/sample"/>
+  <arg name="odom_topic" default="odom_baselink"/>
   <arg name="localization"      default="false"/>
   <arg if="$(arg localization)" name="args"  default=""/>
   <arg unless="$(arg localization)" name="args"  default="--delete_db_on_start"/>
   <arg name="wait_for_transform"  default="0.2"/>
-  <arg name="rviz"              default="true"/>
+
+<node pkg="tf" type="static_transform_publisher" name="baselink_to_d400" args="0.15 0 0.195 0 0 0 base_link d400_link 100"/>
+
+<node pkg="tf" type="static_transform_publisher" name="baselink_to_tcameralink" args="0.15 0 0.165 0 0 0 base_link tcamera_link 100"/>
+
+<node pkg="bada_2dnav" type="newOdom.py" name="newOdom"/>
+
+<include file="$(find depthimage_to_laserscan)/launch/start_laser.launch"/>
 
 
- <include file="$(find bada_2dnav)/launch/move_base.launch"/>
+<include file="$(find bada_2dnav)/launch/move_base.launch"/>
 
  <group ns="rtabmap">
     <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="">
 	<remap from="odom" to="$(arg odom_topic)"/>
+	<remap from="scan" to="/scan"/>
         <remap from="rgb/image" to="$(arg rgb_topic)"/>
         <remap from="depth/image" to="$(arg depth_topic)"/>
         <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
-          <param name="frame_id" type="string" value="d400_link"/>
+          <param name="frame_id" type="string" value="base_link"/>
+          <param name="odom_frame_id" type="string" value="odom"/>
 	  <param name="depth_topic" type="string" value="d400/aligned_depth_to_color/image_raw "/>
           <param name="visual_odometry" type="bool" value="false"/>
-	  <param name="odom_topic" type="string" value="t265/odom/sample"/>
+	  <param name="odom_topic" type="string" value="odom_baselink"/>
 	  <param name="rgb_topic" type="string" value="d400/color/image_raw"/>
 	  <param name="camera_info_topic" type="string" value="d400/color/camera_info"/>
-          <param name="queue_size" type="int" value="200"/>
+          <param name="queue_size" type="int" value="5000"/>
           <param name="rviz" type="bool" value="true"/>
           <param name="rtabmapviz" type="bool" value="true"/>
 	  <param name="approx_sync" type="string" value="false"/>
-
 	  <param name="use_action_for_goal" type="bool" value="true"/>
           <remap from="move_base"            to="/move_base"/>
 
+
+	<param name="Rtabmap/DetectionRate"    type="double" value="2"/>
+	  <param name="subscribe_scan" type="bool" value="true"/>
+	  <param name="subscribe_depth" type="bool" value="true"/>
+
+	  <param name="wait_for_transform_duration" type="double" value="0.5"/>
 	 <!-- output -->
   	  <remap from="grid_map" to="/map"/>
 
@@ -41,16 +55,28 @@
 	  <param name="Kp/MaxDepth"                  type="string" value="4.0"/>
 	  <param name="Reg/Strategy"                 type="string" value="0"/>      <!-- Loop closure transformation: 0=Visual, 1=ICP, 2=Visual+ICP -->
 	  <param name="Icp/CorrespondenceRatio"      type="string" value="0.3"/>
-	  <param name="Vis/MinInliers"               type="string" value="15"/>      <!-- 3D visual words minimum inliers to accept loop closure -->
-	  <param name="Vis/InlierDistance"           type="string" value="0.1"/>    <!-- 3D visual words correspondence distance -->
+	  <param name="Vis/MinInliers"               type="string" value="25"/>      <!-- 3D visual words minimum inliers to accept loop closure -->
+	  <param name="Vis/InlierDistance"           type="string" value="0.5"/>    <!-- 3D visual words correspondence distance -->
 	  <param name="RGBD/AngularUpdate"           type="string" value="0.1"/>    <!-- Update map only if the robot is moving -->
 	  <param name="RGBD/LinearUpdate"            type="string" value="0.1"/>    <!-- Update map only if the robot is moving -->
+<param name="RGBD/OptimizeMaxError"            type="string" value="10"/>
+<param name="RGBD/LoopClosureReextractFeatures"            type="string" value="true"/>
 	  <param name="RGBD/ProximityPathMaxNeighbors" type="string" value="0"/> 
 	  <param name="Rtabmap/TimeThr"              type="string" value="0"/>
-	  <param name="Mem/RehearsalSimilarity"      type="string" value="0.30"/>
+	  <param name="Mem/RehearsalSimilarity"      type="string" value="0.45"/>
 	  <param name="Reg/Force3DoF"                type="string" value="true"/>
-	  <param name="GridGlobal/MinSize"           type="string" value="20"/>
 
+	  <param name="GridGlobal/MinSize"           type="string" value="20"/>
+	 <param name="Grid/RangeMax"           type="string" value="5"/>
+	<param name="Grid/CellSize"           type="string" value="0.02"/>
+	<param name="Grid/ClusterRadius"           type="string" value="0.2"/>
+	<param name="Grid/3D"           type="string" value="false"/>
+
+	<param name="Grid/MaxGroundAngle"           type="string" value="45"/>
+
+	<param name="Odom/Strategy" type="string"  value="1"/>
+	<param name="Vis/CorType" type="string" value="1"/>
+	
 
 	<param if="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="false"/>
         <param unless="$(arg localization)" name="Mem/IncrementalMemory" type="string" value="true"/>

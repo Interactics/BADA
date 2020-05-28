@@ -10,7 +10,8 @@ transform_tolerance: 1.0
 #observation_sources: voxel_cloud
 #voxel_cloud: {data_type: PointCloud2, topic: voxel_cloud , marking: true, clearing: true}
 
-observation_sources: point
-point: {data_type: PointCloud2, topic: /d400/depth/color/points, marking: true, clearing: true}
+# observation_sources: point
+# point: {data_type: PointCloud2, topic: /d400/depth/color/points, marking: true, clearing: true}
 
-
+observation_sources: scan
+point: {data_type: LaserScan, topic: /scan, marking: true, clearing: true}
