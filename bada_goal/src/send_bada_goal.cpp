@@ -20,7 +20,7 @@ int main(int argc, char** argv){
   goal.target_pose.header.stamp = ros::Time::now();
 
   goal.target_pose.pose.position.x = atof(argv[1]);
-  goal.target_pose.pose.position.x = atof(argv[2]);
+  goal.target_pose.pose.position.y = atof(argv[2]);
   goal.target_pose.pose.orientation.w = atof(argv[3]);
 
   ROS_INFO("Sending goal");
