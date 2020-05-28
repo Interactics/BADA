@@ -22,6 +22,7 @@ import os
 
 from std_msgs.msg import String
 from audio_common_msgs.msg import AudioData
+import tensorflow as tf
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -59,36 +60,55 @@ old5secFrames=[]
 frameQ=queue.Queue()
 qsize=0
 pub = rospy.Publisher('/signal', String, queue_size=10)
-def callback(msg):
-    global frames, qsize, yamnet
+audioPub = rospy.Publisher('/audio', String, queue_size=10)
 
+yamnet._make_predict_function()
+
+#somewhere accessible to both:
+callback_queue = queue.Queue()
+
+def from_dummy_thread(func_to_call_from_main_thread):
+    callback_queue.put(func_to_call_from_main_thread)
+
+def from_main_thread_blocking():
+    callback = callback_queue.get() #blocks until an item is available
+    callback()
+
+def from_main_thread_nonblocking():
+    while True:
+        try:
+            callback = callback_queue.get(False) #doesn't block
+        except queue.Empty: #raised when queue is empty
+            break
+        callback()
+
+def signal(msg):
+    global frames, qsize, yamnet, graph, callback_queue
     # read new data and update last 5 sec frames
     old=time.time()
-    # data = stream.read(readChunkSize)
-    #print('read time: ', time.time()-old)
-    print('run1')
     for i, v in enumerate(msg.data):
         qsize+=1
         frameQ.put(v)
-    print('run2')
+
     # frames+=[msg.data]
     # if(len(frames)<=int(predictionPeriod/predictionRate)):
     #     return
-    if(qsize<=int(sr*predictionPeriod/predictionRate)):
+    if(qsize<=int(sr*predictionPeriod/predictionRate*2)):
         return
     current=[]
-    for i in range(sr):
+    for i in range(sr*2):
         qsize-=1
         current.append(frameQ.get())
         if(frameQ.empty()): break
-
-
-    waveform = np.array(current, np.int16) / 32768.0
+    print(current)
+    waveform = np.frombuffer(bytearray(current), dtype=np.int16) / 32768.0
     print(type(waveform))
     print(waveform.shape)
 
     old=time.time()
     scores, spectrogram = yamnet.predict(np.reshape(waveform, [1, -1]), steps=1)
+    # outputs = model.predict(inputs)
+    # scores, spectrogram = yamnet.predict(np.reshape(waveform, [1, -1]), steps=1)
     print('prediction time: ', time.time()-old)
     old=time.time()
 
@@ -99,6 +119,7 @@ def callback(msg):
 
     dat=np.dstack((class_names[top_class_indices],mean_scores[top_class_indices])).tolist()
 
+    audioPub.publish(roslibpy.Message({'data': json.dumps(dat)}))
     # hello_str = "hello world %s" % rospy.get_time()
     picked=dict.fromkeys(keys, 0.0)
     for _,v in enumerate(dat[0]):
@@ -123,13 +144,24 @@ def callback(msg):
             detected[v]=False
     print('prediction: ', dat)
 
+def callback(msg):
+    global frames, qsize, yamnet, graph, callback_queue
+
+    from_dummy_thread(lambda: signal(msg))
+
 def respeaker_node():
     # global pub, keys, signals, picked, frames
     rospy.init_node('respeaker_node', anonymous=True)
     rospy.loginfo('starting')
 
-    rospy.Subscriber("/audio/channel0", AudioData, callback)
-    rospy.spin()
+    rospy.Subscriber("/audio/channel1", AudioData, callback)
+
+    while(not rospy.is_shutdown()):
+        # from_main_thread_blocking()
+        from_main_thread_nonblocking()
+        # print('spinning')
+        # rospy.spin()
+        time.sleep(0.1)
 
 if __name__ == '__main__':
     respeaker_node()
