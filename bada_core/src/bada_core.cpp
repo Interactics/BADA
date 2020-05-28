@@ -5,7 +5,8 @@
 #include <std_msgs/Int16.h>
 #include <std_msgs/Empty.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-
+#include <move_base_msgs/MoveBaseAction.h>
+#include <actionlib/client/simple_action_client.h>
 #include <tf/transform_listener.h>
 //#include <turtlesim/Velocity.h>
 //#include <turtlesim/Spawn.h>
@@ -38,8 +39,7 @@ ros::NodeHandle nh;
 
 bool sig_check = false; 							// Roaming 단계에서 사용. 
 void sig_income(const std_msgs::Empty &msg);        // Roaming 단계에서 사용. 소리가 발생할 경우에 쓸모가 있다. 
-void bada_roaming();     							// 배회하나 소리가 나면 다음으로 넘어간다.
-void bada_go_destination();							// 지정된 방으로 이동.
+void bada_go_destination(double x, double y, double orien_z, double orien_w);							// 지정된 방으로 이동.
 void bada_get_person_position();					// calculate the person's position on map from robot position using detected angle and theta.
 void bada_rounding();       						// 회전하며 사람이 있는지를 검사한다.
 void bada_head_UP(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
@@ -61,6 +61,9 @@ ros::Subscriber pepl_checker = nh.subscribe<std_msgs::Int32>("/bada/eyes/distanc
 //사람이 일정 ROI에 들어오는 것을 검사함. 만약 ROI에 들어온다면, Checker는 True로 바뀜.
 
 ros::Subscriber sig_checker  = nh.subscribe<std_msgs::Empty>("/bada/signal/checker", 1, sig_income);     
+
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
+MoveBaseClient ac("move_base", true); //move_base client 선언
 
 int main(int argc, char **argv){
 	STATE state = FINDING_PEPL;
@@ -125,9 +128,26 @@ void bada_next_state(STATE& present_state){
 	//---끝---
 }
 
-void bada_go_destination(){
+void bada_go_destination(double x, double y, double orien_z, double orien_w){ //맵 위치 x,y quaternion z,w 를 설정해주고 그 위치로 이동
 	//- ACTION MSG 퍼블리시한다.
-	//---끝---
+	ac.waitForServer();
+	move_base_msgs::MoveBaseGoal goal;
+
+	goal.target_pose.header.frame_id = "map";
+	goal.target_pose.header.stamp = ros::Time::now();
+
+	goal.target_pose.pose.position.x = x;
+	goal.target_pose.pose.position.y = y;
+	goal.target_pose.pose.orientation.z = orien_z;
+	goal.target_pose.pose.orientation.w = orien_w;
+
+	ac.sendGoal(goal);
+	ac.waitForResult();
+	if(ac.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+		ROS_INFO("bada moving success!");
+	else
+		ROS_INFO("bada moving fail!");
+	return;
 }
 
 void bada_head_UP(bool STATUS){
