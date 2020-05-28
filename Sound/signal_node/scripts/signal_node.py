@@ -52,6 +52,7 @@ old5secFrames=[]
 
 def signal_node():
     global pub, keys, signals, picked, frames
+
     rospy.init_node('signal_node', anonymous=True)
     rospy.loginfo('starting')
     # rate = rospy.Rate(10) # 10hz
@@ -61,6 +62,7 @@ def signal_node():
 
     #rospy.Subscriber("/audio", String, callback)
     pub = rospy.Publisher('/signal', String, queue_size=10)
+    audioPub = rospy.Publisher('/audio', String, queue_size=10)
 
 #    for i in range(0, int(1 / (predictionRate)) * duration):
     while not rospy.is_shutdown():
@@ -72,8 +74,10 @@ def signal_node():
 
         frames+=[data]
 
+        print(type(b''.join(frames[-int(predictionPeriod/predictionRate):])))
+
         waveform = np.frombuffer(b''.join(frames[-int(predictionPeriod/predictionRate):]), dtype=np.int16) / 32768.0
-    
+        
         old=time.time()
         scores, spectrogram = yamnet.predict(np.reshape(waveform, [1, -1]), steps=1)
         print('prediction time: ', time.time()-old)
@@ -86,6 +90,9 @@ def signal_node():
 
         dat=np.dstack((class_names[top_class_indices],mean_scores[top_class_indices])).tolist()
 
+        audioPub.publish(roslibpy.Message({'data': json.dumps(dat)}))
+        print('sending msg')
+            
         # hello_str = "hello world %s" % rospy.get_time()
         picked=dict.fromkeys(keys, 0.0)
         for _,v in enumerate(dat[0]):
