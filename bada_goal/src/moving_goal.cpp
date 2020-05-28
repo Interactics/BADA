@@ -20,7 +20,7 @@ void moveToHere(float x, float y, float orien_z, float orien_w){
   goal.target_pose.header.stamp = ros::Time::now();
 
   goal.target_pose.pose.position.x = x;
-  goal.target_pose.pose.position.x = y;
+  goal.target_pose.pose.position.y = y;
   goal.target_pose.pose.orientation.z = orien_z;
   goal.target_pose.pose.orientation.w = orien_w;
 
@@ -39,6 +39,7 @@ void moveToHere(float x, float y, float orien_z, float orien_w){
 
 int main(int argc, char** argv){
   	ros::init(argc, argv, "navigation_goals");
-	moveToHere(1,1,0,1);
+	moveToHere(0.982,0.015,-0.377,0.926);
+	moveToHere(-1.415,0.162,0.421,0.907);
 	return 0;
 }
