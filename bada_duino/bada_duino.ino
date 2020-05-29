@@ -1,5 +1,12 @@
 // 20200528
 
+
+////
+/*----------------TODO------------------*/
+// 1. ADD MORE DISPLAY!!!!!!!!!!
+// 2. BUTTON CLICKING TEST
+////
+
 #include <DynamixelMotor.h>
 #include <RGBmatrixPanel.h>
 #include <ros.h>
@@ -13,17 +20,22 @@
 #define B   A2
 #define C   A3
 #define D   A4
-#define D_ID 144  ///Dynmixel ID
+#define D_ID 144                                  ///Dynmixel ID
+
+#define bounceTimer 200                           // For button
+#define BUTTON 2                                  // For button
+u8 keyState = HIGH;                               // Var for storing button's state
+u8 bounceCount = 0;                               // Bounce Coun바운스 변수 선언
 
 unsigned long          previousTime = millis();
-unsigned long          currentTime;
-const long             timeInterval = 100; //ms
-bool                   t_flag       = false;
-char                   t_index      = 0;
-float                  t_val        = 0;
-int16_t speed = 125;                                 // speed, between 0 and 1023
-const long unsigned int DX_baudrate = 1000000;       // communication baudrate
-
+unsigned long          currentTime;   
+const long             timeInterval = 100;         //ms
+bool                   t_flag       = false;   
+char                   t_index      = 0;   
+float                  t_val        = 0;   
+int16_t                speed        = 125;         // speed, between 0 and 1023
+const long unsigned int DX_baudrate = 1000000;     // communication baudrate
+  
 enum Events {
   NOTHING = 0,
   A_UP, A_DOWN, A_LEFT, A_RIGHT,
@@ -102,6 +114,8 @@ const unsigned char PROGMEM FIRE2[] =
   0x03, 0xf8, 0x3f, 0x80, 0x01, 0xff, 0xff, 0x80, 0x00, 0xff, 0xfe, 0x00, 0x00, 0x3f, 0xf8, 0x00
 };
 
+
+
 std_msgs::Bool CameraState_msg;
 std_msgs::Bool DisplayState_msg;
 std_msgs::Bool ButtonState_msg;
@@ -122,6 +136,7 @@ void DisplayCommand(const std_msgs::Int16& cmd);
 ros::Publisher CameraState ("Cameara_State", &CameraState_msg);
 ros::Publisher DisplayState("Display_State", &DisplayState_msg);
 ros::Publisher ButtonState ("Button_State", &ButtonState_msg);
+
 ros::Subscriber<std_msgs::Bool> CameraSUB("bada/duino/camera_cmd", &CameraCommand);
 ros::Subscriber<std_msgs::Int16> DisplaySUB("bada/duino/display_cmd", &DisplayCommand );
 
@@ -146,9 +161,8 @@ void setup() {
   
   Dynamixel_startUP();
   LEDMatrix_startUP();
-  motor.goalPosition(350);
-  delay(1000);
-  motor.goalPosition(500);
+  Button_startUP();
+
 
   nh.loginfo("BADA_DUINO ON");
 }
@@ -168,6 +182,7 @@ void loop() {
         t_index = 2;
       case 2:
         ButtonState.publish(&ButtonState_msg);
+        ButtonState_msg.data = false; // Only one pub
         t_index = 3;
         break;
       case 3:
@@ -202,7 +217,7 @@ void loop() {
   }
   if (Camera_cmd == true) MotorCtrl(Camera_cmd);
   else MotorCtrl(Camera_cmd);
-  if (Button_cmd == true); //motion that go backward, turn 180 and wait. or following situation.
+  ButtonClicked();
 }
 
 void CameraCommand (const std_msgs::Bool& cmd) {
@@ -227,6 +242,12 @@ void Dynamixel_startUP() {
   motor.enableTorque();  // joint mode 180° angle range
   motor.jointMode(204, 820);
   motor.speed(speed);
+
+/// Init Movement
+  motor.goalPosition(350);
+  delay(1000);
+  motor.goalPosition(500);
+/// Init Movement ///
 }
 
 void T_ISR() {
@@ -234,6 +255,11 @@ void T_ISR() {
     previousTime = currentTime;
     t_flag = true;
   }
+}
+
+void Button_startUP(){
+  pinMode(BUTTON, INPUT);  // 버튼(핀)을 입력으로 설정
+  digitalWrite(BUTTON, HIGH); 
 }
 
 void LEDMatrix_startUP() {
@@ -278,6 +304,23 @@ void LEDMatrix_Control(Events event) {
 
 void LEDMatrix_Erasing() {
   matrix.fillScreen(matrix.Color333(0, 0, 0));
+}
+
+void ButtonClicked(){
+  u8 key = digitalRead(BUTTON); // 버튼 값 읽어 key변수에 저장
+  if (key == LOW){
+    if (bounceCount == 0){
+      bounceCount = bounceTimer;
+      keyState = key;
+      ButtonState_msg.data = true;
+    } 
+    else {
+      bounceCount--; //  바운스 카운트 값 감소
+    }
+  }
+  else { // 버튼이 안 눌러졌었다면
+    if (keyState == LOW) keyState = key; // 이전의 상태가 눌린 상태였다면
+  }
 }
 
 void MotorCtrl(bool cmd) {
