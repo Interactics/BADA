@@ -67,8 +67,10 @@ var detectionData = JSON.parse(msg.data);
 ```
 
 # TodoLIST
-## Robot System Architecture Design
- - [ ] Architecture Design
+## Robot System Core
+ - [x] Architecture Design
+ - [ ] Coding 
+ - [ ] Debug 
 
 ## Mobile Robot 
  - [x] Encoder value setting
@@ -78,24 +80,25 @@ var detectionData = JSON.parse(msg.data);
  - [x] Dead Reckoning Information (Odometry / Pose)
  - [x] Code Refactoring
  - [x] TF message Generation
- - [ ] Trajectory 
- - [ ] Navigation
+ - [x] Trajectory 
+ - [x] Navigation
+ - [ ] TF Change
  - [ ] Making roslaunch
  
 ## Sound Localization
  - [x] Measure the direction of sound using TDoA Sensor
- - [ ] Merge TDoA sensor and mobile robot.
- - [ ] Create movement toward where sound is ocurred.
+ - [x] Merge TDoA sensor and mobile robot.
+ - [x] Create movement toward where sound is ocurred.
  
 ## [Sound Recognition](Sound/README.md)
  - [x] YamNet 
- - [ ] Make Yamnet as ROS Program.
+ - [x] Make Yamnet as ROS Program.
  
 ## SLAM 
  - [x] Pointcloud using RealSense T265 & D435 
  - [x] Making SLAM Information
  - [x] GMAPPing 
- - [ ] Navigation
+ - [x] Navigation
  
 ## [WebAPP](Visualization/README.md)
 
