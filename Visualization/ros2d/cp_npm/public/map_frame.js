@@ -87,6 +87,7 @@ function init() {
   tryConnectWebsocket();
 };
 
+
 ///////////////////////////
 var ros = new ROSLIB.Ros({
   url: 'ws://localhost:9090'
