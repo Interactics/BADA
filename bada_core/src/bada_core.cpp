@@ -48,7 +48,7 @@ void bada_roaming(int currentPoint=0);     							// 배회하나 소리가 나�
 void bada_go_destination(double x, double y, double orien_z, double orien_w);							// 지정된 방으로 이동.
 void bada_save_current_position();					// calculate the person's position on map from robot position using detected angle and theta.
 bool bada_rounding();       						// 회전하며 사람이 있는지를 검사한다.
-void bada_head_UP(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
+void bada_head_UP_cmd(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
 int getCurrentRobotPositionTODO();					// get current transform position(pose, quaternion) of robot
 void bada_change_pos(float LPos, float APos); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
 													// 특정 위치만큼만 이동하기.
@@ -69,8 +69,9 @@ void bada_save_sound_odom();
 void bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
 
 
-void bada_open_eyes(bool Status);           //Open Eyes Function.
-void bada_display_cmd(DISP_EVNT status);    //Display Command
+void bada_open_eyes_cmd(bool Status);           					  // Open Eyes Function.
+void bada_display_cmd(DISP_EVNT status);                          // Display Command
+void bada_vel_cmd(const float XLineVel, coonst float ZAngleVel);  // commendation of Publishing Velocity
 
 
 /*--------------------------------------Callback----------------------------------------------*/
@@ -135,9 +136,9 @@ int main(int argc, char **argv){
 		case FINDING_PEPL:
 			do{
 				bada_go_destination(0,1,2,3);	            // Go to POINT of ROOM
-				bada_head_UP(true); 				// HEAD_UP
+				bada_head_UP_cmd(true); 				// HEAD_UP
 				is_there_pepl = bada_rounding();
-				bada_head_UP(false); 				// HEAD_DOWN
+				bada_head_UP_cmd(false); 				// HEAD_DOWN
 			} while (!is_there_pepl);
 			
 			bada_next_state(state);
@@ -158,7 +159,7 @@ int main(int argc, char **argv){
 			break;
 		case MOVING_TO_PEPL:
 		   	bada_go_to_pepl();  					// 반경 2m 이내 도달 검사하기. 그렇지 않으면 계속 접근
-			bada_head_UP(true); 					// 2m 에 도달하면 카메라 위로 들기
+			bada_head_UP_cmd(true); 					// 2m 에 도달하면 카메라 위로 들기
 			bada_aligned_pepl();  					// 사람의 위치고 로봇 사람을 가운데로
 			bada_go_until_touch(); 			     	// 버튼 눌리기 전까지 전진하기
 			bada_change_pos(-5,-5);     			// 뒤로 1m 이동
@@ -267,7 +268,7 @@ bool bada_rounding(){
 	
 	msg.angular.z = (3.14f/4.0f);      // 회전하도록하기
 	
-	bada_open_eyes(true);      // 눈 뜨기. (정보 받기 시작)
+	bada_open_eyes_cmd(true);      // 눈 뜨기. (정보 받기 시작)
     ros::Rate rate(5); // ROS Rate at 5Hz 0.2 sec
 	
 	int time = 0;
@@ -279,7 +280,6 @@ bool bada_rounding(){
 		msg.angular.z;
 		if (PPL_CHECK){		        // 만약 사람 정보가 ROI에 들어왔다면 true
 			//BOOKMARK1
-			
 			// TODO : USE ROBOT POSITION
 			SAVED_HUMAN_POSITION = {
 				CURRENT_ROBOT_POSITION.pose.pose.position.x, 
@@ -287,7 +287,6 @@ bool bada_rounding(){
 				CURRENT_ROBOT_POSITION.pose.pose.orientation.z, 
 				CURRENT_ROBOT_POSITION.pose.pose.orientation.w
 			}; // calculate person position from robot's perspective
-			
 				/** TODO : 각도와 거리를 이용하여 포인트를 저장한다.  **/
 			// ~~맵에 사람의 위치 포인트를 저장하는 방법, 즉 데이터타입이 무엇인지 알아볼 것. ~~<<-- 사람 위치 저장하지 말 것
 			// 지금 위치를 저장한다. (로봇의 위치) <<-- 이것을 사용할것
@@ -297,7 +296,7 @@ bool bada_rounding(){
 		time++;
 		Ang_Position = (time * 0.2) * msg.angular.z; 
 	} while (Ang_Position < 6.28); //한바퀴 돌았는지?
-	bada_open_eyes(false);
+	bada_open_eyes_cmd(false);
 
 	msg.angular.z =0.0; 
 	pub_cmdvel.publish(msg); //스탑
@@ -335,8 +334,6 @@ void bada_roaming(int currentPoint){ //현재위치에서 마지막 지점까지
 	}
 }
 
-
-
 void bada_go_to_pepl(){
 
 	bada_go_destination(
@@ -364,7 +361,7 @@ void bada_go_to_pepl(){
 } // END
 
 void bada_aligned_pepl(){
-	bada_open_eyes(true);      // 눈 뜨기. (정보 받기 시작)
+	bada_open_eyes_cmd(true);
 	while(false){
 
 		/* velocity.publish 각속도*/
@@ -439,13 +436,14 @@ void bada_save_sound_odom(){
 }
 //https://opentutorials.org/module/2894/16661
 
-void bada_open_eyes(bool status){
+
+void bada_open_eyes_cmd(bool status){
 	std_msgs::Bool BoolStatus;
 	BoolStatus.data = status;
 	pub_eyes_open.publish(BoolStatus);
 } // True -> Eyes UP, False -> Eyes Down
 
-void bada_head_UP(bool status){
+void bada_head_UP_cmd(bool status){
 	std_msgs::Bool BoolStatus;
 	BoolStatus.data = status;
 	pub_head_up.publish(BoolStatus);
@@ -455,6 +453,13 @@ void bada_display_cmd(DISP_EVNT status){
 	std_msgs::Int16 IntStatus;
 	IntStatus.data = int(status);
 	pub_display_cmd.publish(IntStatus);
+}
+
+void bada_vel_cmd(const float XLineVel, coonst float ZAngleVel){
+	geometry_msgs::Point msg;
+	msg.linear.x  = XLineVel; 
+	msg.angular.z = ZAngleVel;
+	pub_cmdvel.publish(msg);
 }
 
 /*--------------------------------------Callback----------------------------------------------*/
