@@ -1,15 +1,19 @@
-#TitleAlarm{
-    font-family: 'Roboto Mono', monospace;
 
-    font-size: 25px;
-    color:#000000;
-}
-
+.my-box {
+    border: 2px solid;
+    padding: 5px;
+    border-radius: 20px;
+  }
 #signal{
-    font-family: 'Roboto Mono', monospace;
-    top: 2%;
-    left: 5%;
-    font-size: 70px;
-    color:red;
+    color:red; 
+    font-size: 70px; 
+    font-family: 'Staatliches', cursive; 
+    margin-left: 36.4%; 
+    margin-bottom: 0px;
     }
-
+#alarmtitle{
+    font-size: 20px;
+    font-family: 'Staatliches', cursive;
+    margin-left: 10px;
+}
+    
