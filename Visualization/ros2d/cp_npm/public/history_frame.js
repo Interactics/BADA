@@ -61,7 +61,7 @@ function shareKakaotalk(sig_name)
     minute = minute < 10 ? '0' + minute : minute;
     second = second < 10 ? '0' + second : second;
   
-    var now = `${year}.${month}.${date}    ${ampm} ${hour}:${minute}:${second} `;
+    var now = '${date}일          ${ampm} ${hour}:${minute}`;
     return now;
   };
 
@@ -180,7 +180,7 @@ var h = new Queue();
     time=today.getTime();
     viewtime=printNow();
 
-    if(h.dataStore.length>=30)
+    if(h.dataStore.length>=14)
     {
       h.dequeue();
     }
