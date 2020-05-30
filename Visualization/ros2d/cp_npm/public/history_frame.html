@@ -9,14 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
 
 <html>
-    <div style="color:black; font-size: 25px; font-family: 'Roboto Mono', monospace; padding : 0; ">
+    <span style="color:black; font-size: 25px; font-family: 'Roboto Mono', monospace; padding : 0; ">
         <span id="History"></span>
-    </div>
+    </span>
     <a id="kakao-login-btn"></a>
     
     <script>
         Kakao.Auth.createLoginButton({ 
          container: '#kakao-login-btn', 
+         size : 'small',
          success: function(authObj) { 
            alert(JSON.stringify(authObj)); 
          },

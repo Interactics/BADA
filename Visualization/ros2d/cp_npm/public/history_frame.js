@@ -72,7 +72,7 @@ function Queue(){
     this.enqueue = enqueue;
     this.dequeue = dequeue;
     this.search=search;
-    this.toString=toString;
+    this.stoString=stoString;
 }
 
 function enqueue(element)
@@ -109,10 +109,10 @@ function search(){
     }
   }
   
-  function toString() {
-    var retStr = "";
+  function stoString() {
+    var retStr = "\n";
     for (var i = this.dataStore.length-1;i >=0; --i )    {
-        retStr += this.dataStore[i] + "\n";
+        retStr += "\r\n"+this.dataStore[i]+"\n";
     }
     return retStr;
 }
@@ -196,7 +196,7 @@ var h = new Queue();
         shareKakaotalk(sig_name);
         h.enqueue([sig_name, viewtime]);
         hidx=hidx+1;     
-        PrintHistory=h.toString();
+        PrintHistory=h.stoString();
       }
       else
       {
@@ -209,7 +209,7 @@ var h = new Queue();
         shareKakaotalk(sig_name);
         h.enqueue([sig_name, viewtime]);
         hidx=hidx+1;       
-        PrintHistory=h.toString();
+        PrintHistory=h.stoString();
     }
     document.getElementById("History").innerHTML=PrintHistory;
 
