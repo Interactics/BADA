@@ -71,7 +71,7 @@ void bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이�
 
 void bada_open_eyes_cmd(bool Status);           					  // Open Eyes Function.
 void bada_display_cmd(DISP_EVNT status);                          // Display Command
-void bada_vel_cmd(const float XLineVel, coonst float ZAngleVel);  // commendation of Publishing Velocity
+void bada_vel_cmd(const float XLineVel = 0, const float ZAngleVel = 0);  // commendation of Publishing Velocity
 
 
 /*--------------------------------------Callback----------------------------------------------*/
@@ -456,8 +456,8 @@ void bada_display_cmd(DISP_EVNT status){
 	pub_display_cmd.publish(IntStatus);
 }
 
-void bada_vel_cmd(const float XLineVel, coonst float ZAngleVel){
-	geometry_msgs::Point msg;
+void bada_vel_cmd(const float XLineVel, const float ZAngleVel){
+	geometry_msgs::Twist msg;
 	msg.linear.x  = XLineVel; 
 	msg.angular.z = ZAngleVel;
 	pub_cmdvel.publish(msg);
