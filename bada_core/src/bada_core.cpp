@@ -78,6 +78,17 @@ void bada_open_eyes_cmd(bool Status);           					  // Open Eyes Function.
 void bada_display_cmd(DISP_EVNT status);                          // Display Command
 void bada_vel_cmd(const float XLineVel = 0, const float ZAngleVel = 0);  // commendation of Publishing Velocity
 
+ros::Publisher pub_cmdvel;        	   
+ros::Publisher pub_camera;
+ros::Publisher pub_eyes_open;
+ros::Publisher pub_head_up;
+ros::Publisher pub_display_cmd;
+
+ros::Subscriber sub_odometry;
+ros::Subscriber sub_pepl_checker;
+ros::Subscriber sub_sig_checker;
+ros::Subscriber sub_switch_checker;
+ros::Subscriber sub_sound_localization;     
 
 /*--------------------------------------Callback----------------------------------------------*/
 
@@ -89,24 +100,8 @@ void sub_sound_localization_callback(const geometry_msgs::PoseStamped &msg);    
 
 //==============================================================================================
 
-ros::NodeHandle nh;
-ros::Publisher pub_cmdvel         	   = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-ros::Publisher pub_camera              = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
-ros::Publisher pub_eyes_open           = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
-ros::Publisher pub_head_up             = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
-ros::Publisher pub_display_cmd         = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
-
-ros::Subscriber sub_odometry           = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
-ros::Subscriber sub_pepl_checker       = nh.subscribe("/bada/eyes/distance",1, sub_pepl_checker_callback );   //TODO: FIX CALLBACK FUNCTION
-ros::Subscriber sub_sig_checker        = nh.subscribe("/bada/signal/checker", 1, sub_sig_checker_callback);     
-ros::Subscriber sub_switch_checker     = nh.subscribe("/bada/duino/switch", 1, sub_switch_checker_callback);     
-ros::Subscriber sub_sound_localization = nh.subscribe("/bada/signal/localization_filtered", 1, sub_sound_localization_callback);     
-
 //사람이 일정 ROI에 들어오는 것을 검사함. 만약 ROI에 들어온다면, Checker는 True로 바뀜.
 
-
-typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
-MoveBaseClient ac("move_base", true); //move_base client 선언
 
 bool SIG_CHECK       = false; 							// Roaming 단계에서 사용. 
 bool SWITCH_CHECK    = false; 							// is Switch on?  T/F
@@ -127,9 +122,40 @@ double wayPoint[][4] = {
 	{0.3,2, 0.1,0.2}
 };//roaming 장소 저장
 
+// ros::Publisher pub_cmdvel;
+// ros::Publisher pub_camera;
+// ros::Publisher pub_eyes_open;
+// ros::Publisher pub_head_up;
+// ros::Publisher pub_display_cmd;
+
+// ros::Subscriber sub_odometry;
+// ros::Subscriber sub_pepl_checker;
+// ros::Subscriber sub_sig_checker;
+// ros::Subscriber sub_switch_checker;
+// ros::Subscriber sub_sound_localization;
+
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
+MoveBaseClient ac("move_base", true); //move_base client 선언
+
 int main(int argc, char **argv){
 	STATE state = FINDING_PEPL;
 	ros::init(argc, argv, "/bada/core");
+
+	ros::NodeHandle nh;
+	
+	pub_cmdvel         	   = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+	pub_camera              = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
+	pub_eyes_open           = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
+	pub_head_up             = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
+	pub_display_cmd         = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
+
+	sub_odometry           = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
+	sub_pepl_checker       = nh.subscribe("/bada/eyes/distance",1, sub_pepl_checker_callback );   //TODO: FIX CALLBACK FUNCTION
+	sub_sig_checker        = nh.subscribe("/bada/signal/checker", 1, sub_sig_checker_callback);     
+	sub_switch_checker     = nh.subscribe("/bada/duino/switch", 1, sub_switch_checker_callback);     
+	sub_sound_localization = nh.subscribe("/bada/signal/localization_filtered", 1, sub_sound_localization_callback);     
+
+
 
 	bool is_there_pepl = false;
 
