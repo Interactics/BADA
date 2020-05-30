@@ -14,7 +14,13 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type="text/javascript" src="map_frame.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-
+    <style type="text/css">
+        .my-box {
+            border: 2px solid;
+            padding: 5px;
+            border-radius: 20px;
+        }
+    </style>
 </head>
 
 <body>
@@ -26,10 +32,10 @@
             border: 0;
         }
 
-        div#map{
-            top : 7%;
-            left : 10%;
-            
+        div#map {
+            top: 10%;
+            left: 10%;
+
         }
     </style>
 
@@ -40,12 +46,13 @@
             </p>
         </button>
     </div>
+    <div class="my-box">
 
-    <div id="map">
-        <canvas id="canvas" width="640" height="480">
-        </canvas>
+        <div id="map">
+            <canvas id="canvas" width="640" height="480">
+            </canvas>
+        </div>
     </div>
-
 </body>
 
 </html>
