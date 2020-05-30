@@ -35,6 +35,13 @@ enum DISP_EVNT {
   FIRE_EVENT, WATER_EVENT, DOOR_EVENT, BELL_EVENT, BOILING_EVENT, CRYING_EVENT
 };
 
+struct Position {
+	double x;
+	double y;
+	double orien_z;
+	double orien_w;
+};
+
 typedef std_msgs::Bool BoolMsg;
 
 std_msgs::Bool HEAD_STATUS;
@@ -50,7 +57,7 @@ void bada_save_current_position();					// calculate the person's position on map
 bool bada_rounding();       						// 회전하며 사람이 있는지를 검사한다.
 void bada_head_UP_cmd(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
 int getCurrentRobotPositionTODO();					// get current transform position(pose, quaternion) of robot
-void bada_change_pos(float LPos, float APos); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
+void bada_change_pos(float LinePos, float AnglePos, float distance); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
 													// 특정 위치만큼만 이동하기.
 													/* 리니어, 앵귤러에 도달할 때까지 회전하도록하기. 기본 속도는 정해져있다. 
 													   보내는 것은 cmd_vel, 받는 것은 오도메트리 정보. */
@@ -102,20 +109,16 @@ ros::Subscriber sub_sound_localization = nh.subscribe("/bada/signal/localization
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 MoveBaseClient ac("move_base", true); //move_base client 선언
 
-bool PPL_CHECK       = false;
 bool SIG_CHECK       = false; 							// Roaming 단계에서 사용. 
 bool SWITCH_CHECK    = false; 							// is Switch on?  T/F
+bool PPL_CHECK       = false;		// Is there PPL?
+float PPL_ANGLE      = -90;  		// Angle of PPL respect to camera 
+float PPL_DIST       = -1.0;        // Distnace to PPL from 
 
 //geometry_msgs::Pose2D PERSON_POSITION;
 nav_msgs::Odometry CURRENT_ROBOT_POSITION;
 geometry_msgs::PoseStamped CURRENT_SOUND_DIRECTION;
 
-struct Position {
-	double x;
-	double y;
-	double orien_z;
-	double orien_w;
-};
 Position SAVED_SOUND_POSITION = {0.0f,1.0f,2.0f,3.0f};
 Position SAVED_HUMAN_POSITION =	{0,1,2,3};
 
@@ -191,6 +194,7 @@ void bada_next_state(STATE& present_state){
 	}
 }
 
+// send simple goal
 void bada_go_destination(double x, double y, double orien_z, double orien_w){ //맵 위치 x,y quaternion z,w 를 설정해주고 그 위치로 이동
 	//- ACTION MSG 퍼블리시한다.
 	ac.waitForServer();
@@ -330,15 +334,14 @@ void bada_roaming(int currentPoint){ //현재위치에서 마지막 지점까지
 }
 
 void bada_go_to_pepl(){
-
+	// while
 	bada_go_destination(
 		SAVED_HUMAN_POSITION.x,
 		SAVED_HUMAN_POSITION.y,
 		SAVED_HUMAN_POSITION.orien_w,
 		SAVED_HUMAN_POSITION.orien_z
 	); //사람에게 가기.
-	bada_aligned_pepl();
-	bada_go_until_touch(); //터치할때까지 전진
+	// FUTURE: what if the person gone??
 
 	//예전 알고리즘
 	// do{
@@ -394,7 +397,7 @@ void bada_change_pos(float line, float angle){
 }
 
 void sub_odometry_callback(const nav_msgs::Odometry &msg){
-	CURRENT_ROBOT_POSITION=msg;
+	CURRENT_ROBOT_POSITION = msg;
 }
 
 // void bada_cancelAllGoal(){
