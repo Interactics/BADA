@@ -13,6 +13,7 @@
 #include <tf/transform_listener.h>
 #include <math.h>
 
+const double PI { 3.141592 };
 
 //---------------- 노드 변경할 것 ----------------------------------------
 	/*
@@ -57,7 +58,7 @@ void bada_save_current_position();					// calculate the person's position on map
 bool bada_rounding();       						// 회전하며 사람이 있는지를 검사한다.
 void bada_head_UP_cmd(bool STATUS);						// 카메라달린 모터 위로 들기 for 사람 위치 확인용
 int getCurrentRobotPositionTODO();					// get current transform position(pose, quaternion) of robot
-void bada_change_pos(float LinePos, float AnglePos, float distance); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
+void bada_change_pos(float LinePos, float AnglePos); 		// 로봇에게 직선거리 혹은 회전 명령 주기 
 													// 특정 위치만큼만 이동하기.
 													/* 리니어, 앵귤러에 도달할 때까지 회전하도록하기. 기본 속도는 정해져있다. 
 													   보내는 것은 cmd_vel, 받는 것은 오도메트리 정보. */
@@ -161,11 +162,10 @@ int main(int argc, char **argv){
 			break;
 		case MOVING_TO_PEPL:
 		   	bada_go_to_pepl();  					// 반경 2m 이내 도달 검사하기. 그렇지 않으면 계속 접근
-			bada_head_UP_cmd(true); 					// 2m 에 도달하면 카메라 위로 들기
 			bada_aligned_pepl();  					// 사람의 위치고 로봇 사람을 가운데로
 			bada_go_until_touch(); 			     	// 버튼 눌리기 전까지 전진하기
-			bada_change_pos(-5,-5);     			// 뒤로 1m 이동
-			bada_change_pos(5,0);      				// 180도 회전 
+			bada_change_pos(-1,0);     			// 뒤로 1m 이동
+			bada_change_pos(0,PI);      				// 180도 회전 
 			bada_next_state(state);
 			break;
 		case MOVING_WITH_PEPL:
@@ -389,11 +389,24 @@ void bada_go_until_touch(){// 버튼 눌리기 전까지 전진하기
 	pub_cmdvel.publish(msg); //스탑
 } //END
 
-void bada_change_pos(float line, float angle){
-    geometry_msgs::Twist vel_cmd2;          // 회전하기 위해 퍼블리시 용도로 만들어진 변수
+void bada_change_pos(float LinePos, float AnglePos){
+	ros::Rate loop_rate(10); 
+
+	int t = 0;
+	float vel = 0;
+	float target = (abs(LinePos) > abs(AnglePos)) ? LinePos : AnglePos;
 	do{
-		// vel_cmd2.publish();
-	} while(true);
+		t++;
+		if (abs(LinePos) > abs(AnglePos)) {
+			bada_vel_cmd(-0.3, 0);
+			vel = -0.3;
+		}
+		else {
+			bada_vel_cmd(0, PI / 4.0f);
+			vel = PI / 4.0f;
+		}
+		loop_rate.sleep();
+	} while(t * 0.1 * abs(vel) > abs(target));
 }
 
 void sub_odometry_callback(const nav_msgs::Odometry &msg){
