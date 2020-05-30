@@ -1,2 +1,15 @@
+#TitleAlarm{
+    font-family: 'Roboto Mono', monospace;
 
+    font-size: 25px;
+    color:#000000;
+}
+
+#signal{
+    font-family: 'Roboto Mono', monospace;
+    top: 2%;
+    left: 5%;
+    font-size: 70px;
+    color:red;
+    }
 
