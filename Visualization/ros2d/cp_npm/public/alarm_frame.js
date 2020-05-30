@@ -69,8 +69,9 @@ var signal = new ROSLIB.Topic({
     name : '/signal',
     messageType : 'std_msgs/String'
   });
+  const dic1={'Speech':'말하는 소리', 'Alarm':'알람', 'Door':'노크', 'Television':'티비소리', 'Silence':'없음', 'Water':'물소리', 'Music':'음악'};
 
   signal.subscribe(function(m){
-    sig_name=m.data;
+    sig_name=dic1[m.data];
     document.getElementById("signal").innerHTML = sig_name;
   });

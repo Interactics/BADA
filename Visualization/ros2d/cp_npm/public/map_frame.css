@@ -1,8 +1,8 @@
 
     .my-box {
-        border: 2px solid;
         padding: 5px;
         border-radius: 20px;
+
     }
 
     div#map_button {
@@ -15,6 +15,9 @@
     div#map {
         top: 10%;
         left: 10%;
+    }
+    #canvas{
+        margin-left : 150px;
     }
     #kakao-login-btn{
         padding-top : 30px;
