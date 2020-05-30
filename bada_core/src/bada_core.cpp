@@ -11,9 +11,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <actionlib/client/simple_action_client.h>
 #include <tf/transform_listener.h>
-//#include <turtlesim/Velocity.h>
-//#include <turtlesim/Spawn.h>
-#include <math.h>       /* cos */
+#include <math.h>
 
 
 //---------------- 노드 변경할 것 ----------------------------------------
@@ -68,7 +66,6 @@ void bada_emotion();
 void bada_wait_button();
 
 void bada_save_sound_odom();
-void bada_sub_sound_odom();					//소리 발생하는 방향 인지하기
 void bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
 
 
@@ -86,17 +83,17 @@ void sub_sound_localization_callback(const geometry_msgs::PoseStamped &msg);    
 
 //==============================================================================================
 
-ros::Publisher pub_cmdvel            = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-ros::Publisher pub_camera            = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
-ros::Publisher pub_eyes_open         = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
-ros::Publisher pub_head_up           = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
-ros::Publisher pub_display_cmd       = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
+ros::Publisher pub_cmdvel         	   = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+ros::Publisher pub_camera              = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
+ros::Publisher pub_eyes_open           = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
+ros::Publisher pub_head_up             = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
+ros::Publisher pub_display_cmd         = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
 
-ros::Subscriber sub_odometry         = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
-ros::Subscriber sub_pepl_checker     = nh.subscribe("/bada/eyes/distance",1, sub_pepl_checker_callback );   //TODO: FIX CALLBACK FUNCTION
-ros::Subscriber sub_sig_checker      = nh.subscribe("/bada/signal/checker", 1, sub_sig_checker_callback);     
-ros::Subscriber sub_switch_checker   = nh.subscribe("/bada/duino/switch", 1, sub_switch_checker_callback);     
-ros::Subscriber sub_sound_localization   = nh.subscribe("/bada/signal/localization_filtered", 1, sub_sound_localization_callback);     
+ros::Subscriber sub_odometry           = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
+ros::Subscriber sub_pepl_checker       = nh.subscribe("/bada/eyes/distance",1, sub_pepl_checker_callback );   //TODO: FIX CALLBACK FUNCTION
+ros::Subscriber sub_sig_checker        = nh.subscribe("/bada/signal/checker", 1, sub_sig_checker_callback);     
+ros::Subscriber sub_switch_checker     = nh.subscribe("/bada/duino/switch", 1, sub_switch_checker_callback);     
+ros::Subscriber sub_sound_localization = nh.subscribe("/bada/signal/localization_filtered", 1, sub_sound_localization_callback);     
 
 //사람이 일정 ROI에 들어오는 것을 검사함. 만약 ROI에 들어온다면, Checker는 True로 바뀜.
 
@@ -154,7 +151,6 @@ int main(int argc, char **argv){
 			// 소리 발생한 방향으로 이동하기 
 			// 저장하기
 			while(true/* enogh */) {
-				bada_sub_sound_odom();					//소리 발생하는 방향 인지하기
 				bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
 			}					
 			bada_save_sound_PT();					//로봇의 현재 위치와 소리나는 방향 저장하기.
@@ -164,8 +160,8 @@ int main(int argc, char **argv){
 		   	bada_go_to_pepl();  					// 반경 2m 이내 도달 검사하기. 그렇지 않으면 계속 접근
 			bada_head_UP(true); 					// 2m 에 도달하면 카메라 위로 들기
 			bada_aligned_pepl();  					// 사람의 위치고 로봇 사람을 가운데로
-			bada_go_until_touch(); 				// 버튼 눌리기 전까지 전지하기
-			bada_change_pos(-5,-5);     					// 뒤로 1m 이동
+			bada_go_until_touch(); 			     	// 버튼 눌리기 전까지 전진하기
+			bada_change_pos(-5,-5);     			// 뒤로 1m 이동
 			bada_change_pos(5,0);      				// 180도 회전 
 			bada_next_state(state);
 			break;
@@ -368,7 +364,7 @@ void bada_go_to_pepl(){
 } // END
 
 void bada_aligned_pepl(){
-	// pub_eyes_open.publish(true);      // 눈 뜨기.
+	bada_open_eyes(true);      // 눈 뜨기. (정보 받기 시작)
 	while(false){
 
 		/* velocity.publish 각속도*/
@@ -426,13 +422,15 @@ void bada_wait_button(){
 
 }
 
-
-void bada_sub_sound_odom(){
-
-}
-
 void bada_go_to_sound(){ //소리나는 방향으로 이동
+	// topic:
+	// 
+	// - sub sound localization,
+	// 
+	// - pub cmd vel
+	// go to sound while tracking, stop when "enough"
 
+	
 }
 
 void bada_save_sound_odom(){
