@@ -5,14 +5,14 @@
   }
 
 header{
-    font-size: 20px; 
-    font-family: 'Staatliches';
-     margin-left:10px;
+    font-size: 30px;
+    font-family: 'Staatliches', cursive;
+    margin-left: 10px;
 }
 
-#history{
+#History{
    color:black; 
-   font-size: 18px;
-    font-family: 'Roboto Mono', monospace; 
-    padding : 0;
-}
+   font-size: 22px;
+   font-family: 'Roboto Mono', monospace; 
+   margin-left:10px;
+  }

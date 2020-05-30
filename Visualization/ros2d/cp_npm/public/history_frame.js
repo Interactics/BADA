@@ -112,7 +112,7 @@ function search(){
   function stoString() {
     var retStr = "";
     for (var i = this.dataStore.length-1;i >=0; i-- )    {
-        retStr += this.dataStore[i]+"\n";
+        retStr +="  "+ this.dataStore[i]+"\n";
     }
     retStr = retStr.replace(/(?:\r\n|\r|\n)/g, '<br />');
     return retStr;
