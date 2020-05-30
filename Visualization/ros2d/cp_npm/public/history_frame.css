@@ -1,0 +1,18 @@
+.my-box {
+    border: 2px solid;
+    padding: 5px;
+    border-radius: 20px;
+  }
+
+header{
+    font-size: 20px; 
+    font-family: 'Staatliches';
+     margin-left:10px;
+}
+
+#history{
+   color:black; 
+   font-size: 18px;
+    font-family: 'Roboto Mono', monospace; 
+    padding : 0;
+}
