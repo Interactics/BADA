@@ -67,7 +67,7 @@ void bada_wait_button();
 
 void bada_save_sound_odom();
 void bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
-
+Position bada_get_robot_pos();
 
 void bada_open_eyes_cmd(bool Status);           					  // Open Eyes Function.
 void bada_display_cmd(DISP_EVNT status);                          // Display Command
@@ -282,12 +282,8 @@ bool bada_rounding(){
 		if (PPL_CHECK){		        // 만약 사람 정보가 ROI에 들어왔다면 true
 			//BOOKMARK1
 			// TODO : USE ROBOT POSITION
-			SAVED_HUMAN_POSITION = {
-				CURRENT_ROBOT_POSITION.pose.pose.position.x, 
-				CURRENT_ROBOT_POSITION.pose.pose.position.y, 
-				CURRENT_ROBOT_POSITION.pose.pose.orientation.z, 
-				CURRENT_ROBOT_POSITION.pose.pose.orientation.w
-			}; // calculate person position from robot's perspective
+			SAVED_HUMAN_POSITION = bada_get_robot_pos();
+
 				/** TODO : 각도와 거리를 이용하여 포인트를 저장한다.  **/
 			// ~~맵에 사람의 위치 포인트를 저장하는 방법, 즉 데이터타입이 무엇인지 알아볼 것. ~~<<-- 사람 위치 저장하지 말 것
 			// 지금 위치를 저장한다. (로봇의 위치) <<-- 이것을 사용할것
@@ -431,8 +427,13 @@ void bada_go_to_sound(){ //소리나는 방향으로 이동
 	
 }
 
+Position bada_get_robot_pos(){
+	Position pos= {CURRENT_ROBOT_POSITION.pose.pose.position.x, CURRENT_ROBOT_POSITION.pose.pose.position.y, CURRENT_ROBOT_POSITION.pose.pose.orientation.z, CURRENT_ROBOT_POSITION.pose.pose.orientation.w};
+	return pos;
+}
+
 void bada_save_sound_odom(){
-	Position pos = {CURRENT_ROBOT_POSITION.pose.pose.position.x, CURRENT_ROBOT_POSITION.pose.pose.position.y, CURRENT_ROBOT_POSITION.pose.pose.orientation.z, CURRENT_ROBOT_POSITION.pose.pose.orientation.w};
+	Position pos =bada_get_robot_pos();
 	SAVED_SOUND_POSITION= pos;
 }
 //https://opentutorials.org/module/2894/16661
