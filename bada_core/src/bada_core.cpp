@@ -359,15 +359,19 @@ void bada_go_to_pepl(){
 
 void bada_aligned_pepl(){
 	bada_open_eyes_cmd(true);
-	while(false){
-
-		/* velocity.publish 각속도*/
+	float AngleV = 3.14f/4.0f;
+	while(true){
+		ros::spinOnce();
+		if (abs(PPL_ANGLE) < 80){
+		    if (PPL_ANGLE < 0) bada_vel_cmd(0, AngleV);  // CCW   Object is on Left side
+			else bada_vel_cmd(0, -AngleV); 				// CW,   Object is on right side
+		}
+		if (abs(PPL_ANGLE) < (5*PI/180)){
+			bada_vel_cmd(0, 0);
+			break;
+		}
 	} //가운데로 맞추기
-	// while(/*angle of pepl이 ROI에 도달할 때까지*/){
-	// 	/* velocity.publish 각속도*/;
-	// } //가운데로 맞추기
-	/* velocity.publish  0 */
-	// pub_eyes_open.publish(false); 		// 눈 감기. /bada/eyes 작동 종료하도록한다.
+	bada_open_eyes_cmd(false);
 }
 
 void bada_go_until_touch(){// 버튼 눌리기 전까지 전진하기
