@@ -14,4 +14,7 @@ header{
     font-family: 'Staatliches', cursive;
     margin-left: 10px;
 }
-    
+
+body{
+    background-color: #e5e5e5;
+}
