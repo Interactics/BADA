@@ -109,6 +109,7 @@ bool SWITCH_CHECK    = false; 							// is Switch on?  T/F
 ros::Rate loop_rate(6);                      // 과부하방지로 멈추기
 //geometry_msgs::Pose2D PERSON_POSITION;
 nav_msgs::Odometry CURRENT_ROBOT_POSITION;
+geometry_msgs::PoseStamped CURRENT_SOUND_DIRECTION;
 
 struct Position {
 	double x;
@@ -472,5 +473,5 @@ void sub_switch_checker_callback(const std_msgs::Bool &msgs){
 }
 
 void sub_sound_localization_callback(const geometry_msgs::PoseStamped &msg){
-	
+	CURRENT_SOUND_DIRECTION=msg;
 }
