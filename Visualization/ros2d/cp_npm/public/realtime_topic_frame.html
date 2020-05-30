@@ -13,27 +13,25 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type="text/javascript" src="realtime_topic_frame.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
-    <style type="text/css">
-        .my-box {
-            border: 2px solid;
-            padding: 5px;
-            border-radius: 20px;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet"/>
+
+    <link rel="stylesheet" href="realtime_topic_frame.css"/>
+
 </head>
 
 <body>
     <div class="my-box">
-        <header style="font-size: 20px; font-family: 'Staatliches', cursive; margin-left: 10px;">
+        <header>
             Real-Time sound (unfiltered)
         </header>
-        <div style="color:black; font-size: 25px; font-family: 'Roboto Mono', monospace;">
+
+        <div class="topiclist">
             <span id="first_topic"></span><br>
             <span id="second_topic"></span><br>
             <span id="third_topic"></span>
         </div>
+
     </div>
 </body>
 
