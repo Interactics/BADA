@@ -7,33 +7,45 @@
 <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
 <script type="text/javascript" src="history_frame.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300&display=swap" rel="stylesheet">
+<style type="text/css">
+  .my-box {
+    border: 2px solid;
+    padding: 5px;
+    border-radius: 20px;
+  }
+</style>
 
 <html>
-    <div style="color:black; font-size: 25px; font-family: 'Roboto Mono', monospace; padding : 0; ">
-        <span id="History"></span>
-    </div>
-    <a id="kakao-login-btn"></a>
-    
-    <script>
-        Kakao.Auth.createLoginButton({ 
-         container: '#kakao-login-btn', 
-         success: function(authObj) { 
-           alert(JSON.stringify(authObj)); 
-         },
-         fail: function(err) { 
-           alert(JSON.stringify(err)); 
-         } }); 
-    
-        function setAuth(){
-            Kakao.Auth.login({
-            scope: 'talk_message,friends',
-            success: function(response) {
-                console.log(response);
-            },
-            fail: function(error) {
-                console.log(error);
-            }
-        });}
-    setAuth();
-     </script>
+<div class="my-box">
+  <div style="color:black; font-size: 25px; font-family: 'Roboto Mono', monospace; padding : 0; ">
+    <span id="History"></span>
+  </div>
+</div>
+<a id="kakao-login-btn"></a>
+
+<script>
+  Kakao.Auth.createLoginButton({
+    container: '#kakao-login-btn',
+    success: function (authObj) {
+      alert(JSON.stringify(authObj));
+    },
+    fail: function (err) {
+      alert(JSON.stringify(err));
+    }
+  });
+
+  function setAuth() {
+    Kakao.Auth.login({
+      scope: 'talk_message,friends',
+      success: function (response) {
+        console.log(response);
+      },
+      fail: function (error) {
+        console.log(error);
+      }
+    });
+  }
+  setAuth();
+</script>
+
 </html>
