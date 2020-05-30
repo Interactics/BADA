@@ -106,7 +106,6 @@ bool PPL_CHECK       = false;
 bool SIG_CHECK       = false; 							// Roaming 단계에서 사용. 
 bool SWITCH_CHECK    = false; 							// is Switch on?  T/F
 
-ros::Rate loop_rate(6);                      // 과부하방지로 멈추기
 //geometry_msgs::Pose2D PERSON_POSITION;
 nav_msgs::Odometry CURRENT_ROBOT_POSITION;
 geometry_msgs::PoseStamped CURRENT_SOUND_DIRECTION;
@@ -417,7 +416,12 @@ void bada_emotion(){
 }
 
 void bada_wait_button(){
-
+	bool pressed = false;
+	ros::Rate loop_rate(6);
+	while(!pressed){
+		pressed = SWITCH_CHECK;
+		loop_rate.sleep();
+	}
 }
 
 void bada_go_to_sound(){ //소리나는 방향으로 이동
