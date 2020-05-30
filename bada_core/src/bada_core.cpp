@@ -48,9 +48,6 @@ typedef std_msgs::Bool BoolMsg;
 std_msgs::Bool HEAD_STATUS;
 std_msgs::Int16 MAT_STATUS;
 
-ros::NodeHandle nh;
-
-
 void bada_next_state(STATE& present_state);
 void bada_roaming(int currentPoint=0);     							// 배회하나 소리가 나면 다음으로 넘어간다.
 void bada_go_destination(double x, double y, double orien_z, double orien_w);							// 지정된 방으로 이동.
@@ -92,6 +89,7 @@ void sub_sound_localization_callback(const geometry_msgs::PoseStamped &msg);    
 
 //==============================================================================================
 
+ros::NodeHandle nh;
 ros::Publisher pub_cmdvel         	   = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
 ros::Publisher pub_camera              = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
 ros::Publisher pub_eyes_open           = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
@@ -155,7 +153,7 @@ int main(int argc, char **argv){
 			// 소리 난 방향 서브스크라이빙하기
 			// 소리 발생한 방향으로 이동하기 
 			// 저장하기
-				bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
+			bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
 			
 			// bada_save_sound_PT();					//로봇의 현재 위치와 소리나는 방향 저장하기.
 			bada_next_state(state);
@@ -265,7 +263,6 @@ bool bada_rounding(){
 	geometry_msgs::Twist msg;// 회전하기 위해 퍼블리시 용도로 만들어진 변수
 	//subscribing_odometry
 	//Save present angle
-	// BOOKMARK2
 	geometry_msgs::Quaternion initial_angle = CURRENT_ROBOT_POSITION.pose.pose.orientation;        // 현재 각도 정보를 저장
 	//http://docs.ros.org/melodic/api/nav_msgs/html/msg/Odometry.html
 	
@@ -359,6 +356,7 @@ void bada_go_to_pepl(){
 } // END
 
 void bada_aligned_pepl(){
+	bada_head_UP_cmd(true);                     // 2m 에 도달하면 카메라 위로 들기
 	bada_open_eyes_cmd(true);
 	float AngleV = 3.14f/4.0f;
 	while(true){
@@ -373,6 +371,8 @@ void bada_aligned_pepl(){
 		}
 	} //가운데로 맞추기
 	bada_open_eyes_cmd(false);
+	bada_head_UP_cmd(true);                     // 2m 에 도달하면 카메라 위로 들기
+	
 }
 
 void bada_go_until_touch(){// 버튼 눌리기 전까지 전진하기
@@ -418,7 +418,12 @@ void sub_odometry_callback(const nav_msgs::Odometry &msg){
 // }
 
 void bada_go_to_soundPT(){ //사람 데리고 가는용
-
+	ros::Rate loop_rate(6);
+	while(true){
+		bada_go_destination(SAVED_SOUND_POSITION.x, SAVED_SOUND_POSITION.y, SAVED_SOUND_POSITION.orien_z, SAVED_SOUND_POSITION.orien_w);
+		loop_rate.sleep();
+		//
+	}
 }
 
 
@@ -454,7 +459,7 @@ void bada_go_to_sound(){ //소리나는 방향으로 이동
 		// TODO:: cmd_vel or simple_goal
 		bada_vel_cmd(0.3f, 0);
 		count++;
-
+		
 		loop_rate.sleep(); 				// 6헤르츠가 적당할 듯. 연산 과부화 방지용.
 		if(count>30){
 			break;
