@@ -3,17 +3,23 @@
     border: 2px solid;
     padding: 5px;
     border-radius: 20px;
-  }
+    background-color: #fcc886;
+
+}
 #signal{
     color:red; 
     font-size: 65px; 
     font-family: 'Staatliches', cursive; 
     margin-left: 36.4%; 
     margin-bottom: 0px;
-    }
+}
+
 header{
     font-size: 30px;
     font-family: 'Staatliches', cursive;
     margin-left: 10px;
+    color : white;
 }
-    
+body{
+    background-color: #e5e5e5;
+}
