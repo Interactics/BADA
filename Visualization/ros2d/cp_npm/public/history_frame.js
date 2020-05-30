@@ -169,9 +169,11 @@ var h = new Queue();
     name : '/signal',
     messageType : 'std_msgs/String'
   });
-  
+  const dic1={'Speech':'말하는 소리', 'Alarm':'화재 경보', 'Door':'노크', 'Television':'티비 소리', 'Silence':'조용해요', 'Water':'물소리', 'Music':'휴대폰 벨소리'};
+
   hsignal.subscribe(function(m){
-    sig_name=m.data;
+
+    sig_name=dic1[m.data];
     console.log("NOW SIGNAL : "+sig_name);
 
 
@@ -183,7 +185,7 @@ var h = new Queue();
       h.dequeue();
     }
   
-    if(sig_name=='Water')
+    if(sig_name==dic1['Water'])
     {
       //먼저 검색해 
       if(water.search())
@@ -205,7 +207,7 @@ var h = new Queue();
        water.enqueue(time);
       }
     }
-    else if(sig_name!="Silence")
+    else if(sig_name!=dic1["Silence"])
     {
         shareKakaotalk(sig_name);
         h.enqueue([sig_name, viewtime]);
