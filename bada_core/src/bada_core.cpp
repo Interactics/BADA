@@ -151,10 +151,9 @@ int main(int argc, char **argv){
 			// 소리 난 방향 서브스크라이빙하기
 			// 소리 발생한 방향으로 이동하기 
 			// 저장하기
-			while(true/* enogh */) {
 				bada_go_to_sound();						//소리 발생하는 방향으로 충분히 이동하기.
-			}					
-			bada_save_sound_PT();					//로봇의 현재 위치와 소리나는 방향 저장하기.
+			
+			// bada_save_sound_PT();					//로봇의 현재 위치와 소리나는 방향 저장하기.
 			bada_next_state(state);
 			break;
 		case MOVING_TO_PEPL:
@@ -431,7 +430,21 @@ void bada_go_to_sound(){ //소리나는 방향으로 이동
 	// 
 	// - pub cmd vel
 	// go to sound while tracking, stop when "enough"
+	ros::Rate loop_rate(6);                      // 과부하방지로 멈추기
+	int count = 0;
+	while(ros::ok()){
+		// move base go to : CURRENT_SOUND_DIRECTION
+		// to align direction of the robot.
+		// TODO:: cmd_vel or simple_goal
+		bada_vel_cmd(0.3f, 0);
+		count++;
 
+		loop_rate.sleep(); 				// 6헤르츠가 적당할 듯. 연산 과부화 방지용.
+		if(count>30){
+			break;
+		}
+		ros::spinOnce();
+	}
 	
 }
 
