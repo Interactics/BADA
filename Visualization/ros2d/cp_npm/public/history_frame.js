@@ -110,10 +110,11 @@ function search(){
   }
   
   function stoString() {
-    var retStr = "\n";
-    for (var i = this.dataStore.length-1;i >=0; --i )    {
-        retStr += "\r\n"+this.dataStore[i]+"\n";
+    var retStr = "";
+    for (var i = this.dataStore.length-1;i >=0; i-- )    {
+        retStr += this.dataStore[i]+"\n";
     }
+    retStr = retStr.replace(/(?:\r\n|\r|\n)/g, '<br />');
     return retStr;
 }
 
