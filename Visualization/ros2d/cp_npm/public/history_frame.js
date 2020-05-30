@@ -178,7 +178,7 @@ var h = new Queue();
     time=today.getTime();
     viewtime=printNow();
 
-    if(h.dataStore.length>=5)
+    if(h.dataStore.length>=30)
     {
       h.dequeue();
     }

@@ -1,1 +1,21 @@
 
+    .my-box {
+        border: 2px solid;
+        padding: 5px;
+        border-radius: 20px;
+    }
+
+    div#map_button {
+        position: absolute;
+        top: 1%;
+        left: 41%;
+        border: 0;
+    }
+
+    div#map {
+        top: 10%;
+        left: 10%;
+    }
+    #kakao-login-btn{
+        padding-top : 30px;
+    }
