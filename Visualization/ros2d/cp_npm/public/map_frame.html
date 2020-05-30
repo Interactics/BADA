@@ -8,7 +8,7 @@
         src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
     <script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
     <script type="text/javascript" src="http://static.robotwebtools.org/ros2djs/current/ros2d.min.js"></script>
-    <link rel="stylesheet" href="map_frame.css">
+    <link rel="stylesheet" href="./map_frame.css">
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://developers.kakao.com/sdk/js/kakao.min.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -39,13 +39,7 @@
         }
     </style>
 
-    <div id="map_button">
-        <button class="temp" onclick="init()">
-            <p style="font-size: 15px; color : black; ">
-                DRAW MAP
-            </p>
-        </button>
-    </div>
+
     <div class="my-box">
 
         <div id="map">
@@ -53,6 +47,7 @@
             </canvas>
         </div>
     </div>
+    <script>init();</script>
 </body>
 
 </html>
