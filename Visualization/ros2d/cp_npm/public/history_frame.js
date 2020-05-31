@@ -61,7 +61,7 @@ function shareKakaotalk(sig_name)
     minute = minute < 10 ? '0' + minute : minute;
     second = second < 10 ? '0' + second : second;
   
-    var now = '${date}일          ${ampm} ${hour}:${minute}`;
+    var now = '${date}일          ${ampm} ${hour}:${minute}';
     return now;
   };
 

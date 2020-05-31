@@ -3,6 +3,8 @@
 
 .my-box {
     padding: 5px;
+    border-width: 3px;
+    border: 7px solid #0c0c0c;
     border-radius: 20px;
     background-color: #ffffff;
     font-family: nanumsquare; 
