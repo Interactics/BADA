@@ -7,21 +7,27 @@
 body{
     background-color:#cdcdcd;
 }
-div#img{
-    margin-top:5%;
-    margin-left: 5%;
-    height:150px;
-    width: 150px;
+#img{
+    position : absolute;
+
+    top : 30px;
 }
-div#logo{
+#logo{
     font-size: 123px;
     color : #f3c452;
     text-shadow :  5px 5px 0 #040404, -5px 0 0 #040404, 5px 0 0 #040404, -5px 0 0 #040404;
     font-family: 'Anton', sans-serif;
     margin-bottom: 0%;
-    height : 130px;
+    position : absolute;
+    height: 130px;
+    width : 250px;
+    left : 200px;
+    top : 0px;
 }
-div#sub_logo{
+#sub_logo{
+    position : absolute;
+    top : 140px;
+    left : 200px;
     font-size: 50px;
     color : #ee9996;
     text-shadow :  5px 5px 0 #040404, -5px 0 0 #040404, 5px 0 0 #040404, -5px 0 0 #040404;
@@ -32,7 +38,7 @@ div#sub_logo{
 
 <body>
     <div id="img">
-        <img src="./icon.jpg" />
+        <img src="./icon.jpg" style="width :160px;"  />
     </div>
     <div id="logo">
         BADA
