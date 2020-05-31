@@ -4,23 +4,29 @@
         border-radius: 20px;
     }
 
-    div#map_button {
-        position: absolute;
-        top: 1%;
-        left: 41%;
-        border: 0;
-    }
-
-    div#map {
-        top: 10%;
-        left: 10%;
+    #map {
+        float : left;
+        position : relative;
     }
     #canvas{
-        margin-left : 150px;
+        width : 500px;
+        height:580px;
+        position : absolute;
+        background : transparent;
+    }
+     
+    #mapimg{
+        width : 500px;
+        height:580px;
+        position : absolute;
+
     }
     #kakao-login-btn{
-        padding-top : 30px;
-    }
+        position : absolute;
+        width : 30px;
+        height : 30px;
+        top:620px;
+    } 
     body{
         background-color: #e5e5e5;
     }
