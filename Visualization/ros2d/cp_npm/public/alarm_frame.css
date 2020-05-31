@@ -1,14 +1,15 @@
 ﻿@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css);
 
 
+
 .my-box {
     padding: 10px;
-    border-radius: 30px;
+    /*border-radius: 30px;*/
     border: 7px solid #0c0c0c;
     height:162px;
     background-color: white;
     font-family: nanumsquare; 
-
+    
 }
 #signal{
     color:red; 
@@ -25,5 +26,5 @@ header{
     font-weight:bold;
 }
 body{
-    background-color: #e5e5e5;
+    background-color: #cdcdcd;
 }
