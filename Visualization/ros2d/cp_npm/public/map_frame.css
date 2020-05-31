@@ -1,7 +1,6 @@
 
     .my-box {
         padding: 5px;
-        border-radius: 20px;
     }
 
     #map {
@@ -19,7 +18,7 @@
         width : 500px;
         height:580px;
         position : absolute;
-
+        border: solid 7px #040404;
     }
     #kakao-login-btn{
         position : absolute;
@@ -28,5 +27,5 @@
         top:620px;
     } 
     body{
-        background-color: #cdcdcd;
+        background-color:#5a98e4;
     }
