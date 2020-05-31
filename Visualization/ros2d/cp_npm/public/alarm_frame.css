@@ -3,18 +3,17 @@
 
 .my-box {
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 30px;
+    border: 7px solid #0c0c0c;
     height:162px;
     background-color: white;
     font-family: nanumsquare; 
-
 
 }
 #signal{
     color:red; 
     font-size: 65px; 
     margin-top : 18px;
-    margin-left: 36.4%; 
     margin-bottom: 0px;
     font-weight: bold;
 }

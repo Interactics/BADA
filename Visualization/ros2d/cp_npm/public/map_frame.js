@@ -145,8 +145,10 @@ function draw(timestamp) {
   ctx.fill(); // or context.fill()
 
   ctx.beginPath();//ADD THIS 
-  ctx.fillStyle = 'red';//#DC143C
-  ctx.arc(x, y, 5, 0, 2 * Math.PI);
+  ctx.fillStyle = '#d45d54';//#DC143C
+  ctx.strokeStyle="#black";
+  ctx.arc(x, y, 10, 0, 2 * Math.PI);
+  ctx.stroke();
   ctx.fill(); // or context.fill()
 }
 
