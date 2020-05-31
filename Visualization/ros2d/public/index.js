@@ -207,9 +207,12 @@ function tryConnectWebsocket() {
     name : '/signal',
     messageType : 'std_msgs/String'
   });
+  // 
+  const dic1={'Speech':'말하는 소리', 'Alarm':'알람', 'Door':'노크', 'Television':'티비소리', 'Silence':'고요', 'Water':'물소리', 'Music':'음악'};
   
   signal.subscribe(function(m){
-    sig_name=m.data;
+    sig_name=dic1[m.data];
+    
     console.log("NOW SIGNAL : "+sig_name);
     document.getElementById("signal").innerHTML = sig_name;
 
@@ -222,7 +225,7 @@ function tryConnectWebsocket() {
       h.dequeue();
     }
   
-    if(sig_name=='Water')
+    if(sig_name==dic1['Water'])
     {
       //먼저 검색해 
       if(water.search())
@@ -244,7 +247,7 @@ function tryConnectWebsocket() {
        water.enqueue(time);
       }
     }
-    else if(sig_name!="Silence")
+    else if(sig_name!=dic1["Silence"])
     {
         shareKakaotalk(sig_name);
         h.enqueue([sig_name, viewtime]);

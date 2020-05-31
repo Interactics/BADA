@@ -1,0 +1,25 @@
+@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css);
+
+
+.my-box {
+    padding: 5px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    font-family: nanumsquare; 
+    height : 400px;
+  }
+.topiclist{
+    color:black;
+    font-size: 22px; 
+    margin-left : 10px;
+    font-weight: bold;
+}
+header{
+    font-size: 35px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+body{
+    background-color: #e5e5e5;
+}
