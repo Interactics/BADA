@@ -78,6 +78,8 @@ void bada_open_eyes_cmd(bool Status);           					  // Open Eyes Function.
 void bada_display_cmd(DISP_EVNT status);                          // Display Command
 void bada_vel_cmd(const float XLineVel = 0, const float ZAngleVel = 0);  // commendation of Publishing Velocity
 
+void WaitSec(float sec);
+
 ros::Publisher pub_cmdvel;        	   
 ros::Publisher pub_camera;
 ros::Publisher pub_eyes_open;
@@ -543,4 +545,9 @@ void sub_switch_checker_callback(const std_msgs::Bool &msgs){
 
 void sub_sound_localization_callback(const geometry_msgs::PoseStamped &msg){
 	CURRENT_SOUND_DIRECTION=msg;
+}
+
+
+void WaitSec(float sec){
+	ros::Duration(sec).sleep();
 }
