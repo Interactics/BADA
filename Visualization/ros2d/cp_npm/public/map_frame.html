@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html>
 
 <head>
     <meta charset="utf-8" />
@@ -20,13 +19,14 @@
 <body>
   
 
-    <div class="my-box">
-
+  
         <div id="map">
-            <canvas id="canvas" width="640" height="480">
-            </canvas>
+          <img id = "mapimg" src="./map.jpg" width = "500" height = "610">
+
+           <canvas id="canvas" width="500" height="610">            </canvas>
+
         </div>
-    </div>
+
  
     <a id="kakao-login-btn"></a>
 
@@ -34,7 +34,7 @@
     init(); //canvas initiation
     Kakao.init("b886eede39b9d47bc9d3cb6e91483799");   // 사용할 앱의 JavaScript 키를 설정
     
-      Kakao.Auth.createLoginButton({
+    /*  Kakao.Auth.createLoginButton({
         container: '#kakao-login-btn',
         size : 'small',
         success: function (authObj) {
@@ -43,7 +43,7 @@
         fail: function (err) {
           alert(JSON.stringify(err));
         }
-      });
+      });*/
     
       function setAuth() {
         Kakao.Auth.login({

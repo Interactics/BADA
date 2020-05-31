@@ -45,12 +45,10 @@ function shareKakaotalk(sig_name)
   
     // getDay: 해당 요일(0 ~ 6)를 나타내는 정수를 반환한다.
   
-    const year = today.getFullYear();
-    const month = today.getMonth() + 1;
+  
     const date = today.getDate();
     let hour = today.getHours();
     let minute = today.getMinutes();
-    let second = today.getSeconds();
     const ampm = hour >= 12 ? 'PM' : 'AM';
   
     // 12시간제로 변경
@@ -59,9 +57,9 @@ function shareKakaotalk(sig_name)
   
     // 10미만인 분과 초를 2자리로 변경
     minute = minute < 10 ? '0' + minute : minute;
-    second = second < 10 ? '0' + second : second;
+
   
-    var now = '${date}일          ${ampm} ${hour}:${minute}`;
+    var now = `     ${date}일   ${ampm} ${hour}:${minute}`;
     return now;
   };
 
@@ -167,6 +165,7 @@ var h = new Queue();
   var hsignal = new ROSLIB.Topic({
     ros : ros,
     name : '/signal',
+    //name : '/bada_audio/signal',
     messageType : 'std_msgs/String'
   });
   const dic1={'Speech':'말하는 소리', 'Alarm':'화재 경보', 'Door':'노크', 'Television':'티비 소리', 'Silence':'조용해요', 'Water':'물소리', 'Music':'휴대폰 벨소리'};

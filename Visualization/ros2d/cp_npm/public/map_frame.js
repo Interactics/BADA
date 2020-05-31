@@ -133,6 +133,8 @@ function draw(timestamp) {
   // var progress = timestamp - start;
 
   //Draw number to the screen
+ 
+  
   const radius = 1500;
   const startangle = theta - 1 / 16 * Math.PI;
   const endangle = theta + 1 / 16 * Math.PI;
