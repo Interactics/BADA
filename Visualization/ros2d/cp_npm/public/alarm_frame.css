@@ -1,15 +1,30 @@
-#TitleAlarm{
-    font-family: 'Roboto Mono', monospace;
+﻿@import url(https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@1.0/nanumsquare.css);
 
-    font-size: 25px;
-    color:#000000;
+
+.my-box {
+    padding: 10px;
+    border-radius: 20px;
+    height:162px;
+    background-color: white;
+    font-family: nanumsquare; 
+
+
+}
+#signal{
+    color:red; 
+    font-size: 65px; 
+    margin-top : 18px;
+    margin-left: 36.4%; 
+    margin-bottom: 0px;
+    font-weight: bold;
 }
 
-#signal{
-    font-family: 'Roboto Mono', monospace;
-    top: 2%;
-    left: 5%;
-    font-size: 70px;
-    color:red;
-    }
-
+header{
+    font-size: 35px;
+    margin-left: 10px;
+    color : black;
+    font-weight:bold;
+}
+body{
+    background-color: #e5e5e5;
+}

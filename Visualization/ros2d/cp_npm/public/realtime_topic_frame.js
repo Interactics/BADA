@@ -89,5 +89,8 @@ audio_topic.subscribe(function (m){
     document.getElementById("first_topic").innerHTML = str[0];
     document.getElementById("second_topic").innerHTML = str[1];
     document.getElementById("third_topic").innerHTML = str[2];
+    document.getElementById("fourth_topic").innerHTML = str[3];
+    document.getElementById("fifth_topic").innerHTML = str[4];
+
 });
 
