@@ -1,0 +1,20 @@
+<launch>
+
+  <node pkg="bada_audio" name="bada_audio.py" type="bada_audio"/>
+  <node name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py"
+	output="screen"/>
+
+  <node name="static_transformer" pkg="tf" type="static_transform_publisher"
+        args="0 0 0 0 0 0 map respeaker_base 100"/>
+
+<!-- 
+  <group ns="bada_audio2">
+    <node pkg="bada_audio" name="sim" type="bada_audio_node"/>
+  </group>
+
+  <node pkg="bada_audio" name="mimic" type="mimic">
+    <remap from="input" to="bada_audio1/turtle1"/>
+    <remap from="output" to="bada_audio2/turtle1"/>
+  </node> -->
+
+</launch>

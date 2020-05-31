@@ -78,6 +78,8 @@ void bada_open_eyes_cmd(bool Status);           					  // Open Eyes Function.
 void bada_display_cmd(DISP_EVNT status);                          // Display Command
 void bada_vel_cmd(const float XLineVel = 0, const float ZAngleVel = 0);  // commendation of Publishing Velocity
 
+void WaitSec(float sec);
+
 ros::Publisher pub_cmdvel;        	   
 ros::Publisher pub_camera;
 ros::Publisher pub_eyes_open;
@@ -151,11 +153,9 @@ int main(int argc, char **argv){
 
 	sub_odometry           = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
 	sub_pepl_checker       = nh.subscribe("/bada/eyes/distance",1, sub_pepl_checker_callback );   //TODO: FIX CALLBACK FUNCTION
-	sub_sig_checker        = nh.subscribe("/bada/signal/checker", 1, sub_sig_checker_callback);     
+	sub_sig_checker        = nh.subscribe("/bada/audio/checker", 1, sub_sig_checker_callback);     
 	sub_switch_checker     = nh.subscribe("/bada/duino/switch", 1, sub_switch_checker_callback);     
-	sub_sound_localization = nh.subscribe("/bada/signal/localization_filtered", 1, sub_sound_localization_callback);     
-
-
+	sub_sound_localization = nh.subscribe("/bada/audio/localization_filtered", 1, sub_sound_localization_callback);     
 
 	bool is_there_pepl = false;
 
@@ -543,4 +543,9 @@ void sub_switch_checker_callback(const std_msgs::Bool &msgs){
 
 void sub_sound_localization_callback(const geometry_msgs::PoseStamped &msg){
 	CURRENT_SOUND_DIRECTION=msg;
+}
+
+
+void WaitSec(float sec){
+	ros::Duration(sec).sleep();
 }

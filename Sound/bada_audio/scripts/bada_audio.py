@@ -62,8 +62,8 @@ old5secFrames=[]
 frameQ=queue.Queue()
 qsize=0
 pub = rospy.Publisher('/signal', String, queue_size=10)
-detectInfoPub = rospy.Publisher('/bada/signal/info', String, queue_size=10)
-checkPub = rospy.Publisher('/bada/signal/checker', Empty, queue_size=10)
+detectInfoPub = rospy.Publisher('/bada/audio/info', String, queue_size=10)
+checkPub = rospy.Publisher('/bada/audio/checker', Empty, queue_size=10)
 audioPub = rospy.Publisher('/audio', String, queue_size=10)
 
 yamnet._make_predict_function()
