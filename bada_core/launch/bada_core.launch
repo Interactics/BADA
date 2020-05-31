@@ -1,0 +1,17 @@
+<launch>
+
+  <!-- <node pkg="bada_audio" name="bada_audio.py" type="bada_audio"/> -->
+  <!-- <include file="$(find ../coral_usb_ros)/launch/edgetpu_object_detector.launch" /> -->
+  <include file="~/coral_ws/coral_usb_ros/launch/edgetpu_object_detector.launch" />
+  <node pkg="bada_eyes" name="bada_eyes.py" type="bada_eyes"/>
+<!-- 
+  <group ns="bada_audio2">
+    <node pkg="bada_audio" name="sim" type="bada_audio_node"/>
+  </group>
+
+  <node pkg="bada_audio" name="mimic" type="mimic">
+    <remap from="input" to="bada_audio1/turtle1"/>
+    <remap from="output" to="bada_audio2/turtle1"/>
+  </node> -->
+
+</launch>

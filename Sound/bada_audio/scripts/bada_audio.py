@@ -30,8 +30,8 @@ dname = os.path.dirname(abspath)
 os.chdir(dname+'/../..')
 
 pub=''
-keys=['Speech','Alarm','Door','Television', 'Silence', 'Water', 'Music']
-alarmKeys=['Alarm', 'Telephone bell ringing', 'Bell']
+keys=['Alarm','Door','Television', 'Silence', 'Water', 'Music']
+alarmKeys=['Alarm', 'Fire alarm']
 signals=dict.fromkeys(keys, 0.0)
 picked=dict.fromkeys(keys, 0.0)
 detected=dict.fromkeys(keys, False)
@@ -61,10 +61,10 @@ old5secFrames=[]
 
 frameQ=queue.Queue()
 qsize=0
-pub = rospy.Publisher('/signal', String, queue_size=10)
+pub = rospy.Publisher('/bada_audio/signal', String, queue_size=10)
 detectInfoPub = rospy.Publisher('/bada/audio/info', String, queue_size=10)
 checkPub = rospy.Publisher('/bada/audio/checker', Empty, queue_size=10)
-audioPub = rospy.Publisher('/audio', String, queue_size=10)
+audioPub = rospy.Publisher('/bada_audio/audio', String, queue_size=10)
 
 yamnet._make_predict_function()
 

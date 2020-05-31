@@ -1,6 +1,6 @@
 <launch>
 
-  <node pkg="bada_audio" name="bada_audio.py" type="bada_audio"/>
+  <node pkg="bada_audio" name="bada_audio" type="bada_audio.py"/>
   <node name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py"
 	output="screen"/>
 

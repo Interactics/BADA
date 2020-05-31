@@ -2,17 +2,16 @@
 
 
 
- <!-- Run the map server  
-    <node name="map_server" pkg="map_server" type="map_server" args="$(find bada_2dnav)/maps/map.2.yaml"/>
 
- Run AMCL 
-    <include file="$(find amcl)/examples/amcl_turtle.launch" />-->
 
 
               <arg name="cmd_vel_topic" default="/cmd_vel"/>
                     <arg name="odom_topic" default="baselink_odom"/>
 	                  
    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+	<param name="recovery_behavior_enabled" value="false"/>
+	<param name="clearing_rotation_allowed" value="false"/>
+
 	<param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/>
     <rosparam file="$(find bada_2dnav)/config/costmap_common_params.yaml" command="load" ns="global_costmap" /> 
     <rosparam file="$(find bada_2dnav)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />

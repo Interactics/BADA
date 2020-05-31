@@ -8,9 +8,9 @@
   <arg unless="$(arg localization)" name="args"  default="--delete_db_on_start"/>
   <arg name="wait_for_transform"  default="0.2"/>
 
-<node pkg="tf" type="static_transform_publisher" name="baselink_to_d400" args="0.15 0 0.195 0 0 0 base_link d400_link 100"/>
+<node pkg="tf" type="static_transform_publisher" name="baselink_to_d400" args="0.22 0 0.265 0 0 0 base_link d400_link 100"/>
 
-<node pkg="tf" type="static_transform_publisher" name="baselink_to_tcameralink" args="0.15 0 0.165 0 0 0 base_link tcamera_link 100"/>
+<node pkg="tf" type="static_transform_publisher" name="baselink_to_tcameralink" args="0.22 0 0.235 0 0 0 base_link tcamera_link 100"/>
 
 <node pkg="bada_2dnav" type="newOdom.py" name="newOdom"/>
 

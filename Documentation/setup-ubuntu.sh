@@ -40,7 +40,7 @@ else
     [{
         "key": "ctrl+a ctrl+a",
         "command": "editor.action.selectAll"
-    },
+    }, 
     {
         "key": "ctrl+a",
         "command": "-editor.action.selectAll"

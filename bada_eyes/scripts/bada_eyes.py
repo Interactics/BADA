@@ -12,7 +12,7 @@ import cv2
 import math
 import numpy as np
 
-global depthimg_np, depth_colormap, eyes_status
+global depthimg_np, depth_colormap, eyes_status, eyes_open
 
 eyes_status = False
 start_node = False
@@ -26,13 +26,16 @@ rospy.init_node('bada_eyes', anonymous = False)
 rate = rospy.Rate(5) # ROS Rate at 5Hz
 
 pubDist   = rospy.Publisher('bada/eyes/distance', Point, queue_size=1)
+print('eye start')
 
 def SubEyesOpen(data):
     global eyes_open, eyes_status
+    # print('sub eyes')
     eyes_open = data.data
 
 def DepImgSUB(img_msg) : 
     global depthimg_np, depth_colormap, start_node
+    # print('DepImgSUB eyes')
 
     if eyes_open == False :   return 
     img = msg_to_numpy(img_msg)
@@ -43,10 +46,12 @@ def WhereIsHuman(bbox) :
     global DistTheta
     global depthimg_np
     global depth_colormap
+    # print('WhereIsHuman eyes')
 
     if eyes_open == False :   return 
     if start_node == False :  return 
     if len(bbox.rects) == 0 : return 
+    # print('WhereIsHuman eyes')
 
     xmin = bbox.rects[0].x
     ymin = bbox.rects[0].y
@@ -104,7 +109,7 @@ def getHorizontalCoordinate(x, distance):
     return distance * HRatio
 
 def bada_eyes_func() :
-    rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, DepImgSUB)
+    rospy.Subscriber("/d400/aligned_depth_to_color/image_raw", Image, DepImgSUB)
     rospy.Subscriber("/edgetpu_object_detector/output/rects", RectArray, WhereIsHuman)
     rospy.Subscriber('/bada/eyes/open', Bool, SubEyesOpen)
 
