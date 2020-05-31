@@ -3,27 +3,40 @@
 
 
 .my-box {
-    padding: 10px;
-    /*border-radius: 30px;*/
-    border: 7px solid #0c0c0c;
-    height:150px;
-    background-color: white;
-    font-family: nanumsquare; 
+    border-bottom: 7px solid #0c0c0c;
+    border-top: 7px solid #0c0c0c;
+    height:80%;
+    width: 95%;
+    left:15px;
+    background-color: #f19e9b;
+    /*font-family: nanumsquare;*/
+    font-family: 'Do Hyeon', sans-serif;;
+    position: absolute;
     
 }
+.my_box_ontop{
+    border-left: 7px solid #0c0c0c;
+    border-right:7px solid #0c0c0c ;
+    height:80%;
+    width: 95%;
+    top:14px;
+    opacity: 1;
+    position: absolute;
+}
 #signal{
-    color:red; 
-    font-size: 65px; 
-    margin-top : 18px;
+    color:white; 
+    font-size: 75px; 
+    margin-top : 5px;
     margin-bottom: 0px;
-    font-weight: bold;
+    text-shadow: 3px 3px 3px #040404, -3px -3px 3px #040404, 3px -3px 3px #040404, -3px 3px 3px #040404;
 }
 
 header{
-    font-size: 35px;
-    margin-left: 10px;
+    font-size: 30px;
+    margin-left:10px;
+    margin-top:5px;
     color : black;
-    font-weight:bold;
+    text-shadow: 2px 2px 2px white;
 }
 body{
     background-color:#5a98e4;
