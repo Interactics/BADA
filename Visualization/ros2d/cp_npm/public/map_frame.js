@@ -138,7 +138,7 @@ function draw(timestamp) {
   const radius = 1500;
   const startangle = theta - 1 / 16 * Math.PI;
   const endangle = theta + 1 / 16 * Math.PI;
-  ctx.fillStyle = 'rgba(255,100,50,0.3)';
+  ctx.fillStyle = 'rgba(248,206,105,0.7)';
 
   ctx.beginPath();//ADD THIS LINE!<<<<<<<<<<<<<
   ctx.moveTo(x, y);
@@ -149,6 +149,7 @@ function draw(timestamp) {
   ctx.beginPath();//ADD THIS 
   ctx.fillStyle = '#d45d54';//#DC143C
   ctx.strokeStyle="#black";
+  ctx.lineWidth="10";
   ctx.arc(x, y, 10, 0, 2 * Math.PI);
   ctx.stroke();
   ctx.fill(); // or context.fill()
