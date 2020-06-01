@@ -6,7 +6,7 @@
     border-bottom: 7px solid #0c0c0c;
     border-top: 7px solid #0c0c0c;
     height:80%;
-    width: 95%;
+    width: 92%;
     left:15px;
     background-color: #f19e9b;
     /*font-family: nanumsquare;*/
@@ -18,7 +18,7 @@
     border-left: 7px solid #0c0c0c;
     border-right:7px solid #0c0c0c ;
     height:80%;
-    width: 95%;
+    width: 92%;
     top:14px;
     opacity: 1;
     position: absolute;
@@ -28,6 +28,7 @@
     font-size: 75px; 
     margin-top : 5px;
     margin-bottom: 0px;
+    vertical-align: text-top;
     text-shadow: 3px 3px 3px #040404, -3px -3px 3px #040404, 3px -3px 3px #040404, -3px 3px 3px #040404;
 }
 

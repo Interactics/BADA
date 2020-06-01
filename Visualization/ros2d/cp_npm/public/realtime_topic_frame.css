@@ -6,17 +6,18 @@
     background-color: #ffffff;
     font-family: 'Do Hyeon', sans-serif;
     height : 370px;
+    margin-top: 0;
   }
 .topiclist{
     color:black;
     font-size: 22px; 
-    margin-top: 10px;
+    margin-top: 0px;
     margin-left : 10px;
 }
 header{
     font-size: 30px;
     text-align: center;
-
+    margin-top: 5px;
 }
 
 body{
