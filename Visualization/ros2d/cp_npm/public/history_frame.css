@@ -6,7 +6,7 @@
     border: 7px solid #0c0c0c;
     background-color: #ffffff;    
     font-family: 'Do Hyeon', sans-serif;;
-    height : 370px;
+    height : 540px;
 
   }
 
@@ -14,6 +14,7 @@ header{
     font-size: 30px;
     margin-left: 10px;
     text-align: center;
+    background-color: #f3c452;
 }
 
 #History{

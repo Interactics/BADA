@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html>
 <frameset rows="220,*" frameborder="0" >
-    <frame src="title_frame.html" name="title_section" border-radius="10px" scrolling="no"></frame>
+    <frame src="title_frame.html" name="title_section" scrolling="no"></frame>
     <frameset cols="45%,*">
         <frame src="map_frame.html" name="map_section" scrolling="no" ></frame>
-        <frameset rows="180, *">
-            <frame src="alarm_frame.html" name="alarm_topic_section"></frame>
-            <frameset cols="50%, *">
-                <frame src="history_frame.html" name="history_section" scrolling="yes" noresize></frame>
-                <frame src="realtime_topic_frame.html" name="realtime_topic_section" scrolling="no"></frame>
-            </frameset>
+        <frameset cols="50%, *">
+           <frameset rows="180,*">
+               <frame src="alarm_frame.html" name="alarm_topic_section"></frame>
+               <frame src="realtime_topic_frame.html" name="realtime_topic_section" scrolling="no"></frame>
+           </frameset>
+           <frame src="history_frame.html" name="realtime_topic_section" scrolling="no"></frame>
         </frameset>
     </frameset>
 </frameset>
