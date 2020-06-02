@@ -4,7 +4,7 @@
 .my-box {
     border-bottom: 7px solid #0c0c0c;
     border-top: 7px solid #0c0c0c;
-    height : 550px;
+    height : 565px;
     width :93%;
     left:14px;
 
@@ -16,14 +16,13 @@
 .my_box_ontop {
     border-left: 7px solid #0c0c0c;
     border-right: 7px solid #0c0c0c;
-    height : 550px;
     width : 93%;
     top:15px;
 
     position: absolute;
     background-color:rgba(256,256,256,0);    
     font-family: 'Do Hyeon', sans-serif;;
-    height : 550px;
+    height : 565px;
 }
 
 header{

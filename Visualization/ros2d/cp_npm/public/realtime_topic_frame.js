@@ -77,7 +77,9 @@ var audio_topic = new ROSLIB.Topic({
 });
 
 audio_topic.subscribe(function (m){
+
     str = m.data;
+
     for (var i = 0; i < 100; i++) str = str.replace("\"", "");
     str = str.substring(1);
     str = str.substring(1);
