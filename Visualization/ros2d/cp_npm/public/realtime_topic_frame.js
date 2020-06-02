@@ -92,6 +92,10 @@ audio_topic.subscribe(function (m){
     document.getElementById("third_topic").innerHTML = str[2];
     document.getElementById("fourth_topic").innerHTML = str[3];
     document.getElementById("fifth_topic").innerHTML = str[4];
-
+    document.getElementById("sixth_topic").innerHTML = str[5];
+    document.getElementById("seventh_topic").innerHTML = str[6];
+    document.getElementById("eighth_topic").innerHTML = str[7];
+    document.getElementById("ninth_topic").innerHTML = str[8];
+    document.getElementById("tenth_topic").innerHTML = str[9];
 });
 
