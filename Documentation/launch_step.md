@@ -24,8 +24,8 @@ rosrun rosserial_python serial_node.py /dev/ttyACM0
 ## run respeaker
 source ~/dev/venv/bin/activate # activate python3 virtualenv
 roslaunch bada_audio bada_audio.launch
-# rosrun bada_audio bada_audio.py
-
+# va, rosrun bada_audio bada_audio.py
+# va, rosrun bada_audio filtered_localization.py
 
 ## run camera
 source ~/catkin_ws/devel/setup.bash # sb
