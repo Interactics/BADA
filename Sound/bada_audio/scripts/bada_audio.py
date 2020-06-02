@@ -11,6 +11,7 @@ import soundfile as sf
 import params
 import yamnet as yamnet_model
 
+import datetime
 import time
 import queue
 
@@ -30,12 +31,20 @@ dname = os.path.dirname(abspath)
 os.chdir(dname+'/../..')
 
 pub=''
-keys=['Speech','Alarm','Door','Television', 'Silence', 'Water', 'Music']
-alarmKeys=['Alarm', 'Telephone bell ringing', 'Bell']
+# keys=['Speech','Alarm','Door','Television', 'Silence', 'Water', 'Music']
+# target: door, water, fire alarm, bell, cry, boiling
+keys=['Alarm','Door','Bell', 'Silence', 'Cry', 'Water', 'Boiling']
+alarmKeys=['Alarm', 'Fire alarm', 'Alarm clock']
+doorKeys=['Door', 'Wood', 'Knock']
+bellKeys=['Beep, bleep', 'Doorbell'] # Bell, 'Ding-dong'
+cryKeys=['Crying, sobbing', 'Baby cry, infant cry']
+boilKeys=['Boiling', 'Liquid', 'Water',] # 'Water', 'Pour', 'Drip'
+waterKeys=['Water tap, faucet', 'Sink (filling or washing)']
 signals=dict.fromkeys(keys, 0.0)
 picked=dict.fromkeys(keys, 0.0)
 detected=dict.fromkeys(keys, False)
 detectThreshold=0.3
+checkThreshold=0.12
 resetThreshold=0.1
 
 
@@ -48,8 +57,8 @@ class_names = yamnet_model.class_names('yamnet_class_map.csv')
 CHUNKSIZE = 16000 # fixed chunk size
 sr=16000
 seconds=1
-predictionPeriod=1.0
-predictionRate=1.0
+predictionPeriod=2.0
+predictionRate=2.0
 predChunkSize=int(sr*predictionPeriod)
 readChunkSize=int(sr*predictionRate)
 
@@ -106,14 +115,14 @@ def signal(msg):
         if(frameQ.empty()): break
     # print(current)
     waveform = np.frombuffer(bytearray(current), dtype=np.int16) / 32768.0
-    print(type(waveform))
-    print(waveform.shape)
+    # print(type(waveform))
+    # print(waveform.shape)
 
     old=time.time()
     scores, spectrogram = yamnet.predict(np.reshape(waveform, [1, -1]), steps=1)
     # outputs = model.predict(inputs)
     # scores, spectrogram = yamnet.predict(np.reshape(waveform, [1, -1]), steps=1)
-    print('prediction time: ', time.time()-old)
+    # print('prediction time: ', time.time()-old)
     old=time.time()
 
     # Plot and label the model output scores for the top-scoring classes.
@@ -129,24 +138,54 @@ def signal(msg):
     for _,v in enumerate(dat[0]):
         [key, prob]=v
 
-        if(key in keys or key in alarmKeys):
-            if(key in alarmKeys):
-                picked['Alarm']+=float(prob)
-            else:
-                # rospy.loginfo(key in keys)
-                picked[key]=float(prob)
-    picked['Alarm']/=3
+        if(key in alarmKeys):
+            picked['Alarm']+=float(prob)*5.0
+        elif(key in doorKeys):
+            picked['Door']+=float(prob)*10.0
+        elif(key in bellKeys):
+            picked['Bell']+=float(prob)*5.0
+        elif(key in cryKeys):
+            picked['Cry']+=float(prob)
+        elif(key in boilKeys):
+            picked['Boiling']+=float(prob)*6.0
+        elif(key in waterKeys):
+            picked['Water']+=float(prob)
+        else:
+            # rospy.loginfo(key in keys)
+            picked[key]=float(prob)
+    picked['Alarm']/=len(alarmKeys)*3.0
+    picked['Door']/=len(doorKeys)*5.0
+    picked['Bell']/=len(bellKeys)*4.0
+    picked['Cry']/=len(cryKeys)*1.0
+    picked['Boiling']/=len(boilKeys)*5.0
+    picked['Water']/=len(waterKeys)*1.0
 
     # update 
     for _, v in enumerate(keys):
+
+        if(v == 'Alarm'):
+            #picked['Alarm']+=float(prob)
+            signals[v]=signals[v]*0.2+picked[v]*0.8
+        elif(v == 'Door'):
+            signals[v]=signals[v]*0.05+picked[v]*0.95
+        elif(v == 'Bell'):
+            signals[v]=signals[v]*0.05+picked[v]*0.95
+        elif(v == 'Cry'):
+            signals[v]=signals[v]*0.2+picked[v]*0.8
+        elif(v == 'Boiling'):
+            signals[v]=signals[v]*0.45+picked[v]*0.55
+        elif(v == 'Water'):
+            signals[v]=signals[v]*0.45+picked[v]*0.55
+
         # rospy.loginfo(signals[v])
-        signals[v]=signals[v]*0.3+picked[v]*0.7
+        # signals[v]=signals[v]*0.3+picked[v]*0.7
+        print(v+' ' +str(round(signals[v], 2)) + ' ' + str(detected[v]))
 
     # detect
     detectAny=False
     for _, v in enumerate(keys):
         detectInfoPub.publish('key ' + v + str(signals[v]))
-        if(signals[v]> detectThreshold):
+        if(signals[v]> checkThreshold):
             if(v != 'Silence'):
                 detectAny=True
             if(detected[v]==False):
@@ -156,6 +195,7 @@ def signal(msg):
         if(detected[v]==True and signals[v]<resetThreshold):
             detected[v]=False
     if(detectAny):
+        print('check : ' + str(datetime.datetime.now()))
         checkPub.publish()
     
     print('prediction: ', dat)
