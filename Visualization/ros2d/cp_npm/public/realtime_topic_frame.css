@@ -2,23 +2,23 @@
 
 
 .my-box {
-    padding: 5px;
-    border-width: 3px;
     border: 7px solid #0c0c0c;
     background-color: #ffffff;
-    font-family: nanumsquare; 
+    font-family: 'Do Hyeon', sans-serif;
     height : 370px;
+    margin-top: 0;
   }
 .topiclist{
     color:black;
     font-size: 22px; 
+    margin-top: 0px;
     margin-left : 10px;
-    font-weight: bold;
 }
 header{
-    font-size: 35px;
-    margin-left: 10px;
-    font-weight: bold;
+    font-size: 30px;
+    text-align: center;
+    margin-top: 5px;
+    background-color: #f3c452;
 }
 
 body{
