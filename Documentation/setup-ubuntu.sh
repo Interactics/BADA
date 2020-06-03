@@ -379,6 +379,7 @@ else
 
     sudo apt-get install libasound-dev portaudio19-dev libportaudio2 libportaudiocpp0 -y
     sudo apt-get install ffmpeg libav-tools -y
+    sudo apt-get install python-tk python3-tk -y
 
     pip install pyaudio soundfile tensorflow==1.15 matplotlib roslibpy rospkg
 
