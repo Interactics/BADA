@@ -3,7 +3,7 @@ var data;
 var time;
 var sig_name;
 var viewtime;
-var PrintHistory="Connection";
+var PrintHistory="없습니다";
 
 const today = new Date();
 today.setTime(0);
@@ -23,7 +23,7 @@ function shareKakaotalk(sig_name)
       data: {
         template_object: {
           object_type: 'text',
-          text: sig_name,
+          text: sig_name+"가 발생한 것 같아요!",
           link: {
               web_url: 'http://192.168.137.1',
               mobile_web_url: 'http://192.168.137.1',
@@ -38,7 +38,29 @@ function shareKakaotalk(sig_name)
       },
     });
   }
-  shareKakaotalk("BADA 인증 완료");
+  function shareauthKakaotalk()
+{
+    Kakao.API.request({
+      url: '/v2/api/talk/memo/default/send',
+      data: {
+        template_object: {
+          object_type: 'text',
+          text: "BADA 인증이 완료되었습니다",
+          link: {
+              web_url: 'http://192.168.137.1',
+              mobile_web_url: 'http://192.168.137.1',
+            },
+        },
+      },
+      success: function(response) {
+        console.log(response);
+      },
+      fail: function(error) {
+        console.log(error);
+      },
+    });
+  }
+  shareauthKakaotalk();
 
   function printNow() {
     const today = new Date();
@@ -179,7 +201,7 @@ var h = new Queue();
     time=today.getTime();
     viewtime=printNow();
 
-    if(h.dataStore.length>=14)
+    if(h.dataStore.length>=17)
     {
       h.dequeue();
     }
