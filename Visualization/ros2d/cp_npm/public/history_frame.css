@@ -2,18 +2,35 @@
 
 
 .my-box {
-    padding: 5px;
-    border: 7px solid #0c0c0c;
+    border-bottom: 7px solid #0c0c0c;
+    border-top: 7px solid #0c0c0c;
+    height : 565px;
+    width :93%;
+    left:14px;
+
     background-color: #ffffff;    
     font-family: 'Do Hyeon', sans-serif;;
-    height : 370px;
-
+    position: absolute;
+  
   }
+.my_box_ontop {
+    border-left: 7px solid #0c0c0c;
+    border-right: 7px solid #0c0c0c;
+    width : 93%;
+    top:15px;
+
+    position: absolute;
+    background-color:rgba(256,256,256,0);    
+    font-family: 'Do Hyeon', sans-serif;;
+    height : 565px;
+}
 
 header{
     font-size: 30px;
-    margin-left: 10px;
     text-align: center;
+    color:#b00020;
+    text-shadow:
+    /*background-color: #f3c452;*/
 }
 
 #History{
