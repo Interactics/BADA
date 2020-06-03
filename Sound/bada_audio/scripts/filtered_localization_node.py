@@ -136,10 +136,13 @@ def callback_direction(msg):
         cumsum=0
         
     print(msg)
-    val=-msg.data+180
+    val=-msg.data+180+270
+    #val+=90
     if(val>360):
         val-=360
     val=val*math.pi/180
+
+    
     sq.put(cmath.exp(1j*val))
     cumsum+=cmath.exp(1j*val)
     qsize+=1
