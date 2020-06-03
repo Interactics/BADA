@@ -70,7 +70,7 @@ var signal = new ROSLIB.Topic({
    // name : '/bada_audio/signal',
     messageType : 'std_msgs/String'
   });
-  const dic1={'Speech':'말하는 소리', 'Alarm':'알람', 'Door':'노크', 'Television':'티비소리', 'Silence':'없음', 'Water':'물소리', 'Music':'음악'};
+  const dic1={'Speech':'말하는 소리', 'Alarm':'화재 경보', 'Door':'노크', 'Television':'티비 소리', 'Silence':'조용해요', 'Water':'물소리', 'Music':'휴대폰 벨소리'};
 
   signal.subscribe(function(m){
     sig_name=dic1[m.data];
