@@ -52,7 +52,7 @@ function shareKakaotalk(sig_name)
             },
         },
       },
-      success: function(response) {pull
+      success: function(response) {
         console.log(response);
       },
       fail: function(error) {
@@ -205,7 +205,7 @@ var h = new Queue();
     {
       h.dequeue();
     }
-  
+    
     if(sig_name==dic1['Water'])
     {
       //먼저 검색해 
