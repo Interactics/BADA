@@ -6,19 +6,22 @@
     #map {
         float : left;
         position : relative;
+        
     }
     #canvas{
-        width : 500px;
-        height:580px;
+        width : 590px;
+        height:590px;
         position : absolute;
         background : transparent;
+        left : 140px;
     }
      
     #mapimg{
-        width : 500px;
-        height:580px;
+        width : 590px;
+        height:590px;
         position : absolute;
         border: solid 7px #040404;
+        left : 140px;
     }
     #kakao-login-btn{
         position : absolute;
