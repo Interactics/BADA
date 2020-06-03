@@ -12,7 +12,7 @@ import cv2
 import math
 import numpy as np
 
-global depthimg_np, depth_colormap, eyes_status
+global depthimg_np, depth_colormap, eyes_status, eyes_open
 
 eyes_status = False
 start_node = False
@@ -26,6 +26,7 @@ rospy.init_node('bada_eyes', anonymous = False)
 rate = rospy.Rate(5) # ROS Rate at 5Hz
 
 pubDist   = rospy.Publisher('bada/eyes/distance', Point, queue_size=1)
+print('eyes start')
 
 def SubEyesOpen(data):
     global eyes_open, eyes_status
@@ -104,7 +105,7 @@ def getHorizontalCoordinate(x, distance):
     return distance * HRatio
 
 def bada_eyes_func() :
-    rospy.Subscriber("/camera/aligned_depth_to_color/image_raw", Image, DepImgSUB)
+    rospy.Subscriber("/d400/aligned_depth_to_color/image_raw", Image, DepImgSUB)
     rospy.Subscriber("/edgetpu_object_detector/output/rects", RectArray, WhereIsHuman)
     rospy.Subscriber('/bada/eyes/open', Bool, SubEyesOpen)
 
