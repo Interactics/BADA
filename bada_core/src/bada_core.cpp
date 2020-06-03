@@ -144,17 +144,18 @@ int main(int argc, char **argv){
 	ros::init(argc, argv, "/bada/core");
 
 	ros::NodeHandle nh;
+	pub_cmdvel = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
+	pub_camera = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
+	pub_eyes_open = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
+	pub_head_up = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
+	pub_display_cmd = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
+	pub_logger = nh.advertise<std_msgs::String>("/bada/log", 1);
 	
-	pub_cmdvel         	   = nh.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-	pub_camera              = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
-	pub_eyes_open           = nh.advertise<std_msgs::Bool>("/bada/eyes/open", 1);
-	pub_head_up             = nh.advertise<std_msgs::Bool>("/bada/duino/camera_cmd", 1);
-	pub_display_cmd         = nh.advertise<std_msgs::Int16>("/bada/duino/display_cmd", 1);
-
-	sub_odometry           = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
-	sub_pepl_checker       = nh.subscribe("/bada/eyes/distance",1, sub_pepl_checker_callback );   //TODO: FIX CALLBACK FUNCTION
-	sub_sig_checker        = nh.subscribe("/bada/audio/checker", 1, sub_sig_checker_callback);     
-	sub_switch_checker     = nh.subscribe("/bada/duino/switch", 1, sub_switch_checker_callback);     
+	// sub_odometry           = nh.subscribe("/bada/odom", 1, sub_odometry_callback);
+	sub_pepl_checker = nh.subscribe("/bada/eyes/distance", 1, sub_pepl_checker_callback); //TODO: FIX CALLBACK FUNCTION
+	sub_sig_checker = nh.subscribe("/bada/audio/checker", 1, sub_sig_checker_callback);
+	sub_signal = nh.subscribe("/bada/audio/signal", 1, sub_signal_callback);
+	sub_switch_checker = nh.subscribe("Button_State", 1, sub_switch_checker_callback);
 	sub_sound_localization = nh.subscribe("/bada/audio/localization_filtered", 1, sub_sound_localization_callback);     
 
 	bool is_there_pepl = false;
