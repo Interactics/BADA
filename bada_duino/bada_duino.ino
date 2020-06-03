@@ -1,4 +1,4 @@
-// 20200528
+// 20200603
 
 
 ////
@@ -28,14 +28,14 @@ u8 keyState = HIGH;                               // Var for storing button's st
 u8 bounceCount = 0;                               // Bounce Coun바운스 변수 선언
 
 unsigned long          previousTime = millis();
-unsigned long          currentTime;   
+unsigned long          currentTime;
 const long             timeInterval = 100;         //ms
-bool                   t_flag       = false;   
-char                   t_index      = 0;   
-float                  t_val        = 0;   
+bool                   t_flag       = false;
+char                   t_index      = 0;
+float                  t_val        = 0;
 int16_t                speed        = 125;         // speed, between 0 and 1023
 const long unsigned int DX_baudrate = 1000000;     // communication baudrate
-  
+
 enum Events {
   NOTHING = 0,
   A_UP, A_DOWN, A_LEFT, A_RIGHT,
@@ -151,14 +151,14 @@ ros::NodeHandle  nh;
 
 void setup() {
   nh.initNode();
-  
+
   nh.advertise(CameraState);
   nh.advertise(DisplayState);
   nh.advertise(ButtonState);
-  
+
   nh.subscribe(CameraSUB);
   nh.subscribe(DisplaySUB);
-  
+
   Dynamixel_startUP();
   LEDMatrix_startUP();
   Button_startUP();
@@ -243,11 +243,11 @@ void Dynamixel_startUP() {
   motor.jointMode(204, 820);
   motor.speed(speed);
 
-/// Init Movement
+  /// Init Movement
   motor.goalPosition(350);
   delay(1000);
   motor.goalPosition(500);
-/// Init Movement ///
+  /// Init Movement ///
 }
 
 void T_ISR() {
@@ -257,9 +257,9 @@ void T_ISR() {
   }
 }
 
-void Button_startUP(){
+void Button_startUP() {
   pinMode(BUTTON, INPUT);  // 버튼(핀)을 입력으로 설정
-  digitalWrite(BUTTON, HIGH); 
+  digitalWrite(BUTTON, HIGH);
 }
 
 void LEDMatrix_startUP() {
@@ -270,7 +270,7 @@ void LEDMatrix_startUP() {
 void LEDMatrix_Control(Events event) {
   static Events current = -1;
 
-  if (current != event){
+  if (current != event) {
     matrix.fillScreen(matrix.Color333(0, 0, 0));
     current = event;
   }
@@ -278,13 +278,13 @@ void LEDMatrix_Control(Events event) {
   // FIRE_EVENT, WATER_EVENT, DOOR_EVENT, BELL_EVENT, BOILING_EVENT, CRYING_EVENT
 
   switch (event) {
-    case NOTHING : 
+    case NOTHING :
       matrix.fillScreen(matrix.Color333(0, 0, 0));
       break;
-    case A_UP : 
+    case A_UP :
       matrix.drawBitmap(0, 0,  ARROW_UP, 32, 32, matrix.Color333(3, 7, 1));
       break;
-    case A_DOWN : 
+    case A_DOWN :
       matrix.drawBitmap(0, 0,  ARROW_DOWN, 32, 32, matrix.Color333(3, 7, 1));
       break;
     case A_LEFT:
@@ -306,17 +306,20 @@ void LEDMatrix_Erasing() {
   matrix.fillScreen(matrix.Color333(0, 0, 0));
 }
 
-void ButtonClicked(){
+void ButtonClicked() {
   u8 key = digitalRead(BUTTON); // 버튼 값 읽어 key변수에 저장
-  if (key == LOW){
-    if (bounceCount == 0){
-      bounceCount = bounceTimer;
-      keyState = key;
-      ButtonState_msg.data = true;
-    } 
-    else {
-      bounceCount--; //  바운스 카운트 값 감소
-    }
+
+  if (key == LOW) {
+    ButtonState_msg.data = true;
+
+    //    if (bounceCount == 0){
+    //      bounceCount = bounceTimer;
+    //      keyState = key;
+    //      ButtonState_msg.data = true;
+    //    }
+    //    else {
+    //      bounceCount--; //  바운스 카운트 값 감소
+    //    }
   }
   else { // 버튼이 안 눌러졌었다면
     if (keyState == LOW) keyState = key; // 이전의 상태가 눌린 상태였다면
