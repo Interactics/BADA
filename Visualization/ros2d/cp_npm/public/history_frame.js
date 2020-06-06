@@ -25,8 +25,8 @@ function shareKakaotalk(sig_name)
           object_type: 'text',
           text: sig_name+"가 발생한 것 같아요!",
           link: {
-              web_url: 'http://192.168.137.1',
-              mobile_web_url: 'http://192.168.137.1',
+              web_url: 'http://192.168.0.193',
+              mobile_web_url: 'http://192.168.0.193',
             },
         },
       },
@@ -47,8 +47,8 @@ function shareKakaotalk(sig_name)
           object_type: 'text',
           text: "BADA 인증이 완료되었습니다",
           link: {
-              web_url: 'http://192.168.137.1',
-              mobile_web_url: 'http://192.168.137.1',
+              web_url: 'http://192.168.0.193',
+              mobile_web_url: 'http://192.168.0.193',
             },
         },
       },
@@ -205,7 +205,7 @@ var h = new Queue();
     {
       h.dequeue();
     }
-  
+    
     if(sig_name==dic1['Water'])
     {
       //먼저 검색해 

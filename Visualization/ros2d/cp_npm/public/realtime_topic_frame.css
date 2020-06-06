@@ -2,11 +2,27 @@
 
 
 .my-box {
-    border: 7px solid #0c0c0c;
+    border-bottom: 7px solid #0c0c0c;
+    border-top: 7px solid #0c0c0c;
+    position: absolute;
     background-color: #ffffff;
     font-family: 'Do Hyeon', sans-serif;
-    height : 385px;
-    margin-top: 0;
+    height : 410px;
+    width : 455.39px;
+
+    left:15px;
+  } 
+
+.my_box_ontop {
+    border-left: 7px solid #0c0c0c;
+    border-right: 7px solid #0c0c0c;
+    background-color: rgba(256,256,256,0);
+    position: absolute;
+    height : 410px;
+    width : 455.39px;
+
+    top:15px;
+    
   }
 .topiclist{
     color:black;
