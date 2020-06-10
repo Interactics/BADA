@@ -59,23 +59,48 @@ function tryConnectWebsocket() {
   });
 
 
-  var turtle1 = new ROSLIB.Topic({
-    ros: ros,
-    name: '/turtle1/pose',
-    messageType: 'turtlesim/Pose'
+
+
+
+  var odom=new ROSLIB.Topic({
+    ros:ros,
+    name : '/t265/odom/sample/',
+    messageType : 'nav_msgs/Odometry'
   });
 
 
-  turtle1.subscribe(function (message) {
+
+  odom.subscribe(function (message) {
     // if (count) {
     //   console.log(message);
     // }
-    x = message.x * 50;
-    y = message.y * 50;
-    theta = message.theta;
-  });
+    x=message.pose.pose.position.x
+    y=message.pose.pose.position.y
+    //console.log(message.pose.pose.position);
+    console.log(x,y);
+    x=(x*55)+220;
+    y=((y*55)+380);
 
+    // X=(x*150) +280
+     // 280, 230 = X*590
+    //x=x*400;
+    //y=y*400;
+
+    var quaternion = new THREE.Quaternion(message.pose.pose.orientation.x, message.pose.pose.orientation.y, message.pose.pose.orientation.z, message.pose.pose.orientation.w);
+    var euler= new THREE.Euler();
+    euler.setFromQuaternion(quaternion,'XYZ');
+    theta=euler.z;
+//   console.log(theta);
+  });
 };
+
+
+
+
+///////////////////////////
+var ros = new ROSLIB.Ros({
+  url: 'ws://localhost:9090'
+});
 
 function init() {
   canvas = document.getElementById('canvas');
@@ -86,14 +111,6 @@ function init() {
   window.requestAnimationFrame(loop);
   tryConnectWebsocket();
 };
-
-
-///////////////////////////
-var ros = new ROSLIB.Ros({
-  url: 'ws://localhost:9090'
-});
-
-
 
 function loop(timeStamp) {
   // Keep requesting new frames
@@ -113,7 +130,7 @@ function loop(timeStamp) {
   var fps = Math.round(10 / secondsPassed) / 10;
 
   //Draw number to the screen
-  //ctx.fillStyle = 'white';
+  //ctx.fillStyle = 'white';3
   //ctx.fillRect(0, 0, 200, 100);
   //ctx.font = '25px Arial';
   //ctx.fillStyle = 'black';
@@ -140,6 +157,8 @@ function draw(timestamp) {
   const endangle = theta + 1 / 16 * Math.PI;
   ctx.fillStyle = 'rgba(248,206,105,0.7)';
 
+
+
   ctx.beginPath();//ADD THIS LINE!<<<<<<<<<<<<<
   ctx.moveTo(x, y);
   ctx.arc(x, y, radius, startangle, endangle);
@@ -152,8 +171,8 @@ function draw(timestamp) {
   ctx.lineWidth="10";
   ctx.arc(x, y, 7, 0, 2 * Math.PI);
   ctx.stroke();
-  ctx.fill(); // or context.fill()
+  ctx.fill(); // or context.fill()*/
 }
 
-
+ //canvas initiatio
 

@@ -28,6 +28,7 @@ function shareKakaotalk(sig_name)
               web_url: 'http://192.168.0.193',
               mobile_web_url: 'http://192.168.0.193',
             },
+            button_title : "BADA에서 확인하기"
         },
       },
       success: function(response) {
@@ -50,6 +51,8 @@ function shareKakaotalk(sig_name)
               web_url: 'http://192.168.0.193',
               mobile_web_url: 'http://192.168.0.193',
             },
+            button_title : "BADA에서 확인하기"
+
         },
       },
       success: function(response) {

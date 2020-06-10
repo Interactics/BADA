@@ -13,6 +13,8 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script type="text/javascript" src="map_frame.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r99/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
 
 </head>
 
@@ -21,7 +23,7 @@
 
   
         <div id="map">
-          <img id = "mapimg" src="./finalmap.jpg" width = "500" height = "610">
+          <img id = "mapimg" src="./finalmap.png" width = "500" height = "610">
 
            <canvas id="canvas" width="500" height="610">            </canvas>
 
@@ -30,9 +32,9 @@
  
 
     <script>
-    init(); //canvas initiation
+      
     Kakao.init("b886eede39b9d47bc9d3cb6e91483799");   // 사용할 앱의 JavaScript 키를 설정
-    
+    init();
     /*  Kakao.Auth.createLoginButton({
         container: '#kakao-login-btn',
         size : 'small',
