@@ -1,7 +1,13 @@
-2019-2020 Robot Capstone Project Team : [사과가 쿵]
+2019-2020 Robot Capstone Project 
+Team : [사과가 쿵!]
 
+Member : 유호연, 김민우, 배종학, 이현우, 최수진, 황지원
 
-# Bada
+Directed by Prof. 한재권
+
+# BADA : The social Robot for Hearing-impaired people.
+
+### 2020 CAPSTONE DESIGN FAIR Grand prize @ Hanyang University ERICA Engineering College. 
 ## Overview
 
 Bada is a Social Robot made for Hearing-impaired people.
@@ -67,10 +73,13 @@ var detectionData = JSON.parse(msg.data);
 ```
 
 # TodoLIST
+### Final
+ - [ ] refactoring
+ 
 ## Robot System Core
  - [x] Architecture Design
- - [ ] Coding 
- - [ ] Debug 
+ - [x] Coding 
+ - [x] Debug 
 
 ## Mobile Robot 
  - [x] Encoder value setting
@@ -82,8 +91,8 @@ var detectionData = JSON.parse(msg.data);
  - [x] TF message Generation
  - [x] Trajectory 
  - [x] Navigation
- - [ ] TF Change
- - [ ] Making roslaunch
+ - [x] TF Change
+ - [x] Making roslaunch
  
 ## Sound Localization
  - [x] Measure the direction of sound using TDoA Sensor
@@ -102,11 +111,11 @@ var detectionData = JSON.parse(msg.data);
  
 ## [WebAPP](Visualization/README.md)
 
- - [ ] Interaction Design
+ - [x] Interaction Design
  - [x] Connect WebAPP with ROS 
- - [ ] Visualizing SLAM Information
+ - [x] Visualizing SLAM Information
  
  ## Human-Robot-Interaction
- - [ ] What if the person sleeps.
- - [ ] What if the person is far from their phone.
- - [ ] How to transfer information about danger situation.
+ - [x] What if the person sleeps.
+ - [x] What if the person is far from their phone.
+ - [x] How to transfer information about danger situation.
