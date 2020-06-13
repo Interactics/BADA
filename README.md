@@ -7,7 +7,7 @@ Directed by Prof. 한재권
 
 # BADA : The social Robot for Hearing-impaired people.
 
-### 2020 CAPSTONE DESIGN FAIR Grand prize @ Hanyang University ERICA Engineering College. 
+### 2020 CAPSTONE DESIGN FAIR Grand prize @ Hanyang University ERICA. 
 ## Overview
 
 Bada is a Social Robot made for Hearing-impaired people.
