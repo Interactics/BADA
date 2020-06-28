@@ -10,11 +10,10 @@ Directed by Prof. 한재권
 ### 2020 CAPSTONE DESIGN FAIR Grand prize @ Hanyang University ERICA. 
 ## Overview
 
-Bada is a Social Robot made for Hearing-impaired people.
-The word 'BADA' derive from "Buddy for Auditory Detecting Assistance" and South Korean first assistance dog's name.
+BADA is a Social Robot made for Hearing-impaired people.
+The word 'BADA' is derived from "Buddy for Auditory Detecting Assistance" and South Korean first assistance dog's name.
 
 ## Purpose
-
 
 ## Requirement
 
