@@ -34,8 +34,8 @@ if __name__ == "__main__":
 	while not rospy.is_shutdown():
 		try:
 			(trans,rot)= listener.lookupTransform('/t265_odom_frame','/t265_pose_frame',rospy.Time(0))
-			trans[0]+=0.0
-			trans[2]+=0.015
+			trans[0]+=0.088
+			trans[2]+=0
 			pose_msg.pose.pose.position.x = trans[0]
 			pose_msg.pose.pose.position.y = trans[1]
 			pose_msg.pose.pose.position.z = trans[2]
