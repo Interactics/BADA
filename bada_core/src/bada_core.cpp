@@ -131,22 +131,10 @@ Position SAVED_SOUND_POSITION = {0.0f,1.0f,2.0f,3.0f};
 Position SAVED_HUMAN_POSITION =	{0,1,2,3};
 
 double wayPoint[][4] = {
-	{1.0,1.0,1.0,0.9},
-	{0.5,0.5,0.1,0.4},
-	{0.3,2, 0.1,0.2}
-};//roaming 장소 저장
-
-// ros::Publisher pub_cmdvel;
-// ros::Publisher pub_camera;
-// ros::Publisher pub_eyes_open;
-// ros::Publisher pub_head_up;
-// ros::Publisher pub_display_cmd;
-
-// ros::Subscriber sub_odometry;
-// ros::Subscriber sub_pepl_checker;
-// ros::Subscriber sub_sig_checker;
-// ros::Subscriber sub_switch_checker;
-// ros::Subscriber sub_sound_localization;
+	{3.293, 1.023, 0.028, 1.000}, //way1
+	{-0.097, 0.548, 1.000, -0.006},	//way2
+	{-0.854, -1.400, -0.716, 0.699}	//way3
+};									//roaming 장소 저장
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 MoveBaseClient ac("move_base", true); //move_base client 선언
