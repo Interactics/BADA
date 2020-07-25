@@ -13,7 +13,7 @@
 #include <tf/transform_listener.h>
 #include <math.h>
 
-const double PI { 3.141592 };
+const double PI{3.141592};
 
 //---------------- 노드 변경할 것 ----------------------------------------
 	/*
@@ -22,7 +22,8 @@ const double PI { 3.141592 };
 	*/ 
 //================================================================================
 
-enum STATE{
+enum STATE
+{
 	FINDING_PEPL,
 	ROAMING,
 	SOUND_DETECTING,
@@ -30,13 +31,23 @@ enum STATE{
 	MOVING_WITH_PEPL
 };
 
-enum DISP_EVNT {
+enum DISP_EVNT
+{
   NOTHING = 0,
-  A_UP, A_DOWN, A_LEFT, A_RIGHT,
-  FIRE_EVENT, WATER_EVENT, DOOR_EVENT, BELL_EVENT, BOILING_EVENT, CRYING_EVENT
+	A_UP,
+	A_DOWN,
+	A_LEFT,
+	A_RIGHT,
+	FIRE_EVENT,
+	WATER_EVENT,
+	DOOR_EVENT,
+	BELL_EVENT,
+	BOILING_EVENT,
+	CRYING_EVENT
 };
 
-struct Position {
+struct Position
+{
 	double x;
 	double y;
 	double orien_z;
@@ -44,6 +55,7 @@ struct Position {
 };
 
 typedef std_msgs::Bool BoolMsg;
+typedef std_msgs::String StringMsg;
 
 std_msgs::Bool HEAD_STATUS;
 std_msgs::Int16 MAT_STATUS;
