@@ -26,6 +26,7 @@
         <remap from="rgb/image" to="$(arg rgb_topic)"/>
         <remap from="depth/image" to="$(arg depth_topic)"/>
         <remap from="rgb/camera_info" to="$(arg camera_info_topic)"/>
+          <param name="database_path" type="string" value="$(find bada_2dnav)/maps/rtabmap_copy.db"/>
           <param name="frame_id" type="string" value="base_link"/>
           <param name="odom_frame_id" type="string" value="odom"/>
 	  <param name="depth_topic" type="string" value="d400/aligned_depth_to_color/image_raw "/>
