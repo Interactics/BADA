@@ -3,9 +3,10 @@
   <!-- <node pkg="bada_audio" name="bada_audio" type="bada_audio.py"/> -->
   <node name="respeaker_node" pkg="respeaker_ros" type="respeaker_node.py"
 	output="screen"/>
-  
-  <node name="static_transformer" pkg="tf" type="static_transform_publisher"
-        args="0 0 0 0 0 0 map respeaker_base 100"/>
+<!--   
+  <node name="baselink_to_respeaker" pkg="tf" type="static_transform_publisher"
+        args="0.09 0  0.23 0 0 base_link respeaker_base 100"/> -->
+  <node pkg="tf" type="static_transform_publisher" name="baselink_to_respeaker" args="0.09 0 0.23 0 0 0 base_link respeaker_base 100"/>
 
 <!-- 
   <group ns="bada_audio2">
