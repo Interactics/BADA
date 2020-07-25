@@ -43,8 +43,8 @@ waterKeys=['Water tap, faucet', 'Sink (filling or washing)']
 signals=dict.fromkeys(keys, 0.0)
 picked=dict.fromkeys(keys, 0.0)
 detected=dict.fromkeys(keys, False)
-detectThreshold=0.6
-checkThreshold=0.45
+detectThreshold=0.40
+checkThreshold=0.25
 resetThreshold=0.1
 
 
