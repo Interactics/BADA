@@ -131,8 +131,10 @@ def signal(msg):
     top_class_indices = np.argsort(mean_scores)[::-1][:top_N]
 
     dat=np.dstack((class_names[top_class_indices],mean_scores[top_class_indices])).tolist()
-    
+    try:
     audioPub.publish(roslibpy.Message({'data': json.dumps(dat)}))
+    except:
+        pass
     # hello_str = "hello world %s" % rospy.get_time()
     picked=dict.fromkeys(keys, 0.0)
     for _,v in enumerate(dat[0]):
