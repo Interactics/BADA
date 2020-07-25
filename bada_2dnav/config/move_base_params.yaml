@@ -19,3 +19,16 @@ base_local_planner: "dwa_local_planner/DWAPlannerROS"
 
 base_global_planner: "navfn/NavfnROS" #alternatives: global_planner/GlobalPlanner, carrot_planner/CarrotPlanner
 
+recovery_behaviors:
+  - name: 'conservative_reset'
+    type: 'clear_costmap_recovery/ClearCostmapRecovery'
+  - name: 'aggressive_reset'
+    type: 'clear_costmap_recovery/ClearCostmapRecovery'
+
+conservative_reset:
+  reset_distance: 0.1
+  layer_names: ['obstacle_layer']
+
+aggressive_reset:
+  reset_distance: 0.0
+  layer_names: ['obstacle_layer']
