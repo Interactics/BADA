@@ -1,19 +1,21 @@
-2019-2020 Robot Capstone Project 
-Team : [사과가 쿵!]
+# BADA : The social Robot for Hearing-impaired people.
+
+ 2019-2020 Robot Capstone Project 
+## 2020 CAPSTONE DESIGN FAIR Grand prize @ Hanyang University ERICA. 
+
+### Team : [사과가 쿵!]
 
 Member : 유호연, 김민우, 배종학, 이현우, 최수진, 황지원
 
 Directed by Prof. 한재권
 
-# BADA : The social Robot for Hearing-impaired people.
 
-### 2020 CAPSTONE DESIGN FAIR Grand prize @ Hanyang University ERICA. 
 ## Overview
 
 BADA is a Social Robot made for Hearing-impaired people.
 The word 'BADA' is derived from "Buddy for Auditory Detection Assistance" and South Korean first assistance dog's name.
 
-BADA project is inspired by hearing dog which can assists hearing-impaired people by acting from the situation of things and modeled on their behaviors.
+This project is inspired by hearing dog which can assists hearing-impaired people by acting from the situation of things and modeled on their behaviors.
 If BADA detects dangerous sounds such as Fire alarm, this robot firstly send sound information to BADA Web page and KAKAO Talk message for people in thier home and displays pictogram of the sounds source and find person who live in. However, to prepare in situations that people cannot interact with those interfaces, BADA will bump into him/her to delivery sound information. 
 
 BADA can hear 6 sounds source that is selected on the basis of Korean hearing-dog education guide. these are Fire Alarm, Door Knocking, Water Boiling, Water, Baby crying and Door Bell. By utilizing YAMNet which is a machine learning algorithm of sound recognition, this detection system can be constructed. 
@@ -29,6 +31,18 @@ Raspberry pi 3B+, NUC, ReSpeaker Microphone Array, Coral USB accelerator, Intel 
 ## Action Flowchart
 
 ![action알고리즘](https://user-images.githubusercontent.com/56077549/91379042-bb959880-e85c-11ea-93c5-d4fcb14c21d6.png)
+
+## Interface 
+
+### Kakao Talk
+
+![kaka](https://user-images.githubusercontent.com/56077549/91381735-0e724e80-e863-11ea-8d5b-6a415960aca6.png)
+
+
+
+### Web
+
+![그림1](https://user-images.githubusercontent.com/56077549/91381727-0adec780-e863-11ea-9a8c-85d8f375ef24.png)
 
 
 ### Raspberry pi 3B+
