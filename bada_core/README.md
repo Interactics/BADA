@@ -1,4 +1,4 @@
 # BADA_CORE
 
-It manage and control the bada's whole system.
+It manages and controls BADA's whole system.
 
