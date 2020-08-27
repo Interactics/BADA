@@ -21,7 +21,7 @@ const FRAME_MIN_TIME = (1000 / 60) * (60 / FRAMES_PER_SECOND) - (1000 / 60) * 0.
 var lastFrameTime = 0;  // the last frame time
 
 
-Kakao.init("b886eede39b9d47bc9d3cb6e91483799");   // 사용할 앱의 JavaScript 키를 설정
+Kakao.init("-");   // 사용할 앱의 JavaScript 키를 설정
 
 function shareKakaotalk(sig_name)
 {
