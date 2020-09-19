@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>here</title>
+    <script type = "text/javascript" src = "../node_modules/jquery/dist/jquery.js"></script>
+    <script>
+      $(document).ready(function(){
+        $(".select").on("click",function(){
+          var num = $('input[name=num]').val();
+          $.ajax({
+            url : "/test",
+            type : "POST",
+            dataType : "JSON",
+            data : {"num" : num}
+          })
+          .done(function(json){
+            $(".result").text(json);
+          })
+
+          .fail(function(xhr,status,errorThrown){
+            alert("ajax failed");
+          })
+        })
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Server Running</h1>
+    <form action="/test" method="post">
+      넘버 : <input type="text" name = "num"><br>
+    </form>
+    <button class = "select">select</button>
+    <div class ="result"></div>
+  </body>
+</html>
