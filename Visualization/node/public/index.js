@@ -260,8 +260,71 @@ function tryConnectWebsocket() {
 
 }
 
+function writeAlarmTest(){
+  console.log('writing data to db...');
+      
+  // Make a request for a user with a given ID
+  axios.put('/alarm', {alarmType:'knock', alarmTime: Date.now()} )
+  .then(function (response) {
+    // handle success
+    // console.log(response);
+    console.log(response.status);   // should be 200 (success)
 
 
+  })
+  .catch(function (error) {
+    // handle error
+    console.error(error);
+  })
+  .then(function () {
+    // always executed
+  });
+
+}
+
+function readAlarmTest(){
+  console.log('reading data from db...');
+      
+  // Make a request for a user with a given ID
+  axios.get('/alarm', {data:'what'} )
+  .then(function (response) {
+    // handle success
+    // console.log(response);
+    console.log(response.status);   // should be 200 (success)
+
+
+  })
+  .catch(function (error) {
+    // handle error
+    console.error(error);
+  })
+  .then(function () {
+    // always executed
+  });
+
+}
+
+function getAlarmTest(){
+  console.log('getting data from db...');
+      
+  // Make a request for a user with a given ID
+  axios.get('/alarm/:1' )
+  .then(function (response) {
+    // handle success
+    // console.log(response);
+    console.log(response.status);   // should be 200 (success)
+
+
+  })
+  .catch(function (error) {
+    // handle error
+    console.error(error);
+  })
+  .then(function () {
+    // always executed
+  });
+
+}
 
 function init() {
   canvas = document.getElementById('canvas');
